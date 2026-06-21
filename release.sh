@@ -96,9 +96,15 @@ main() {
     title "拉取最新代码..."
     git pull --ff-only 2>/dev/null || true
 
-    # 4. 获取当前版本号
-    current_version=$(grep '^version:' pubspec.yaml | sed -E 's/^version:\s*([0-9.]+)\+.*/\1/')
-    current_code=$(grep '^version:' pubspec.yaml | sed -E 's/^version:.*\+([0-9]+).*/\1/')
+    # 4. 获取当前版本号（仅匹配严格格式 version: X.Y.Z+N，防止损坏文件导致恶性循环）
+    local version_line
+    version_line=$(grep -E '^version: [0-9]+\.[0-9]+\.[0-9]+\+[0-9]+$' pubspec.yaml)
+    if [ -z "$version_line" ]; then
+        err "pubspec.yaml 版本行格式异常，请检查: $(head -n1 <<< "$(grep '^version:' pubspec.yaml)")"
+        exit 1
+    fi
+    current_version=$(echo "$version_line" | sed -E 's/^version: ([0-9.]+)\+.*/\1/')
+    current_code=$(echo "$version_line" | sed -E 's/^version:.*\+([0-9]+)/\1/')
     info "当前版本: $current_version+$current_code"
 
     # 5. 根据代码变更量自动判断版本递增级别
@@ -178,7 +184,7 @@ main() {
     echo "  2) Windows"
     echo "  3) Linux"
     echo "  4) Android (无签名)"
-    echo "  5) iOS"
+    echo "  5) iOS (无签名)"
     echo "  6) 全部"
     read -rp "请选择: " platform_choice
 
