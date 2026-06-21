@@ -16,6 +16,52 @@ title() { echo -e "\n${GREEN}$1${NC}"; }
 
 REPO="Heartworm97/PiliMiLe"
 
+# 从 Git 提交记录自动生成更新内容
+generate_changelog() {
+    local last_tag new_tag
+    new_tag="v$1"
+
+    # 找到上一个 tag
+    last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+    echo "# $new_tag" > CHANGELOG.md
+    echo "" >> CHANGELOG.md
+
+    if [ -n "$last_tag" ]; then
+        info "上次发布: $last_tag → 本次: $new_tag"
+        echo "## 变更记录" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+
+        # 按类型分类汇总
+        {
+            echo "### 新增功能"
+            git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "feat|add|new|新增|添加" || echo "- (无)"
+            echo ""
+            echo "### 修复"
+            git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "fix|bug|修复|修正" || echo "- (无)"
+            echo ""
+            echo "### 优化"
+            git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "refactor|perf|optimize|优化|重构|改进|chore" || echo "- (无)"
+            echo ""
+            echo "### 其他"
+            git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -ivE "feat|add|new|fix|bug|refactor|perf|optimize|chore|Merge|合并|新增|添加|修复|修正|优化|重构|改进" || echo "- (无)"
+        } >> CHANGELOG.md
+
+        echo "" >> CHANGELOG.md
+        echo "## 全部提交" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        git log "$last_tag..HEAD" --no-merges --pretty=format:"- \`%h\` %s (%an)" >> CHANGELOG.md
+    else
+        warn "未找到历史 tag，生成首次发布的更新内容"
+        echo "## 首次发布" >> CHANGELOG.md
+        echo "" >> CHANGELOG.md
+        echo "初始版本 $new_tag" >> CHANGELOG.md
+    fi
+
+    echo "" >> CHANGELOG.md
+    info "更新内容已生成: CHANGELOG.md"
+}
+
 # ---- 入口 ----
 main() {
     cd "$(dirname "$0")"
@@ -46,12 +92,16 @@ main() {
         fi
     fi
 
-    # 3. 获取当前版本号
+    # 3. 确保本地代码最新
+    title "拉取最新代码..."
+    git pull --ff-only 2>/dev/null || true
+
+    # 4. 获取当前版本号
     current_version=$(grep '^version:' pubspec.yaml | sed -E 's/^version:\s*([0-9.]+)\+.*/\1/')
     current_code=$(grep '^version:' pubspec.yaml | sed -E 's/^version:.*\+([0-9]+).*/\1/')
     info "当前版本: $current_version+$current_code"
 
-    # 4. 输入新版本号
+    # 5. 输入新版本号
     echo ""
     read -rp "新版本名 (如 2.1.0): " new_version
     if [ -z "$new_version" ]; then
@@ -64,9 +114,24 @@ main() {
     info "构建号自动递增: $current_code → $new_code"
     info "新版本: $new_version+$new_code"
 
-    # 5. 确认平台
+    # 6. 生成更新内容
+    title "生成更新内容..."
+    generate_changelog "$new_version"
+
+    # 显示并让用户确认
     echo ""
-    echo "选择要构建的平台 (多选用空格分隔, 如: 1 3):"
+    echo -e "${GREEN}──────── 更新内容预览 ────────${NC}"
+    cat CHANGELOG.md
+    echo -e "${GREEN}────────────────────────────────${NC}"
+    echo ""
+    read -rp "是否编辑更新内容? (将用 vim 打开，不需要编辑则按 n) [y/N] " edit_ans
+    if [[ "$edit_ans" == "y" || "$edit_ans" == "Y" ]]; then
+        ${EDITOR:-vim} CHANGELOG.md
+    fi
+
+    # 7. 确认平台
+    echo ""
+    echo "选择要构建的平台:"
     echo "  1) macOS"
     echo "  2) Windows"
     echo "  3) 全部（macOS + Windows）"
@@ -82,7 +147,7 @@ main() {
         *) warn "无效选择，默认构建全部"; build_mac=true; build_win=true ;;
     esac
 
-    # 6. 最终确认
+    # 8. 最终确认
     echo ""
     echo -e "══════════════════════════════════"
     echo "  仓库:    $REPO"
@@ -98,19 +163,19 @@ main() {
         exit 0
     fi
 
-    # 7. 修改版本号
+    # 9. 修改版本号
     title "更新版本号..."
     sed -i '' -E "s/^version: .*/version: $new_version+$new_code/" pubspec.yaml
     info "pubspec.yaml 已更新"
 
-    # 8. 提交推送
+    # 10. 提交推送（包含 CHANGELOG.md）
     title "提交并推送..."
-    git add pubspec.yaml
-    git commit -m "chore: 升级版本到 $new_version" || true
+    git add pubspec.yaml CHANGELOG.md
+    git commit -m "chore: 发布 $new_version" || true
     git push
     info "已推送"
 
-    # 9. 触发 CI
+    # 11. 触发 CI
     title "触发 CI 构建..."
     gh workflow run build.yml \
         --repo "$REPO" \

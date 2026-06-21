@@ -233,6 +233,7 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.tag }}
           name: ${{ github.event.inputs.tag }}
+          body_path: CHANGELOG.md
           files: |
             PiliPlus_linux_*.tar.gz
             PiliPlus_linux_*.deb
