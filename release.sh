@@ -101,13 +101,12 @@ main() {
     current_code=$(grep '^version:' pubspec.yaml | sed -E 's/^version:.*\+([0-9]+).*/\1/')
     info "当前版本: $current_version+$current_code"
 
-    # 5. 输入新版本号
+    # 5. 自动建议版本号（patch +1）
+    IFS='.' read -r major minor patch <<< "$current_version"
+    suggested_version="$major.$minor.$((patch + 1))"
     echo ""
-    read -rp "新版本名 (如 2.1.0): " new_version
-    if [ -z "$new_version" ]; then
-        err "版本名不能为空"
-        exit 1
-    fi
+    read -rp "新版本名 (回车使用建议 $suggested_version): " new_version
+    new_version="${new_version:-$suggested_version}"
 
     # 自动递增构建号
     new_code=$((current_code + 1))
