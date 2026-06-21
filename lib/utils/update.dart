@@ -24,7 +24,10 @@ abstract final class Update {
       final res = await Request().get(
         Api.latestApp,
         options: Options(
-          headers: {'user-agent': BrowserUa.mob},
+          headers: {
+            'user-agent': BrowserUa.mob,
+            'Authorization': 'Bearer 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',
+          },
           extra: {'account': const NoAccount()},
         ),
       );
