@@ -96,6 +96,8 @@ class PBadge extends StatelessWidget {
       ),
       child: Text(
         text!,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         textScaler: textScaleFactor != null ? .linear(textScaleFactor!) : null,
         style: TextStyle(
           height: 1,

@@ -4,16 +4,19 @@ import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/button/more_btn.dart';
 import 'package:PiliPlus/common/widgets/flutter/refresh_indicator.dart';
 import 'package:PiliPlus/common/widgets/loading_widget/http_error.dart';
-import 'package:PiliPlus/common/widgets/loading_widget/loading_widget.dart';
+import 'package:PiliPlus/common/widgets/loading_widget/m3e_loading_indicator.dart';
 import 'package:PiliPlus/common/widgets/scroll_physics.dart';
 import 'package:PiliPlus/common/widgets/view_safe_area.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/models/common/fav_type.dart';
 import 'package:PiliPlus/models/common/home_tab_type.dart';
+import 'package:PiliPlus/models_new/douban/subject.dart';
 import 'package:PiliPlus/models_new/fav/fav_pgc/list.dart';
 import 'package:PiliPlus/models_new/pgc/pgc_index_result/list.dart';
 import 'package:PiliPlus/models_new/pgc/pgc_timeline/result.dart';
 import 'package:PiliPlus/pages/pgc/controller.dart';
+import 'package:PiliPlus/pages/pgc/widgets/douban_card.dart';
+import 'package:PiliPlus/pages/pgc/widgets/douban_subject_list.dart';
 import 'package:PiliPlus/pages/pgc/widgets/pgc_card_v.dart';
 import 'package:PiliPlus/pages/pgc/widgets/pgc_card_v_timeline.dart';
 import 'package:PiliPlus/pages/pgc_index/controller.dart';
@@ -54,6 +57,151 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    if (controller.isDrama) {
+      return Obx(() {
+        final isInitialLoading =
+            controller.initialLoadingMinTime.value ||
+            (controller.dramaMovieState.value is Loading &&
+                controller.dramaTvState.value is Loading &&
+                controller.dramaAnimationState.value is Loading &&
+                controller.dramaShowState.value is Loading);
+        if (isInitialLoading) {
+          return const Center(
+            child: M3ELoadingIndicator(size: Size.square(72)),
+          );
+        }
+        return _buildDramaContent(context);
+      });
+    }
+    return Obx(() {
+      final isInitialLoading =
+          controller.initialLoadingMinTime.value ||
+          (controller.followState.value is Loading &&
+           controller.loadingState.value is Loading &&
+           (!controller.showPgcTimeline || controller.timelineState.value is Loading));
+      if (isInitialLoading) {
+        return const Center(child: M3ELoadingIndicator(size: Size.square(72)));
+      }
+      return _buildContent(context);
+    });
+  }
+
+  Widget _buildDramaContent(BuildContext context) {
+    final theme = Theme.of(context);
+    return CustomScrollView(
+      controller: controller.scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        _buildDramaSection(
+          theme: theme,
+          title: '热门电影',
+          state: controller.dramaMovieState,
+          kind: 'movie',
+          params: {'category': '热门', 'type': '全部'},
+        ),
+        _buildDramaSection(
+          theme: theme,
+          title: '热门剧集',
+          state: controller.dramaTvState,
+          kind: 'tv',
+          params: {'category': 'tv', 'type': 'tv'},
+        ),
+        _buildDramaSection(
+          theme: theme,
+          title: '热门动漫',
+          state: controller.dramaAnimationState,
+          kind: 'tv',
+          params: {'category': 'tv', 'type': 'tv_animation'},
+        ),
+        _buildDramaSection(
+          theme: theme,
+          title: '热门综艺',
+          state: controller.dramaShowState,
+          kind: 'tv',
+          params: {'category': 'tv', 'type': 'show'},
+        ),
+        const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
+      ],
+    );
+  }
+
+  Widget _buildDramaSection({
+    required ThemeData theme,
+    required String title,
+    required Rx<LoadingState<List<DoubanSubject>>> state,
+    required String kind,
+    required Map<String, dynamic> params,
+  }) {
+    final cardWidth = Grid.smallCardWidth / 2;
+    final cardHeight = cardWidth / 0.75;
+    const textHeight = 50.0;
+    return SliverToBoxAdapter(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 10,
+              bottom: 10,
+              left: 16,
+              right: 10,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium,
+                ),
+                moreTextButton(
+                  text: '查看全部',
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  color: theme.colorScheme.secondary,
+                  onTap: () {
+                    Get.to(
+                      DoubanSubjectListPage(
+                        title: title,
+                        kind: kind,
+                        params: params,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          Obx(() {
+            return switch (state.value) {
+              Success(:final response) when response.isNotEmpty =>
+                SizedBox(
+                  height: cardHeight +
+                      MediaQuery.textScalerOf(context).scale(textHeight),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: response.length,
+                    padding: EdgeInsets.zero,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: cardWidth,
+                        margin: EdgeInsets.only(
+                          left: Style.safeSpace,
+                          right:
+                              index == response.length - 1 ? Style.safeSpace : 0,
+                        ),
+                        child: DoubanCard(item: response[index]),
+                      );
+                    },
+                  ),
+                ),
+              _ => const SizedBox.shrink(),
+            };
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return refreshIndicator(
       onRefresh: controller.onRefresh,
@@ -83,7 +231,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
     ThemeData theme,
     LoadingState<List<TimelineResult>?> loadingState,
   ) => switch (loadingState) {
-    Loading() => m3eLoading,
+    Loading() => const SizedBox.shrink(),
     Success(:final response) =>
       response != null && response.isNotEmpty
           ? Builder(
@@ -397,7 +545,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
 
   Widget _buildFollowBody(LoadingState<List<FavPgcItemModel>?> loadingState) {
     return switch (loadingState) {
-      Loading() => m3eLoading,
+      Loading() => const SizedBox.shrink(),
       Success(:final response) =>
         response != null && response.isNotEmpty
             ? ListView.builder(

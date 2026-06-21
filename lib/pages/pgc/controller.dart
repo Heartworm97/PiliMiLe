@@ -1,7 +1,9 @@
+import 'package:PiliPlus/http/douban.dart';
 import 'package:PiliPlus/http/fav.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/pgc.dart';
 import 'package:PiliPlus/models/common/home_tab_type.dart';
+import 'package:PiliPlus/models_new/douban/subject.dart';
 import 'package:PiliPlus/models_new/fav/fav_pgc/list.dart';
 import 'package:PiliPlus/models_new/pgc/pgc_index_result/list.dart';
 import 'package:PiliPlus/models_new/pgc/pgc_timeline/result.dart';
@@ -21,8 +23,14 @@ class PgcController
   final HomeTabType tabType;
   final int? indexType;
 
+  bool get isDrama => tabType == HomeTabType.drama;
+
   late final showPgcTimeline =
-      tabType == HomeTabType.bangumi && Pref.showPgcTimeline;
+      !isDrama && tabType == HomeTabType.bangumi && Pref.showPgcTimeline;
+
+  /// 初始加载最短显示时间（1300ms），避免转圈一闪而过
+  final _initTime = DateTime.now();
+  late final RxBool initialLoadingMinTime = true.obs;
 
   @override
   final accountService = Get.find<AccountService>();
@@ -31,10 +39,24 @@ class PgcController
   void onInit() {
     super.onInit();
 
-    queryData();
-    queryPgcFollow();
-    if (showPgcTimeline) {
-      queryPgcTimeline();
+    final elapsed = DateTime.now().difference(_initTime);
+    final remaining = const Duration(milliseconds: 1300) - elapsed;
+    if (remaining > Duration.zero) {
+      Future.delayed(remaining, () => initialLoadingMinTime.value = false);
+    } else {
+      initialLoadingMinTime.value = false;
+    }
+
+    if (!isDrama) {
+      queryData();
+      queryPgcFollow();
+      if (showPgcTimeline) {
+        queryPgcTimeline();
+      }
+    } else {
+      loadingState.value = const Success(null);
+      followState.value = const Success(null);
+      queryDramaSections();
     }
   }
 
@@ -150,6 +172,57 @@ class PgcController
       _refreshPgcFollow();
     } else {
       followState.value = LoadingState.loading();
+    }
+  }
+
+  // 追剧 - 豆瓣 4 个板块
+  final dramaMovieState =
+      Rx<LoadingState<List<DoubanSubject>>>(LoadingState.loading());
+  final dramaTvState = Rx<LoadingState<List<DoubanSubject>>>(LoadingState.loading());
+  final dramaAnimationState =
+      Rx<LoadingState<List<DoubanSubject>>>(LoadingState.loading());
+  final dramaShowState =
+      Rx<LoadingState<List<DoubanSubject>>>(LoadingState.loading());
+
+  Future<void> queryDramaSections() async {
+    final results = await Future.wait([
+      _queryDramaHot(kind: 'movie', category: '热门', type: '全部'),
+      _queryDramaHot(kind: 'tv', category: 'tv', type: 'tv'),
+      _queryDramaHot(kind: 'tv', category: 'tv', type: 'tv_animation'),
+      _queryDramaHot(kind: 'tv', category: 'tv', type: 'show'),
+    ]);
+    dramaMovieState.value = results[0];
+    dramaTvState.value = results[1];
+    dramaAnimationState.value = results[2];
+    dramaShowState.value = results[3];
+  }
+
+  Future<LoadingState<List<DoubanSubject>>> _queryDramaHot({
+    required String kind,
+    required String category,
+    required String type,
+  }) async {
+    try {
+      final res = await DoubanHttp.dio.get(
+        '/rexxar/api/v2/subject/recent_hot/$kind',
+        queryParameters: {
+          'start': 0,
+          'limit': 10,
+          'category': category,
+          'type': type,
+        },
+      );
+      if (res.statusCode == 200) {
+        final data = DoubanHotResponse.fromJson(
+          res.data is Map<String, dynamic>
+              ? res.data as Map<String, dynamic>
+              : {},
+        );
+        return Success(data.items);
+      }
+      return const Error('请求失败');
+    } catch (e) {
+      return Error(e.toString());
     }
   }
 }

@@ -20,6 +20,7 @@ enum HomeTabType implements EnumWithLabel {
   rank('分区'),
   bangumi('番剧'),
   cinema('影视'),
+  drama('追剧'),
   ;
 
   @override
@@ -32,7 +33,8 @@ enum HomeTabType implements EnumWithLabel {
     HomeTabType.hot => Get.find<HotController>,
     HomeTabType.rank => Get.find<RankController>,
     HomeTabType.bangumi ||
-    HomeTabType.cinema => () => Get.find<PgcController>(tag: name),
+    HomeTabType.cinema ||
+    HomeTabType.drama => () => Get.find<PgcController>(tag: name),
   };
 
   Widget get page => switch (this) {
@@ -42,5 +44,6 @@ enum HomeTabType implements EnumWithLabel {
     HomeTabType.rank => const RankPage(),
     HomeTabType.bangumi => const PgcPage(tabType: HomeTabType.bangumi),
     HomeTabType.cinema => const PgcPage(tabType: HomeTabType.cinema),
+    HomeTabType.drama => const PgcPage(tabType: HomeTabType.drama),
   };
 }

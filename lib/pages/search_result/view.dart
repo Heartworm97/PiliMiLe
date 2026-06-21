@@ -8,6 +8,8 @@ import 'package:PiliPlus/pages/search_panel/pgc/view.dart';
 import 'package:PiliPlus/pages/search_panel/user/view.dart';
 import 'package:PiliPlus/pages/search_panel/video/view.dart';
 import 'package:PiliPlus/pages/search_result/controller.dart';
+import 'package:PiliPlus/utils/storage.dart';
+import 'package:PiliPlus/utils/storage_key.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,9 +24,35 @@ class _SearchResultPageState extends State<SearchResultPage>
     with SingleTickerProviderStateMixin {
   late SearchResultController _searchResultController;
   late TabController _tabController;
+  late List<SearchType> _filteredTypes;
   final String _tag = DateTime.now().millisecondsSinceEpoch.toString();
   final bool _isFromSearch = Get.arguments?['fromSearch'] ?? false;
   SSearchController? sSearchController;
+
+  static final _defaultDisabled = {
+    SearchType.live_room.index,
+    SearchType.bili_user.index,
+    SearchType.article.index,
+  };
+
+  static List<SearchType> _resolveFilteredTypes() {
+    final raw = GStorage.setting.get(SettingBoxKey.searchTabSort);
+    List<int>? orderList;
+    Set<int>? disabledSet;
+    if (raw is Map) {
+      orderList = (raw['order'] as List?)?.cast<int>();
+      disabledSet = (raw['disabled'] as List?)?.cast<int>().toSet();
+    }
+    if (orderList != null && orderList.isNotEmpty) {
+      return orderList
+          .where((i) => disabledSet == null || !disabledSet.contains(i))
+          .map((i) => SearchType.values[i])
+          .toList();
+    }
+    return SearchType.values
+        .where((t) => !_defaultDisabled.contains(t.index))
+        .toList();
+  }
 
   @override
   void initState() {
@@ -34,10 +62,14 @@ class _SearchResultPageState extends State<SearchResultPage>
       tag: _tag,
     );
 
+    _filteredTypes = _resolveFilteredTypes();
+
+    final rawInitIdx = Get.arguments?['initIndex'] as int? ?? 0;
+    final filteredInitIdx = _filteredTypes.indexWhere((t) => t.index == rawInitIdx);
     _tabController = TabController(
       vsync: this,
-      initialIndex: Get.arguments?['initIndex'] ?? 0,
-      length: SearchType.values.length,
+      initialIndex: filteredInitIdx != -1 ? filteredInitIdx : 0,
+      length: _filteredTypes.length,
     );
 
     if (_isFromSearch) {
@@ -105,7 +137,7 @@ class _SearchResultPageState extends State<SearchResultPage>
               splashFactory: NoSplash.splashFactory,
               padding: const EdgeInsets.only(top: 4, left: 8, right: 8),
               controller: _tabController,
-              tabs: SearchType.values
+              tabs: _filteredTypes
                   .map(
                     (item) => Obx(
                       () {
@@ -152,7 +184,7 @@ class _SearchResultPageState extends State<SearchResultPage>
             Expanded(
               child: tabBarView(
                 controller: _tabController,
-                children: SearchType.values
+                children: _filteredTypes
                     .map(
                       (item) => switch (item) {
                         // SearchType.all => SearchAllPanel(
@@ -166,7 +198,8 @@ class _SearchResultPageState extends State<SearchResultPage>
                           keyword: _searchResultController.keyword,
                         ),
                         SearchType.media_bangumi ||
-                        SearchType.media_ft => SearchPgcPanel(
+                        SearchType.media_ft ||
+                        SearchType.drama => SearchPgcPanel(
                           tag: _tag,
                           searchType: item,
                           keyword: _searchResultController.keyword,

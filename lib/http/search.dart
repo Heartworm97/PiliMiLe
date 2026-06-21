@@ -59,6 +59,10 @@ abstract final class SearchHttp {
     String? gaiaVtoken,
     required ValueChanged<String> onSuccess,
   }) async {
+    if (searchType == SearchType.drama) {
+      final data = SearchPgcData(numResults: 0, list: []) as R;
+      return Success(data);
+    }
     final params = await WbiSign.makSign({
       'search_type': searchType.name,
       'keyword': keyword,
@@ -115,8 +119,8 @@ abstract final class SearchHttp {
             case SearchType.article:
               data = SearchArticleData.fromJson(dataData);
               break;
-            // default:
-            //   break;
+            case SearchType.drama:
+              break;
           }
           return Success(data);
         } catch (e, s) {

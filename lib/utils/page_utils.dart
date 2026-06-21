@@ -653,7 +653,7 @@ abstract final class PageUtils {
     bool off = false,
   }) async {
     try {
-      SmartDialog.showLoading(msg: '资源获取中');
+      SmartDialog.showLoading(msg: '资源获取中...');
       final res = await SearchHttp.pgcInfo(seasonId: seasonId, epId: epId);
       SmartDialog.dismiss();
       if (res case Success(:final response)) {
@@ -753,7 +753,7 @@ abstract final class PageUtils {
     bool off = false,
   }) async {
     try {
-      SmartDialog.showLoading(msg: '资源获取中');
+      SmartDialog.showLoading(msg: '资源获取中...');
       final res = await SearchHttp.pugvInfo(seasonId: seasonId, epId: epId);
       SmartDialog.dismiss();
       if (res case Success(:final response)) {
@@ -790,6 +790,11 @@ abstract final class PageUtils {
       SmartDialog.dismiss();
       SmartDialog.showToast(e.toString());
     }
+  }
+
+  static void viewDouban({required String id, required String type}) {
+    final url = 'https://m.douban.com/${type == 'movie' ? 'movie' : 'tv'}/subject/$id/';
+    inAppWebview(url);
   }
 
   static void toDupNamed(
