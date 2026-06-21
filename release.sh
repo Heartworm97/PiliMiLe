@@ -173,31 +173,51 @@ main() {
 
     # 7. 确认平台
     echo ""
-    echo "选择要构建的平台:"
+    echo "选择要构建的平台 (输入数字，多选用空格分隔，如: 1 3):"
     echo "  1) macOS"
     echo "  2) Windows"
-    echo "  3) 全部（macOS + Windows）"
-    read -rp "请选择 [1-3]: " platform_choice
+    echo "  3) Linux"
+    echo "  4) Android (无签名)"
+    echo "  5) iOS"
+    echo "  6) 全部"
+    read -rp "请选择: " platform_choice
 
     build_mac=false
     build_win=false
+    build_linux=false
+    build_android=false
+    build_ios=false
 
-    case "$platform_choice" in
-        1) build_mac=true ;;
-        2) build_win=true ;;
-        3) build_mac=true; build_win=true ;;
-        *) warn "无效选择，默认构建全部"; build_mac=true; build_win=true ;;
-    esac
+    for choice in $platform_choice; do
+        case "$choice" in
+            1) build_mac=true ;;
+            2) build_win=true ;;
+            3) build_linux=true ;;
+            4) build_android=true ;;
+            5) build_ios=true ;;
+            6) build_mac=true; build_win=true; build_linux=true; build_android=true; build_ios=true; break ;;
+            *) warn "无效选择: $choice" ;;
+        esac
+    done
+
+    # 都没选则默认全部
+    if ! $build_mac && ! $build_win && ! $build_linux && ! $build_android && ! $build_ios; then
+        warn "未有效选择，默认构建全部"
+        build_mac=true; build_win=true; build_linux=true; build_android=true; build_ios=true
+    fi
 
     # 8. 最终确认
     echo ""
     echo -e "══════════════════════════════════"
-    echo "  仓库:    $REPO"
-    echo "  旧版本:  $current_version+$current_code"
-    echo "  新版本:  $new_version+$new_code"
-    echo "  tag:     v$new_version"
-    echo "  macOS:   $build_mac"
-    echo "  Windows: $build_win"
+    echo "  仓库:      $REPO"
+    echo "  旧版本:    $current_version+$current_code"
+    echo "  新版本:    $new_version+$new_code"
+    echo "  tag:       v$new_version"
+    echo "  macOS:     $build_mac"
+    echo "  Windows:   $build_win"
+    echo "  Linux:     $build_linux"
+    echo "  Android:   $build_android"
+    echo "  iOS:       $build_ios"
     echo -e "══════════════════════════════════"
     read -rp "确认发版? [y/N] " confirm
     if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
@@ -221,11 +241,11 @@ main() {
     title "触发 CI 构建..."
     gh workflow run build.yml \
         --repo "$REPO" \
-        -f build_android=false \
-        -f build_ios=false \
+        -f build_android="$build_android" \
+        -f build_ios="$build_ios" \
         -f build_mac="$build_mac" \
         -f build_win_x64="$build_win" \
-        -f build_linux_x64=false \
+        -f build_linux_x64="$build_linux" \
         -f tag="v$new_version"
 
     info "CI 已触发！查看进度: https://github.com/$REPO/actions"
