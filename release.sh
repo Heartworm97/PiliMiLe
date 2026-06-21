@@ -234,7 +234,10 @@ main() {
     title "提交并推送..."
     git add pubspec.yaml CHANGELOG.md
     git commit -m "chore: 发布 $new_version" || true
-    git push
+    if ! git push; then
+        err "推送失败，请检查网络或权限后重试"
+        exit 1
+    fi
     info "已推送"
 
     # 11. 触发 CI
