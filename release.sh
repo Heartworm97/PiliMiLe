@@ -101,11 +101,54 @@ main() {
     current_code=$(grep '^version:' pubspec.yaml | sed -E 's/^version:.*\+([0-9]+).*/\1/')
     info "当前版本: $current_version+$current_code"
 
-    # 5. 自动建议版本号（patch +1）
+    # 5. 根据代码变更量自动判断版本递增级别
     IFS='.' read -r major minor patch <<< "$current_version"
-    suggested_version="$major.$minor.$((patch + 1))"
+
+    # 找到上一个 tag，统计变更
+    last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+    if [ -n "$last_tag" ]; then
+        feat_count=$(git log "$last_tag..HEAD" --no-merges --oneline 2>/dev/null | grep -iEc "feat|新增|添加" || echo 0)
+        fix_count=$(git log "$last_tag..HEAD" --no-merges --oneline 2>/dev/null | grep -iEc "fix|bug|修复|修正" || echo 0)
+        total_count=$(git log "$last_tag..HEAD" --no-merges --oneline 2>/dev/null | wc -l | tr -d ' ')
+        breaking_count=$(git log "$last_tag..HEAD" --no-merges --oneline 2>/dev/null | grep -iEc "BREAKING|break|不兼容|重构.*架构" || echo 0)
+
+        # 自动判断
+        if [ "$breaking_count" -gt 0 ]; then
+            auto_level="major"
+            suggested_version="$((major + 1)).0.0"
+            reason="检测到 BREAKING CHANGE / 架构重构，建议 major"
+        elif [ "$feat_count" -gt 0 ]; then
+            auto_level="minor"
+            suggested_version="$major.$((minor + 1)).0"
+            reason="检测到 $feat_count 个新功能，建议 minor"
+        else
+            auto_level="patch"
+            suggested_version="$major.$minor.$((patch + 1))"
+            reason="共 $total_count 个提交，均为修复/优化，建议 patch"
+        fi
+
+        info "代码分析: $reason"
+        info "提交: 总计$total_count / 新功能$feat_count / 修复$fix_count / 破坏性$breaking_count"
+    else
+        auto_level="patch"
+        suggested_version="$major.$minor.$((patch + 1))"
+        reason="首次发版"
+    fi
+
     echo ""
-    read -rp "新版本名 (回车使用建议 $suggested_version): " new_version
+    read -rp "新版本名 (回车使用建议 $suggested_version, 或输入 m=M/major p=patch): " new_version
+
+    # 解析快捷输入
+    case "${new_version,,}" in
+        m|major)
+            suggested_version="$((major + 1)).0.0"
+            new_version="$suggested_version"
+            ;;
+        p|patch)
+            suggested_version="$major.$minor.$((patch + 1))"
+            new_version="$suggested_version"
+            ;;
+    esac
     new_version="${new_version:-$suggested_version}"
 
     # 自动递增构建号
