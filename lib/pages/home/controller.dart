@@ -65,16 +65,32 @@ class HomeController extends GetxController
   }
 
   void setTabConfig() {
-    final tabs = GStorage.setting.get(SettingBoxKey.tabBarSort) as List?;
-    if (tabs != null) {
-      this.tabs = tabs.map((i) => HomeTabType.values[i]).toList();
+    final rawTabs = GStorage.setting.get(SettingBoxKey.tabBarSort);
+    final defaults = HomeTabType.values.where((t) => t != HomeTabType.rank).toList();
+    if (rawTabs is Map) {
+      final orderList = (rawTabs['order'] as List?)?.cast<int>();
+      final disabledSet = (rawTabs['disabled'] as List?)?.cast<int>().toSet() ?? {};
+      if (orderList != null && orderList.isNotEmpty) {
+        tabs = orderList
+            .where((i) => !disabledSet.contains(i))
+            .map((i) => HomeTabType.values[i])
+            .toList();
+      } else {
+        tabs = defaults;
+      }
+    } else if (rawTabs is List && rawTabs.isNotEmpty) {
+      final enabled = rawTabs.toSet();
+      tabs = rawTabs
+          .where((i) => defaults.map((d) => d.index).contains(i) || enabled.contains(i))
+          .map((i) => HomeTabType.values[i])
+          .toList();
     } else {
-      this.tabs = HomeTabType.values;
+      tabs = defaults;
     }
 
     tabController = TabController(
-      initialIndex: max(0, this.tabs.indexOf(HomeTabType.rcmd)),
-      length: this.tabs.length,
+      initialIndex: max(0, tabs.indexOf(HomeTabType.rcmd)),
+      length: tabs.length,
       vsync: this,
     );
   }

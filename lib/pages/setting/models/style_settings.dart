@@ -343,6 +343,7 @@ List<SettingsModel> get styleSettings => [
       arguments: {
         'key': SettingBoxKey.tabBarSort,
         'defaultBars': HomeTabType.values,
+        'defaultDisabledIndices': {HomeTabType.rank.index},
         'title': '首页标签页',
       },
     ),

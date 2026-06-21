@@ -7,6 +7,7 @@ import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/dialog/dialog.dart';
 import 'package:PiliPlus/common/widgets/dialog/export_import.dart';
+import 'package:PiliPlus/common/widgets/dialog/feedback.dart';
 import 'package:PiliPlus/common/widgets/flutter/list_tile.dart';
 import 'package:PiliPlus/pages/mine/controller.dart';
 import 'package:PiliPlus/services/logger.dart';
@@ -386,7 +387,8 @@ class _AboutPageState extends State<AboutPage> {
           ListTile(
             onTap: _showSourceCodeDialog,
             leading: const Icon(MdiIcons.codeTags),
-            title: const Text('Source Code'),
+            title: const Text('开源代码'),
+            subtitle: Text('因为开源，所以信赖', style: subTitleStyle),
           ),
           if (Platform.isAndroid)
             ListTile(
@@ -396,8 +398,10 @@ class _AboutPageState extends State<AboutPage> {
               trailing: Icon(Icons.arrow_forward, size: 16, color: outline),
             ),
           ListTile(
+            onTap: () => showFeedbackDialog(context),
             leading: const Icon(Icons.feedback_outlined),
             title: const Text('问题反馈'),
+            subtitle: Text('帮助我们变得更好', style: subTitleStyle),
             trailing: Icon(Icons.arrow_forward, size: 16, color: outline),
           ),
           ListTile(

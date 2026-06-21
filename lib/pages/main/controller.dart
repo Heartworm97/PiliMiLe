@@ -221,15 +221,25 @@ class MainController extends GetxController
   }
 
   void setNavBarConfig() {
-    List<int>? navBarSort =
-        (GStorage.setting.get(SettingBoxKey.navBarSort) as List?)?.fromCast();
+    final raw = GStorage.setting.get(SettingBoxKey.navBarSort);
     late final List<NavigationBarType> navigationBars;
-    if (navBarSort == null || navBarSort.isEmpty) {
-      navigationBars = NavigationBarType.values;
-    } else {
-      navigationBars = navBarSort
+    if (raw is Map) {
+      final orderList = (raw['order'] as List?)?.cast<int>();
+      final disabledSet = (raw['disabled'] as List?)?.cast<int>().toSet() ?? {};
+      if (orderList != null && orderList.isNotEmpty) {
+        navigationBars = orderList
+            .where((i) => !disabledSet.contains(i))
+            .map((i) => NavigationBarType.values[i])
+            .toList();
+      } else {
+        navigationBars = NavigationBarType.values;
+      }
+    } else if (raw is List && raw.isNotEmpty) {
+      navigationBars = raw.cast<int>()
           .map((i) => NavigationBarType.values[i])
           .toList();
+    } else {
+      navigationBars = NavigationBarType.values;
     }
     this.navigationBars = navigationBars;
     final defPage = Pref.defaultHomePage;

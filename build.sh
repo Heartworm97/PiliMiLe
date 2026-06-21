@@ -36,6 +36,30 @@ run_quiet() {
     fi
 }
 
+# ---- 生成本地版本信息 JSON（--dart-define-from-file） ----
+gen_release_json() {
+    local version_name commit_count commit_hash build_time
+    version_name=$(python3 -c "
+import yaml
+with open('pubspec.yaml') as f:
+    print(yaml.safe_load(f)['version'])
+" 2>/dev/null || echo "0.0.0")
+    commit_count=$(git rev-list --count HEAD 2>/dev/null || echo 1)
+    commit_hash=$(git rev-parse --short HEAD 2>/dev/null || echo "N/A")
+    build_time=$(date +%s)
+
+    python3 -c "
+import json
+json.dump({
+    'pili.name': '${version_name}',
+    'pili.code': ${commit_count},
+    'pili.hash': '${commit_hash}',
+    'pili.time': ${build_time},
+}, open('pili_release.json', 'w'))
+"
+    info "已生成 pili_release.json (version: ${version_name}+${commit_count}, hash: ${commit_hash})"
+}
+
 # ---- 前置检查 ----
 check_prereq() {
     title "前置检查..."
@@ -71,32 +95,53 @@ ios_simulator() {
     check_prereq
     title "iOS 模拟器"
 
-    open -a Simulator 2>/dev/null || true
+    gen_release_json
 
     # 指定了 UDID 则直接使用
     if [ -n "$IOS_SIMULATOR_UDID" ]; then
+        # 检查是否已启动
         if flutter devices 2>/dev/null | grep -q "$IOS_SIMULATOR_UDID"; then
             info "使用指定模拟器: $IOS_SIMULATOR_UDID"
-            flutter run -d "$IOS_SIMULATOR_UDID"
-            return
+        elif xcrun simctl list devices available 2>/dev/null | grep -q "$IOS_SIMULATOR_UDID"; then
+            # 存在但未启动，先启动并等待就绪
+            info "启动模拟器: $IOS_SIMULATOR_UDID ..."
+            xcrun simctl boot "$IOS_SIMULATOR_UDID" 2>/dev/null || true
+            info "等待模拟器就绪（可能需要 30 秒）..."
+            xcrun simctl bootstatus "$IOS_SIMULATOR_UDID" -b >/dev/null 2>&1 || sleep 15
+            open -a Simulator 2>/dev/null || true
+            info "使用指定模拟器: $IOS_SIMULATOR_UDID"
+        else
+            err "指定模拟器不存在: $IOS_SIMULATOR_UDID"
+            echo "请在 Xcode → Settings → Devices 中确认该设备"
+            exit 1
         fi
-        warn "指定 UDID ($IOS_SIMULATOR_UDID) 未找到，尝试自动检测..."
+        flutter run -d "$IOS_SIMULATOR_UDID" --dart-define-from-file=pili_release.json
+        return
     fi
 
-    local devices
-    devices=$(flutter devices 2>/dev/null | grep -i 'ios.*simulator' || true)
+    # 未指定 UDID：从 xcrun simctl list 获取所有可用模拟器（含关机状态）
+    local simulators device_id
+    simulators=$(xcrun simctl list devices available 2>/dev/null \
+        | grep -E '^[[:space:]]+[^(]+\([0-9A-Fa-f-]{36}\)' \
+        | sed -E 's/^[[:space:]]+//; s/ \([0-9A-Fa-f-]{36}\).*//' \
+        | head -20)
 
-    if [ -z "$devices" ]; then
+    if [ -z "$simulators" ]; then
+        # 回退到 flutter devices（可能模拟器已启动）
+        simulators=$(flutter devices 2>/dev/null | grep -i 'ios.*simulator' || true)
+    fi
+
+    if [ -z "$simulators" ]; then
         err "未找到 iOS 模拟器设备"
-        echo "请确认 Xcode 中已安装至少一个模拟器 Runtime"
+        echo "请确认 Xcode 中已安装至少一个模拟器 Runtime（Settings → Platforms → iOS）"
         exit 1
     fi
 
     echo "可用 iOS 模拟器:"
-    echo "$devices" | nl -w2 -s') '
+    echo "$simulators" | nl -w2 -s') '
 
-    local count selection device_id
-    count=$(echo "$devices" | wc -l | tr -d ' ')
+    local count selection
+    count=$(echo "$simulators" | wc -l | tr -d ' ')
 
     if [ "$count" -eq 1 ]; then
         selection=1
@@ -104,23 +149,38 @@ ios_simulator() {
         read -rp "选择设备 [1-$count]: " selection
     fi
 
-    device_id=$(echo "$devices" | sed -n "${selection}p" | grep -oE '[0-9A-Fa-f-]{36}')
+    # 提取完整行（含 UDID），从 xcrun 重新查
+    local selected_name
+    selected_name=$(echo "$simulators" | sed -n "${selection}p")
+    device_id=$(xcrun simctl list devices available 2>/dev/null \
+        | grep -F "$selected_name" \
+        | grep -oE '[0-9A-Fa-f-]{36}' \
+        | head -1)
 
     if [ -z "$device_id" ]; then
-        err "无法解析设备 ID"
+        err "无法解析设备 ID，请确认模拟器名称未变更"
         exit 1
     fi
 
+    info "启动模拟器: $selected_name ($device_id) ..."
+    # 如果未启动则 boot
+    if ! xcrun simctl list devices available 2>/dev/null | grep "$device_id" | grep -q 'Booted'; then
+        xcrun simctl boot "$device_id" 2>/dev/null || true
+        xcrun simctl bootstatus "$device_id" -b >/dev/null 2>&1 || sleep 15
+    fi
+    open -a Simulator 2>/dev/null || true
+
     info "启动到 iOS 模拟器..."
-    flutter run -d "$device_id"
+    flutter run -d "$device_id" --dart-define-from-file=pili_release.json
 }
 
 # ---- 2. macOS 桌面端启动 ----
 macos_run() {
     check_prereq
+    gen_release_json
     title "macOS 桌面端"
     info "启动 macOS 应用..."
-    flutter run -d macos
+    flutter run -d macos --dart-define-from-file=pili_release.json
 }
 
 # ---- 3. 构建无签名 IPA ----

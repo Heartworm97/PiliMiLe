@@ -3,10 +3,10 @@ import 'dart:convert';
 
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/widgets/button/icon_button.dart';
+import 'package:PiliPlus/common/widgets/dialog/feedback.dart';
 import 'package:PiliPlus/common/widgets/loading_widget/loading_widget.dart';
 import 'package:PiliPlus/services/logger.dart';
 import 'package:PiliPlus/utils/date_utils.dart';
-import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
@@ -140,8 +140,7 @@ class _LogsPageState extends State<LogsPage> {
                 child: const Text('复制日志'),
               ),
               PopupMenuItem(
-                onTap: () =>
-                    PageUtils.launchURL('${Constants.sourceCodeUrl}/issues'),
+                onTap: () => showFeedbackDialog(context),
                 child: const Text('错误反馈'),
               ),
               PopupMenuItem(

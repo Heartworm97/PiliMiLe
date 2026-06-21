@@ -24,16 +24,32 @@ class _BarSetPageState extends State<BarSetPage> with ReorderMixin {
     final Map<String, dynamic> args = Get.arguments;
     key = args['key'];
     title = args['title'];
-    final List? cache = GStorage.setting.get(key);
-    list = (args['defaultBars'] as List<EnumWithLabel>)
-        .map((e) => Pair(first: e, second: cache?.contains(e.index) ?? true))
+    final defaultDisabled = args['defaultDisabledIndices'] as Set<int>? ?? const {};
+    final defaultBars = args['defaultBars'] as List<EnumWithLabel>;
+    final raw = GStorage.setting.get(key);
+    List<int>? orderList;
+    Set<int>? disabledSet;
+    if (raw is Map) {
+      orderList = (raw['order'] as List?)?.cast<int>();
+      disabledSet = (raw['disabled'] as List?)?.cast<int>().toSet();
+    } else if (raw is List) {
+      orderList = raw.cast<int>();
+    }
+    list = defaultBars
+        .map((e) => Pair(
+            first: e,
+            second: disabledSet != null
+                ? !disabledSet.contains(e.index)
+                : (orderList?.contains(e.index) ?? !defaultDisabled.contains(e.index))))
         .toList();
-    if (cache != null && cache.isNotEmpty) {
-      final cacheIndex = {for (final (k, v) in cache.indexed) v: k};
+    if (orderList != null && orderList.isNotEmpty) {
+      final cacheIndex = {for (final (k, v) in orderList.indexed) v: k};
       list.sort((a, b) {
-        final indexA = cacheIndex[a.first.index] ?? cacheIndex.length;
-        final indexB = cacheIndex[b.first.index] ?? cacheIndex.length;
-        return indexA.compareTo(indexB);
+        final idxA = cacheIndex[a.first.index];
+        final idxB = cacheIndex[b.first.index];
+        if (idxA != null && idxB != null) return idxA.compareTo(idxB);
+        if (idxA == null && idxB == null) return 0;
+        return idxA != null ? -1 : 1;
       });
     }
   }
@@ -41,7 +57,10 @@ class _BarSetPageState extends State<BarSetPage> with ReorderMixin {
   void saveEdit() {
     GStorage.setting.put(
       key,
-      list.where((e) => e.second).map((e) => e.first.index).toList(),
+      {
+        'order': list.map((e) => e.first.index).toList(),
+        'disabled': list.where((e) => !e.second).map((e) => e.first.index).toList(),
+      },
     );
     SmartDialog.showToast('保存成功，下次启动时生效');
   }

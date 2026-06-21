@@ -5,7 +5,7 @@
 2. 仅代码关键字、变量名、包名、命令行工具名称保留英文，其余说明、分析、方案、报错解释全部中文。
 3. 不要夹杂英文短句、英文解释，专业术语可保留单词但配套中文翻译说明。
 4. 提问、复盘、代码讲解、优化建议全部输出中文。
-5. 收到我的问题后，**优先先用一句话复述确认你对我需求的理解**；
+5. 收到我的问题后，**优先先用一句话复述、主动告知我你对本次需求的理解**；
    - 复述无误，再展开正式解答、执行操作；
    - 若理解有偏差、信息不足，直接向我确认疑问点，不擅自作答。
 
@@ -26,11 +26,10 @@
 | 状态管理 / 路由 | GetX | 4.7.2 (自定义 fork) |
 | HTTP 客户端 | Dio | 5.9.1 + Http2Adapter |
 | 本地存储 | Hive CE | 2.19.3 |
-| 视频播放 | media-kit | 1.1.11 (自定义 fork) |
+| 视频播放 | media-kit + MPV | 1.1.11 (自定义 fork) |
 | 弹幕渲染 | canvas_danmaku | git (自定义 fork) |
 | gRPC / Protobuf | protobuf | 6.0.0 |
 | 动态主题 | dynamic_color + flex_seed_scheme | 1.8.1 / 4.0.1 |
-| 视频渲染 | media-kit | 1.1.11 + MPV |
 | 桌面 WebView | flutter_inappwebview | 6.1.5 (自定义 fork) |
 | 桌面窗口 | window_manager | git (自定义 fork) |
 | 代码生成 | build_runner + json_annotation | 2.10.3 / 4.11.0 |
@@ -110,7 +109,7 @@
 ├── linux/                     # Linux 原生
 ├── .fvmrc                     # Flutter 版本锁定 (3.44.2)
 ├── pubspec.yaml               # 依赖声明
-├── build.sh                   # 多目标构建脚本（iOS/macOS/IPA/DMG/codegen）
+├── build.sh                   # 多目标构建脚本（iOS/macOS/IPA/DMG/清理）
 ├── analysis_options.yaml      # Dart 静态分析配置
 ├── tool/                      # 辅助工具（jnigen 等）
 └── .github/workflows/         # CI/CD（Android/iOS/macOS/Win/Linux）
@@ -133,9 +132,6 @@ flutter pub run flutter_launcher_icons
 
 # 静态分析
 flutter analyze
-
-# 运行测试
-flutter test
 
 # 在连接设备上运行
 flutter run
@@ -161,9 +157,25 @@ bash build.sh 1    # iOS 模拟器启动
 bash build.sh 2    # macOS 桌面端启动
 bash build.sh 3    # 构建无签名 IPA
 bash build.sh 4    # 构建 macOS 应用 + 可选 DMG
-bash build.sh 5    # 代码生成（build_runner）
-bash build.sh 6    # 清理编译缓存
+bash build.sh 5    # 清理编译缓存（flutter clean）
+bash build.sh 6    # 清理 Xcode DerivedData（可选）
 ```
+
+### 发版脚本 (release.sh)
+
+```bash
+bash release.sh    # 一键发版：自动递增版本号 → 生成 CHANGELOG → 触发全平台 CI
+```
+
+`release.sh` 根据代码变更量自动判断版本递增级别（patch/minor/major），从 Git 提交记录生成 CHANGELOG，创建 tag 并推送到 GitHub 触发 CI 构建。使用前需安装 `gh` 和 `python3` + `pyyaml`。
+
+### Flutter 框架补丁系统
+
+`lib/scripts/` 目录下包含 `.patch` 文件，用于在 CI 中修补 Flutter 框架的已知 bug（底部弹出框行为、滚动视图、文本选择、导航抽屉等）。各平台的修补逻辑见 `patch.ps1`。
+
+- **禁止随意删除或重命名 `.patch` 文件**，否则对应平台的构建可能失败或出现 UI 异常
+- 修改 `.patch` 文件需在 PR 描述中说明原因和关联 issue
+- 本地开发不影响（补丁仅在 CI 中应用），除非在本地手动执行 `lib/scripts/patch.ps1`
 
 ### CI/CD 构建时的 dart-define
 
@@ -216,7 +228,17 @@ import 'controller.dart';
 - `always_declare_return_types` — 必须声明返回类型
 - `always_use_package_imports` — 必须使用 package 导入
 - `avoid_relative_lib_imports` — 禁止相对路径导入
-- `avoid_print` — 禁止 print，使用 logger
+- `avoid_print` — 禁止 print，使用 `logger`（`package:PiliPlus/services/logger.dart`）
+```dart
+// ✅ 正确：使用 logger
+import 'package:PiliPlus/services/logger.dart';
+logger.t('trace 级别');
+logger.d('debug 级别');
+logger.i('info 级别');
+logger.w('warning 级别');
+logger.e('error 级别');
+// ❌ 禁止：print('xxx') / debugPrint('xxx')
+```
 - `prefer_const_constructors` — 优先 const 构造
 - `cascade_invocations` — 优先级联调用
 - `avoid_void_async` — 禁止 void 异步函数
@@ -272,12 +294,16 @@ pages/<feature>/
 ### 平台适配
 
 ```dart
-// 使用 PlatformUtils 而非 dart:io Platform 做平台判断
+// 使用 PlatformUtils 判断平台大类
 PlatformUtils.isMobile     // Android || iOS
 PlatformUtils.isDesktop    // Windows || macOS || Linux
-PlatformUtils.isMacOS
-PlatformUtils.isWindows
-PlatformUtils.isLinux
+
+// 具体平台判断直接使用 dart:io 的 Platform
+Platform.isAndroid
+Platform.isIOS
+Platform.isWindows
+Platform.isMacOS
+Platform.isLinux
 ```
 
 ## 禁止修改的目录/文件
@@ -335,6 +361,31 @@ GStorage 中注册的 Box 名称（`userInfo`、`setting`、`localCache`、`watc
 ### Android 权限
 
 Android 端涉及存储权限（下载）、悬浮窗权限（画中画）、音频焦点等，修改相关功能时注意权限声明在 `android/app/src/main/AndroidManifest.xml`。
+
+### 主题系统
+
+主题系统由三部分构成：
+
+1. **品牌色种子**：`lib/models/common/theme/theme_color_type.dart` 定义了 19 种可选颜色，用户选择后通过 `flex_seed_scheme` 生成完整的 `ColorScheme`
+2. **Dynamic Color**：支持 Android 12+ Material You 取色，通过 `dynamic_color` 插件获取系统壁纸颜色覆盖品牌色
+3. **ThemeUtils**（`lib/utils/theme_utils.dart`）：统一管理亮/暗主题生成，`ThemeUtils.isDarkMode` 判断当前模式，`ThemeUtils.theme` 获取当前主题
+
+修改主题相关代码时，需同时验证：用户自选颜色模式 + Dynamic Color 模式 + 亮/暗切换。
+
+### Logger 使用
+
+`lib/services/logger.dart` 导出全局 `logger` 实例（`package:logger/logger.dart`）。lint 规则 `avoid_print` 禁止所有 `print`/`debugPrint`，改用：
+
+```dart
+import 'package:PiliPlus/services/logger.dart';
+logger.t('trace');   // trace 级别
+logger.d('debug');   // debug 级别
+logger.i('info');    // info 级别
+logger.w('warning'); // warning 级别
+logger.e('error');   // error 级别
+```
+
+debug 模式显示 trace 及以上，release 模式仅显示 warning 及以上。
 
 ## Git 提交规范
 
