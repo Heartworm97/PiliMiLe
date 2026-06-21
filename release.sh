@@ -139,7 +139,7 @@ main() {
     read -rp "新版本名 (回车使用建议 $suggested_version, 或输入 m=M/major p=patch): " new_version
 
     # 解析快捷输入
-    case "${new_version,,}" in
+    case "$(echo "$new_version" | tr '[:upper:]' '[:lower:]')" in
         m|major)
             suggested_version="$((major + 1)).0.0"
             new_version="$suggested_version"
