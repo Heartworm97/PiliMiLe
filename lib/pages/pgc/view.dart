@@ -152,6 +152,8 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text.rich(
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
                           TextSpan(
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.outline,
