@@ -24,7 +24,7 @@ generate_changelog() {
     # 找到上一个 tag
     last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 
-    echo "# $new_tag" > CHANGELOG.md
+    echo "## 更新内容" > CHANGELOG.md
     echo "" >> CHANGELOG.md
 
     if [ -n "$last_tag" ]; then
@@ -43,14 +43,12 @@ generate_changelog() {
             echo "### 优化"
             git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "refactor|perf|optimize|优化|重构|改进|chore" || echo "- (无)"
             echo ""
-            echo "### 其他"
-            git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -ivE "feat|add|new|fix|bug|refactor|perf|optimize|chore|Merge|合并|新增|添加|修复|修正|优化|重构|改进" || echo "- (无)"
         } >> CHANGELOG.md
 
         echo "" >> CHANGELOG.md
         echo "## 全部提交" >> CHANGELOG.md
         echo "" >> CHANGELOG.md
-        git log "$last_tag..HEAD" --no-merges --pretty=format:"- \`%h\` %s (%an)" >> CHANGELOG.md
+        git log "$last_tag..HEAD" --no-merges --pretty=format:"- \`%h\` %s" >> CHANGELOG.md
     else
         warn "未找到历史 tag，生成首次发布的更新内容"
         echo "## 首次发布" >> CHANGELOG.md
@@ -84,9 +82,8 @@ main() {
         warn "检测到未提交的改动"
         read -rp "是否先提交这些改动? [y/N] " ans
         if [[ "$ans" == "y" || "$ans" == "Y" ]]; then
-            read -rp "输入提交信息: " commit_msg
             git add -A
-            git commit -m "$commit_msg"
+            git commit -m "chore: 发版前自动提交"
             git push
             info "已提交并推送"
         fi
@@ -174,7 +171,7 @@ main() {
     echo ""
     read -rp "是否编辑更新内容? (将用 vim 打开，不需要编辑则按 n) [y/N] " edit_ans
     if [[ "$edit_ans" == "y" || "$edit_ans" == "Y" ]]; then
-        ${EDITOR:-vim} CHANGELOG.md
+        ${EDITOR:-code} --wait CHANGELOG.md
     fi
 
     # 7. 确认平台
