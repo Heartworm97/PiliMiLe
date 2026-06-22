@@ -44,30 +44,14 @@ class _SearchDramaPanelState
 
   @override
   Widget buildList(ThemeData theme, List<SearchDramaItemModel> list) {
-    return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(
-        Style.safeSpace,
-        4,
-        Style.safeSpace,
-        0,
-      ),
-      sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          mainAxisSpacing: Style.cardSpace - 2,
-          crossAxisSpacing: Style.cardSpace,
-          crossAxisCount: 3,
-          childAspectRatio: 0.50,
-        ),
-        delegate: SliverChildBuilderDelegate(
-          (BuildContext context, int index) {
-            if (index == list.length - 1) {
-              controller.onLoadMore();
-            }
-            return SearchDramaItem(item: list[index]);
-          },
-          childCount: list.length,
-        ),
-      ),
+    return SliverList.builder(
+      itemBuilder: (BuildContext context, int index) {
+        if (index == list.length - 1) {
+          controller.onLoadMore();
+        }
+        return SearchDramaItem(item: list[index]);
+      },
+      itemCount: list.length,
     );
   }
 
