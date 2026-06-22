@@ -79,7 +79,7 @@ class SearchDramaItem extends StatelessWidget {
                     if (item.vodActor.isNotEmpty)
                       Text(
                         '演员：${item.vodActor}',
-                        maxLines: 3,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: style,
                       ),
