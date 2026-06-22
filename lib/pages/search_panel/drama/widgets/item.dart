@@ -23,6 +23,7 @@ class SearchDramaItem extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(8),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(8)),
