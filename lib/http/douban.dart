@@ -133,6 +133,36 @@ class DoubanHttp {
     );
   }
 
+  // ============ 图片URL清洗 ============
+
+  /// 上游返回的海报地址可能是代理 URL，提取真实豆瓣地址并替换为社区CDN
+  static String cleanVodPic(String rawUrl) {
+    if (rawUrl.isEmpty) return rawUrl;
+
+    // 从代理 URL 中提取真实图片地址
+    // 如: https://4k.jdyx.pro/img.php?url=https://img1.doubanio.com/... → 提取 url 参数
+    String url = rawUrl;
+    final uri = Uri.tryParse(rawUrl);
+    if (uri != null && !uri.host.contains('doubanio')) {
+      final innerUrl = uri.queryParameters['url'];
+      if (innerUrl != null && innerUrl.isNotEmpty) {
+        url = innerUrl;
+      }
+    }
+
+    // 将豆瓣图片CDN替换为社区CDN代理
+    final doubanUri = Uri.tryParse(url);
+    if (doubanUri != null && doubanUri.host.contains('doubanio.com')) {
+      final pathSegments = doubanUri.pathSegments;
+      if (pathSegments.length >= 2) {
+        final filename = pathSegments.last;
+        return 'https://img.doubanio.cmliussss.net/view/photo/m_ratio_poster/public/$filename';
+      }
+    }
+
+    return url;
+  }
+
   // ============ 上游搜索 ============
 
   static Future<Map<String, dynamic>> searchVod({
@@ -168,7 +198,7 @@ class DoubanHttp {
                     vodId: item['vod_id'],
                     vodName: item['vod_name'] ?? '',
                     typeName: typeName == '剧集' ? '电视剧' : typeName,
-                    vodPic: item['vod_pic'] ?? '',
+                    vodPic: cleanVodPic(item['vod_pic'] ?? ''),
                     vodRemarks: item['vod_remarks'] ?? '',
                     vodYear: item['vod_year']?.toString() ?? '',
                     vodActor: item['vod_actor'] ?? '',
