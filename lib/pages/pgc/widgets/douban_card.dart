@@ -2,10 +2,12 @@ import 'dart:math';
 
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/badge.dart';
+import 'package:PiliMiLe/common/widgets/image/image_save.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
 import 'package:PiliMiLe/models/common/badge_type.dart';
 import 'package:PiliMiLe/models/common/search/search_type.dart';
 import 'package:PiliMiLe/models_new/douban/subject.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -66,6 +68,16 @@ class DoubanCard extends StatelessWidget {
             parameters: {'keyword': item.title},
             arguments: {'initIndex': SearchType.drama.index});
         },
+        onLongPress: () => imageSaveDialog(
+          title: item.title,
+          cover: proxyImg(item.picLarge),
+        ),
+        onSecondaryTap: PlatformUtils.isMobile
+            ? null
+            : () => imageSaveDialog(
+                  title: item.title,
+                  cover: proxyImg(item.picLarge),
+                ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
