@@ -148,11 +148,32 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      '本页面所有视频资源均采集自互联网。如果无意中侵犯了您的版权，请联系APP管理员，我们将在核实后第一时间进行处理。',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.outline,
-                        height: 1.5,
+                    child: Text.rich(
+                      TextSpan(
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.outline,
+                          height: 1.5,
+                        ),
+                        children: const [
+                          TextSpan(text: '本页面所有视频资源均'),
+                          TextSpan(
+                            text: '采集自互联网',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          TextSpan(text: '。如果无意中'),
+                          TextSpan(
+                            text: '侵犯了您的版权',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          TextSpan(
+                            text: '，请联系APP管理员，我们将在核实后',
+                          ),
+                          TextSpan(
+                            text: '第一时间进行处理',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          TextSpan(text: '。'),
+                        ],
                       ),
                     ),
                   ),
