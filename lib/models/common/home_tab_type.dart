@@ -1,4 +1,5 @@
 import 'package:PiliMiLe/models/common/enum_with_label.dart';
+import 'package:PiliMiLe/models/common/search/search_type.dart';
 import 'package:PiliMiLe/pages/common/common_controller.dart';
 import 'package:PiliMiLe/pages/hot/controller.dart';
 import 'package:PiliMiLe/pages/hot/view.dart';
@@ -26,6 +27,15 @@ enum HomeTabType implements EnumWithLabel {
   @override
   final String label;
   const HomeTabType(this.label);
+
+  /// 映射到搜索结果页对应 Tab 的 [SearchType.index]
+  int get searchInitIndex => switch (this) {
+    HomeTabType.live => SearchType.live_room.index,
+    HomeTabType.bangumi => SearchType.media_bangumi.index,
+    HomeTabType.cinema => SearchType.media_ft.index,
+    HomeTabType.drama => SearchType.drama.index,
+    _ => SearchType.video.index,
+  };
 
   ScrollOrRefreshMixin Function() get ctr => switch (this) {
     HomeTabType.live => Get.find<LiveController>,

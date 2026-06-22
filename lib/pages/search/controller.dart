@@ -91,7 +91,7 @@ class SSearchController extends GetxController
 
   String? hintText;
 
-  int initIndex = 0;
+  late int initIndex;
 
   // uid
   final RxBool showUidBtn = false.obs;
@@ -120,6 +120,7 @@ class SSearchController extends GetxController
     super.onInit();
     final params = Get.parameters;
     hintText = params['hintText'];
+    initIndex = int.tryParse(params['initIndex'] ?? '') ?? 0;
     final text = params['text'];
     if (text != null) {
       controller.text = text;
