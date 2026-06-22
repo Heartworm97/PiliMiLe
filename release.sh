@@ -125,10 +125,15 @@ main() {
         exit 1
     fi
 
-    # 2. 检查是否有未提交的改动
+    # 2. 检查是否有未提交的改动，自动提交
     if ! git diff --quiet || ! git diff --cached --quiet; then
-        warn "检测到未提交的改动，请先手动提交后再发版"
-        exit 1
+        warn "检测到未提交的改动，自动提交..."
+        git add -A
+        local dirs
+        dirs=$(git diff --cached --stat -- 'lib/**' 2>/dev/null | grep -oE '\S+/' | tr -d '/' | sort -u | head -5 | paste -sd, - | sed 's/,/, /g')
+        git commit -m "chore: 发版前提交 (${dirs:-杂项})"
+        git push
+        info "已自动提交并推送"
     fi
 
     # 3. 确保本地代码最新
