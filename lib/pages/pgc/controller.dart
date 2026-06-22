@@ -62,6 +62,9 @@ class PgcController
 
   @override
   Future<void> onRefresh() {
+    if (isDrama) {
+      return queryDramaSections();
+    }
     if (accountService.isLogin.value) {
       _refreshPgcFollow();
     }

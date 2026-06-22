@@ -88,10 +88,12 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
 
   Widget _buildDramaContent(BuildContext context) {
     final theme = Theme.of(context);
-    return CustomScrollView(
-      controller: controller.scrollController,
-      physics: const AlwaysScrollableScrollPhysics(),
-      slivers: [
+    return refreshIndicator(
+      onRefresh: controller.onRefresh,
+      child: CustomScrollView(
+        controller: controller.scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
         _buildDramaSection(
           theme: theme,
           title: '热门电影',
@@ -122,6 +124,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
         ),
         const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
       ],
+      ),
     );
   }
 
