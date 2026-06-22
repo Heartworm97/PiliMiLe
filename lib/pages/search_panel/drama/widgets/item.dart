@@ -1,7 +1,9 @@
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/badge.dart';
+import 'package:PiliMiLe/common/widgets/image/image_save.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
 import 'package:PiliMiLe/models/search/result.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 
 class SearchDramaItem extends StatelessWidget {
@@ -18,12 +20,18 @@ class SearchDramaItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     const TextStyle style = TextStyle(fontSize: 13);
+    void onLongPress() => imageSaveDialog(
+      title: item.vodName,
+      cover: item.vodPic,
+    );
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
         onTap: () {
           // TODO: navigate to drama detail page
         },
+        onLongPress: onLongPress,
+        onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: Style.safeSpace,
