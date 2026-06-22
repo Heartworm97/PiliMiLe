@@ -158,21 +158,25 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                               height: 1.5,
                             ),
                             children: const [
-                              TextSpan(text: '本页面所有视频资源均'),
                               TextSpan(
-                                text: '采集自互联网',
-                                style: TextStyle(fontWeight: FontWeight.w600),
+                                text: '本APP当前页面所有视频、影视短片、短视频等多媒体资源，均通过互联网公开网络渠道',
                               ),
-                              TextSpan(text: '。如果无意中'),
                               TextSpan(
-                                text: '侵犯了您的版权',
+                                text: '自动抓取、采集整理而来',
                                 style: TextStyle(fontWeight: FontWeight.w600),
                               ),
                               TextSpan(
-                                text: '，请联系APP管理员，我们将在核实后',
+                                text: '。平台仅作为内容信息展示浏览工具，',
                               ),
                               TextSpan(
-                                text: '第一时间进行处理',
+                                text: '不参与原作品录制、制作、发行',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                              TextSpan(
+                                text: '，',
+                              ),
+                              TextSpan(
+                                text: '不拥有任何素材的著作权、传播授权等相关版权权益',
                                 style: TextStyle(fontWeight: FontWeight.w600),
                               ),
                               TextSpan(text: '。'),
