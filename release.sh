@@ -131,7 +131,8 @@ main() {
         read -rp "是否先提交这些改动? [y/N] " ans
         if [[ "$ans" == "y" || "$ans" == "Y" ]]; then
             git add -A
-            git commit -m "chore: 发版前自动提交"
+            read -rp "提交信息: " commit_msg
+            git commit -m "${commit_msg:-chore: 发版前自动提交}"
             git push
             info "已提交并推送"
         fi
