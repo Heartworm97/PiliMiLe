@@ -122,6 +122,18 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
           kind: 'tv',
           params: {'category': 'tv', 'type': 'show'},
         ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text(
+              '本页面所有视频资源均采集自互联网。如果无意中侵犯了您的版权，请联系APP管理员，我们将在核实后第一时间进行处理。',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
         const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
       ],
       ),
