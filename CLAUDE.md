@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 ## 语言强制规则
 1. 全程使用简体中文进行所有回复、代码注释、文档、解释内容，禁止任何英文自然描述。
 2. 仅代码关键字、变量名、包名、命令行工具名称保留英文，其余说明、分析、方案、报错解释全部中文。
@@ -11,11 +13,11 @@
 
 ## 项目概述
 
-**PiliPlus** — 使用 Flutter 开发的 BiliBili 第三方客户端，支持 Android / iOS / iPad / Windows / macOS / Linux 全平台。
+**PiliMiLe** — 使用 Flutter 开发的 BiliBili 第三方客户端，支持 Android / iOS / iPad / Windows / macOS / Linux 全平台。
 
 核心功能：视频/直播播放、弹幕、番剧追番、动态社区、私信聊天、离线下载、DLNA 投屏、多账号管理等完整 B 站客户端体验。
 
-上游上游：[orz12/PiliPalaX](https://github.com/orz12/PiliPalaX) | 上游上游：[guozhigq/pilipala](https://github.com/guozhigq/pilipala)
+上游：[orz12/PiliPalaX](https://github.com/orz12/PiliPalaX) | 上游上游：[guozhigq/pilipala](https://github.com/guozhigq/pilipala)
 
 ## 技术栈
 
@@ -49,7 +51,7 @@
 │   │   ├── style.dart         # 全局样式
 │   │   ├── assets.dart        # 资源路径引用
 │   │   ├── skeleton/          # 骨架屏组件
-│   │   └── widgets/           # 通用 Widget（image、dialog、gesture、video_card 等）
+│   │   └── widgets/           # 通用 Widget；其中 flutter/ 是 Flutter 框架 Widget 的本地覆盖
 │   ├── pages/                 # 页面（按功能模块分目录）
 │   │   ├── video/             # 视频详情页（含 intro/reply/note/related 子组件）
 │   │   ├── home/              # 首页推荐
@@ -117,6 +119,8 @@
 
 ## 开发命令
 
+> **注意**：项目通过 FVM 锁定 Flutter 3.44.2（`.fvmrc`）。以下命令直接写 `flutter`，如果你的环境未配置 FVM 全局激活，请替换为 `fvm flutter`。
+
 ```bash
 # 安装依赖（首次/修改 pubspec.yaml 后）
 flutter pub get
@@ -148,7 +152,12 @@ flutter build linux --release
 
 # 清理编译缓存
 flutter clean
+
+# 运行测试（项目暂无单元测试/Wiget测试）
+# flutter test
 ```
+
+> 项目目前没有 `test/` 目录和测试文件，功能验证依赖实际运行和手动测试。
 
 ### 构建脚本 (build.sh)
 
@@ -206,15 +215,15 @@ flutter build apk --release \
 
 ```dart
 // ✅ 正确：使用 package 导入
-import 'package:PiliPlus/utils/storage.dart';
-import 'package:PiliPlus/pages/video/controller.dart';
+import 'package:PiliMiLe/utils/storage.dart';
+import 'package:PiliMiLe/pages/video/controller.dart';
 
 // ❌ 禁止：相对路径导入
 import '../utils/storage.dart';
 import 'controller.dart';
 ```
 
-导入包名始终为 `PiliPlus`（注意大小写），对应 `pubspec.yaml` 中的 name。
+导入包名始终为 `PiliMiLe`（注意大小写），对应 `pubspec.yaml` 中的 name。
 
 ### 格式化
 
@@ -228,17 +237,7 @@ import 'controller.dart';
 - `always_declare_return_types` — 必须声明返回类型
 - `always_use_package_imports` — 必须使用 package 导入
 - `avoid_relative_lib_imports` — 禁止相对路径导入
-- `avoid_print` — 禁止 print，使用 `logger`（`package:PiliPlus/services/logger.dart`）
-```dart
-// ✅ 正确：使用 logger
-import 'package:PiliPlus/services/logger.dart';
-logger.t('trace 级别');
-logger.d('debug 级别');
-logger.i('info 级别');
-logger.w('warning 级别');
-logger.e('error 级别');
-// ❌ 禁止：print('xxx') / debugPrint('xxx')
-```
+- `avoid_print` — 禁止 print/debugPrint，必须使用 `logger`，详见[常见踩坑 > Logger 使用](#logger-使用)
 - `prefer_const_constructors` — 优先 const 构造
 - `cascade_invocations` — 优先级联调用
 - `avoid_void_async` — 禁止 void 异步函数
@@ -377,7 +376,7 @@ Android 端涉及存储权限（下载）、悬浮窗权限（画中画）、音
 `lib/services/logger.dart` 导出全局 `logger` 实例（`package:logger/logger.dart`）。lint 规则 `avoid_print` 禁止所有 `print`/`debugPrint`，改用：
 
 ```dart
-import 'package:PiliPlus/services/logger.dart';
+import 'package:PiliMiLe/services/logger.dart';
 logger.t('trace');   // trace 级别
 logger.d('debug');   // debug 级别
 logger.i('info');    // info 级别
@@ -386,6 +385,17 @@ logger.e('error');   // error 级别
 ```
 
 debug 模式显示 trace 及以上，release 模式仅显示 warning 及以上。
+
+### GStorage 与 Pref 的使用区分
+
+- **GStorage**（`lib/utils/storage.dart`）：Hive Box 的原始读写封装，用于存储用户信息、本地缓存、观看进度等结构化数据。新增 Box 要在 `GStorage.init()` 中注册、`accounts.dart` 的 `close()` 中关闭。
+- **Pref**（`lib/utils/storage_pref.dart`）：偏好设置的便捷 getter/put，底层也是 Hive Box（`setting` box），但提供类型安全的静态快捷访问。仅用于开关/选择器等简单键值设置。
+
+原则：**应用偏好设置用 Pref，业务数据用 GStorage**。不要混用——用 GStorage 读写偏好键不报错但绕过了 Pref 的默认值机制。
+
+### lib/common/widgets/flutter/ 覆盖目录
+
+该目录包含对 Flutter 框架 Widget 的**本地覆盖版本**（`page_view`、`scrollable`、`refresh_indicator`、`tabs` 等），用于修补框架 bug 或调整行为。修改这些文件会影响**全局所有页面**的滚动/页面切换/下拉刷新行为，务必谨慎。`analysis_options.yaml` 中已注释掉该目录的排除项（第15行），因此 lint 规则对该目录同样生效。
 
 ## Git 提交规范
 

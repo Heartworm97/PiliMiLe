@@ -1,15 +1,15 @@
-import 'package:PiliPlus/models/common/enum_with_label.dart';
-import 'package:PiliPlus/pages/common/common_controller.dart';
-import 'package:PiliPlus/pages/hot/controller.dart';
-import 'package:PiliPlus/pages/hot/view.dart';
-import 'package:PiliPlus/pages/live/controller.dart';
-import 'package:PiliPlus/pages/live/view.dart';
-import 'package:PiliPlus/pages/pgc/controller.dart';
-import 'package:PiliPlus/pages/pgc/view.dart';
-import 'package:PiliPlus/pages/rank/controller.dart';
-import 'package:PiliPlus/pages/rank/view.dart';
-import 'package:PiliPlus/pages/rcmd/controller.dart';
-import 'package:PiliPlus/pages/rcmd/view.dart';
+import 'package:PiliMiLe/models/common/enum_with_label.dart';
+import 'package:PiliMiLe/pages/common/common_controller.dart';
+import 'package:PiliMiLe/pages/hot/controller.dart';
+import 'package:PiliMiLe/pages/hot/view.dart';
+import 'package:PiliMiLe/pages/live/controller.dart';
+import 'package:PiliMiLe/pages/live/view.dart';
+import 'package:PiliMiLe/pages/pgc/controller.dart';
+import 'package:PiliMiLe/pages/pgc/view.dart';
+import 'package:PiliMiLe/pages/rank/controller.dart';
+import 'package:PiliMiLe/pages/rank/view.dart';
+import 'package:PiliMiLe/pages/rcmd/controller.dart';
+import 'package:PiliMiLe/pages/rcmd/view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

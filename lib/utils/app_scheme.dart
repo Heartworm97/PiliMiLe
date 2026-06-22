@@ -2,26 +2,26 @@
 
 import 'dart:async' show StreamSubscription;
 
-import 'package:PiliPlus/common/widgets/view_safe_area.dart';
-import 'package:PiliPlus/grpc/bilibili/app/listener/v1.pbenum.dart'
+import 'package:PiliMiLe/common/widgets/view_safe_area.dart';
+import 'package:PiliMiLe/grpc/bilibili/app/listener/v1.pbenum.dart'
     show PlaylistSource;
-import 'package:PiliPlus/http/search.dart';
-import 'package:PiliPlus/models/common/fav_type.dart';
-import 'package:PiliPlus/models/common/video/source_type.dart';
-import 'package:PiliPlus/pages/audio/view.dart';
-import 'package:PiliPlus/pages/dynamics/widgets/vote.dart';
-import 'package:PiliPlus/pages/fan/view.dart';
-import 'package:PiliPlus/pages/follow/view.dart';
-import 'package:PiliPlus/pages/follow_type/followed/view.dart';
-import 'package:PiliPlus/pages/live/view.dart';
-import 'package:PiliPlus/pages/rank/view.dart';
-import 'package:PiliPlus/pages/subscription_detail/view.dart';
-import 'package:PiliPlus/pages/video/reply_reply/view.dart';
-import 'package:PiliPlus/utils/id_utils.dart';
-import 'package:PiliPlus/utils/page_utils.dart';
-import 'package:PiliPlus/utils/request_utils.dart';
-import 'package:PiliPlus/utils/url_utils.dart';
-import 'package:PiliPlus/utils/utils.dart';
+import 'package:PiliMiLe/http/search.dart';
+import 'package:PiliMiLe/models/common/fav_type.dart';
+import 'package:PiliMiLe/models/common/video/source_type.dart';
+import 'package:PiliMiLe/pages/audio/view.dart';
+import 'package:PiliMiLe/pages/dynamics/widgets/vote.dart';
+import 'package:PiliMiLe/pages/fan/view.dart';
+import 'package:PiliMiLe/pages/follow/view.dart';
+import 'package:PiliMiLe/pages/follow_type/followed/view.dart';
+import 'package:PiliMiLe/pages/live/view.dart';
+import 'package:PiliMiLe/pages/rank/view.dart';
+import 'package:PiliMiLe/pages/subscription_detail/view.dart';
+import 'package:PiliMiLe/pages/video/reply_reply/view.dart';
+import 'package:PiliMiLe/utils/id_utils.dart';
+import 'package:PiliMiLe/utils/page_utils.dart';
+import 'package:PiliMiLe/utils/request_utils.dart';
+import 'package:PiliMiLe/utils/url_utils.dart';
+import 'package:PiliMiLe/utils/utils.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

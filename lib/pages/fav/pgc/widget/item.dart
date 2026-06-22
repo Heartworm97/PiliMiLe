@@ -1,13 +1,13 @@
-import 'package:PiliPlus/common/style.dart';
-import 'package:PiliPlus/common/widgets/badge.dart';
-import 'package:PiliPlus/common/widgets/button/icon_button.dart';
-import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
-import 'package:PiliPlus/common/widgets/select_mask.dart';
-import 'package:PiliPlus/models/common/badge_type.dart';
-import 'package:PiliPlus/models_new/fav/fav_pgc/list.dart';
-import 'package:PiliPlus/pages/common/multi_select/base.dart';
-import 'package:PiliPlus/utils/page_utils.dart';
-import 'package:PiliPlus/utils/platform_utils.dart';
+import 'package:PiliMiLe/common/style.dart';
+import 'package:PiliMiLe/common/widgets/badge.dart';
+import 'package:PiliMiLe/common/widgets/button/icon_button.dart';
+import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
+import 'package:PiliMiLe/common/widgets/select_mask.dart';
+import 'package:PiliMiLe/models/common/badge_type.dart';
+import 'package:PiliMiLe/models_new/fav/fav_pgc/list.dart';
+import 'package:PiliMiLe/pages/common/multi_select/base.dart';
+import 'package:PiliMiLe/utils/page_utils.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 
 class FavPgcItem extends StatelessWidget {

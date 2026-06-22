@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:PiliPlus/grpc/bilibili/app/im/v1.pb.dart'
+import 'package:PiliMiLe/grpc/bilibili/app/im/v1.pb.dart'
     show SelectItem, Setting, SettingSwitch;
 import 'package:flutter/material.dart';
 

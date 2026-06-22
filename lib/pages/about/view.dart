@@ -1,29 +1,29 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:PiliPlus/build_config.dart';
-import 'package:PiliPlus/common/assets.dart';
-import 'package:PiliPlus/common/constants.dart';
-import 'package:PiliPlus/common/style.dart';
-import 'package:PiliPlus/common/widgets/dialog/dialog.dart';
-import 'package:PiliPlus/common/widgets/dialog/export_import.dart';
-import 'package:PiliPlus/common/widgets/dialog/feedback.dart';
-import 'package:PiliPlus/common/widgets/flutter/list_tile.dart';
-import 'package:PiliPlus/pages/mine/controller.dart';
-import 'package:PiliPlus/services/logger.dart';
-import 'package:PiliPlus/utils/accounts.dart';
-import 'package:PiliPlus/utils/accounts/account.dart';
-import 'package:PiliPlus/utils/android/android_helper.dart';
-import 'package:PiliPlus/utils/cache_manager.dart';
-import 'package:PiliPlus/utils/date_utils.dart';
-import 'package:PiliPlus/utils/device_utils.dart';
-import 'package:PiliPlus/utils/extension/num_ext.dart';
-import 'package:PiliPlus/utils/login_utils.dart';
-import 'package:PiliPlus/utils/page_utils.dart';
-import 'package:PiliPlus/utils/platform_utils.dart';
-import 'package:PiliPlus/utils/storage.dart';
-import 'package:PiliPlus/utils/update.dart';
-import 'package:PiliPlus/utils/utils.dart';
+import 'package:PiliMiLe/build_config.dart';
+import 'package:PiliMiLe/common/assets.dart';
+import 'package:PiliMiLe/common/constants.dart';
+import 'package:PiliMiLe/common/style.dart';
+import 'package:PiliMiLe/common/widgets/dialog/dialog.dart';
+import 'package:PiliMiLe/common/widgets/dialog/export_import.dart';
+import 'package:PiliMiLe/common/widgets/dialog/feedback.dart';
+import 'package:PiliMiLe/common/widgets/flutter/list_tile.dart';
+import 'package:PiliMiLe/pages/mine/controller.dart';
+import 'package:PiliMiLe/services/logger.dart';
+import 'package:PiliMiLe/utils/accounts.dart';
+import 'package:PiliMiLe/utils/accounts/account.dart';
+import 'package:PiliMiLe/utils/android/android_helper.dart';
+import 'package:PiliMiLe/utils/cache_manager.dart';
+import 'package:PiliMiLe/utils/date_utils.dart';
+import 'package:PiliMiLe/utils/device_utils.dart';
+import 'package:PiliMiLe/utils/extension/num_ext.dart';
+import 'package:PiliMiLe/utils/login_utils.dart';
+import 'package:PiliMiLe/utils/page_utils.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
+import 'package:PiliMiLe/utils/storage.dart';
+import 'package:PiliMiLe/utils/update.dart';
+import 'package:PiliMiLe/utils/utils.dart';
 import 'package:flutter/material.dart' hide ListTile;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -144,8 +144,8 @@ class _AboutPageState extends State<AboutPage> {
             const SizedBox(height: 6),
             _buildCreditCard(
               label: '上游作者',
-              name: 'bggRGjQaUbCoE / PiliPlus',
-              url: 'https://github.com/bggRGjQaUbCoE/PiliPlus',
+              name: 'bggRGjQaUbCoE / PiliMiLe',
+              url: 'https://github.com/bggRGjQaUbCoE/PiliMiLe',
               colorScheme: colorScheme,
               theme: theme,
             ),

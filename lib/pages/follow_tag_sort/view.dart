@@ -1,9 +1,9 @@
-import 'package:PiliPlus/common/widgets/reorder_mixin.dart';
-import 'package:PiliPlus/http/follow.dart';
-import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/models/member/tags.dart';
-import 'package:PiliPlus/pages/follow/controller.dart';
-import 'package:PiliPlus/utils/bili_utils.dart';
+import 'package:PiliMiLe/common/widgets/reorder_mixin.dart';
+import 'package:PiliMiLe/http/follow.dart';
+import 'package:PiliMiLe/http/loading_state.dart';
+import 'package:PiliMiLe/models/member/tags.dart';
+import 'package:PiliMiLe/pages/follow/controller.dart';
+import 'package:PiliMiLe/utils/bili_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';

@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:PiliPlus/http/live.dart';
-import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/models_new/live/live_area_list/area_item.dart';
-import 'package:PiliPlus/pages/common/common_list_controller.dart';
+import 'package:PiliMiLe/http/live.dart';
+import 'package:PiliMiLe/http/loading_state.dart';
+import 'package:PiliMiLe/models_new/live/live_area_list/area_item.dart';
+import 'package:PiliMiLe/pages/common/common_list_controller.dart';
 import 'package:flutter/material.dart' show TabController;
 import 'package:get/get_state_manager/src/rx_flutter/rx_ticket_provider_mixin.dart';
 

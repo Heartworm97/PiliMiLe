@@ -16,12 +16,11 @@ title() { echo -e "\n${GREEN}$1${NC}"; }
 
 REPO="Heartworm97/PiliMiLe"
 
-# 从 Git 提交记录自动生成更新内容
+# AI 自动分析变更并生成 CHANGELOG.md
 generate_changelog() {
     local last_tag new_tag
     new_tag="v$1"
 
-    # 找到上一个 tag
     last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 
     echo "## 更新内容" > CHANGELOG.md
@@ -29,23 +28,72 @@ generate_changelog() {
 
     if [ -n "$last_tag" ]; then
         info "上次发布: $last_tag → 本次: $new_tag"
-        echo "## 变更记录" >> CHANGELOG.md
-        echo "" >> CHANGELOG.md
 
-        # 按类型分类汇总
-        {
-            echo "### 新增功能"
-            git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "feat|add|new|新增|添加" || echo "- (无)"
-            echo ""
-            echo "### 修复"
-            git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "fix|bug|修复|修正" || echo "- (无)"
-            echo ""
-            echo "### 优化"
-            git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "refactor|perf|optimize|优化|重构|改进|chore" || echo "- (无)"
-            echo ""
-        } >> CHANGELOG.md
+        # 收集提交记录
+        local diff_log
+        diff_log=$(git log "$last_tag..HEAD" --no-merges --pretty=format:"[%h] %s" 2>/dev/null)
 
-        echo "" >> CHANGELOG.md
+        if [ -n "$diff_log" ] && command -v claude &> /dev/null; then
+            info "AI 正在分析代码变更..."
+            local prompt="根据以下 git 提交记录，生成一份简洁的中文 CHANGELOG 更新内容。
+请严格按以下格式输出，不要加任何额外说明：
+
+## 变更记录
+
+### 新增功能
+- (根据提交内容输出，确实没有则写「(无)」)
+
+### 修复
+- (根据提交内容输出，确实没有则写「(无)」)
+
+### 优化
+- (根据提交内容输出，确实没有则写「(无)」)
+
+### 更新内容
+- (根据提交内容输出，确实没有则写「(无)」)
+
+规则：
+- 根据提交信息判断改动类型，分到对应分类
+- chore/ci/build 类提交放到「优化」或「更新内容」
+- 每条用简短的中文描述，不要照搬 commit message
+- 排除发版相关的 chore 提交（如「chore: 发布」「chore: 发版前自动提交」「chore: 重置」）
+- 只输出格式内容，不要多写任何话
+
+提交记录：
+$diff_log"
+
+            if claude -p "$prompt" --output-format text >> CHANGELOG.md 2>/dev/null; then
+                info "AI 总结完成"
+            else
+                warn "AI 不可用，回退到 git log"
+                {
+                    echo "### 新增功能"
+                    git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "feat|add|new|新增|添加" || echo "- (无)"
+                    echo ""
+                    echo "### 修复"
+                    git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "fix|bug|修复|修正" || echo "- (无)"
+                    echo ""
+                    echo "### 优化"
+                    git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "refactor|perf|optimize|优化|重构|改进|chore" || echo "- (无)"
+                    echo ""
+                } >> CHANGELOG.md
+            fi
+        else
+            # 无 AI，git log 回退
+            warn "git log 自动生成"
+            {
+                echo "### 新增功能"
+                git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "feat|add|new|新增|添加" || echo "- (无)"
+                echo ""
+                echo "### 修复"
+                git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "fix|bug|修复|修正" || echo "- (无)"
+                echo ""
+                echo "### 优化"
+                git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "refactor|perf|optimize|优化|重构|改进|chore" || echo "- (无)"
+                echo ""
+            } >> CHANGELOG.md
+        fi
+
         echo "## 全部提交" >> CHANGELOG.md
         echo "" >> CHANGELOG.md
         git log "$last_tag..HEAD" --no-merges --pretty=format:"- \`%h\` %s" >> CHANGELOG.md
@@ -169,7 +217,7 @@ main() {
     cat CHANGELOG.md
     echo -e "${GREEN}────────────────────────────────${NC}"
     echo ""
-    read -rp "是否编辑更新内容? (将用 vim 打开，不需要编辑则按 n) [y/N] " edit_ans
+    read -rp "是否编辑更新内容? (将用编辑器打开，不需要编辑则按 n) [y/N] " edit_ans
     if [[ "$edit_ans" == "y" || "$edit_ans" == "Y" ]]; then
         ${EDITOR:-code} --wait CHANGELOG.md
     fi
@@ -233,7 +281,7 @@ main() {
     sed -i '' -E "s/^version: .*/version: $new_version+$new_code/" pubspec.yaml
     info "pubspec.yaml 已更新"
 
-    # 10. 提交推送（包含 CHANGELOG.md）
+    # 10. 提交推送
     title "提交并推送..."
     git add pubspec.yaml CHANGELOG.md
     git commit -m "chore: 发布 $new_version" || true

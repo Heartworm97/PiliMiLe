@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:PiliPlus/utils/android/bindings.g.dart';
-import 'package:PiliPlus/utils/utils.dart';
+import 'package:PiliMiLe/utils/android/bindings.g.dart';
+import 'package:PiliMiLe/utils/utils.dart';
 import 'package:jni/jni.dart';
 
 abstract final class PiliAndroidHelper {

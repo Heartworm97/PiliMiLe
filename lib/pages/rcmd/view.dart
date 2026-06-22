@@ -1,12 +1,12 @@
-import 'package:PiliPlus/common/skeleton/video_card_v.dart';
-import 'package:PiliPlus/common/style.dart';
-import 'package:PiliPlus/common/widgets/flutter/refresh_indicator.dart';
-import 'package:PiliPlus/common/widgets/loading_widget/http_error.dart';
-import 'package:PiliPlus/common/widgets/video_card/video_card_v.dart';
-import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/pages/rcmd/controller.dart';
-import 'package:PiliPlus/utils/grid.dart';
-import 'package:PiliPlus/utils/storage_pref.dart';
+import 'package:PiliMiLe/common/skeleton/video_card_v.dart';
+import 'package:PiliMiLe/common/style.dart';
+import 'package:PiliMiLe/common/widgets/flutter/refresh_indicator.dart';
+import 'package:PiliMiLe/common/widgets/loading_widget/http_error.dart';
+import 'package:PiliMiLe/common/widgets/video_card/video_card_v.dart';
+import 'package:PiliMiLe/http/loading_state.dart';
+import 'package:PiliMiLe/pages/rcmd/controller.dart';
+import 'package:PiliMiLe/utils/grid.dart';
+import 'package:PiliMiLe/utils/storage_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ============================================================
-# PiliPlus 构建脚本
+# PiliMiLe 构建脚本
 # ============================================================
 
 # ---- 颜色 ----
@@ -192,7 +192,7 @@ build_unsigned_ipa() {
 
     project_dir="$(pwd)"
     build_dir="$project_dir/build/ios/Release-iphoneos"
-    ipa_path="$project_dir/build/PiliPlus-unsigned.ipa"
+    ipa_path="$project_dir/build/PiliMiLe-unsigned.ipa"
 
     info "使用 Release 模式编译 iOS..."
     run_quiet flutter build ios --release --no-codesign
@@ -369,7 +369,7 @@ extra_clean() {
 show_menu() {
     echo ""
     echo -e "${GREEN}══════════════════════════════════${NC}"
-    echo -e "${GREEN}  PiliPlus 构建脚本${NC}"
+    echo -e "${GREEN}  PiliMiLe 构建脚本${NC}"
     echo -e "${GREEN}══════════════════════════════════${NC}"
     echo ""
     echo "  1) iOS 模拟器启动"

@@ -1,11 +1,11 @@
-import 'package:PiliPlus/common/widgets/flutter/list_tile.dart';
-import 'package:PiliPlus/common/widgets/flutter/refresh_indicator.dart';
-import 'package:PiliPlus/common/widgets/loading_widget/http_error.dart';
-import 'package:PiliPlus/common/widgets/view_sliver_safe_area.dart';
-import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/models_new/login_devices/device.dart';
-import 'package:PiliPlus/pages/login_devices/controller.dart';
-import 'package:PiliPlus/utils/extension/widget_ext.dart';
+import 'package:PiliMiLe/common/widgets/flutter/list_tile.dart';
+import 'package:PiliMiLe/common/widgets/flutter/refresh_indicator.dart';
+import 'package:PiliMiLe/common/widgets/loading_widget/http_error.dart';
+import 'package:PiliMiLe/common/widgets/view_sliver_safe_area.dart';
+import 'package:PiliMiLe/http/loading_state.dart';
+import 'package:PiliMiLe/models_new/login_devices/device.dart';
+import 'package:PiliMiLe/pages/login_devices/controller.dart';
+import 'package:PiliMiLe/utils/extension/widget_ext.dart';
 import 'package:flutter/material.dart' hide ListTile;
 import 'package:get/get.dart';
 

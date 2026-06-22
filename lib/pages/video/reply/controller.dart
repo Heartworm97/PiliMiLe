@@ -1,11 +1,11 @@
-import 'package:PiliPlus/grpc/bilibili/main/community/reply/v1.pb.dart'
+import 'package:PiliMiLe/grpc/bilibili/main/community/reply/v1.pb.dart'
     show MainListReply, ReplyInfo;
-import 'package:PiliPlus/grpc/reply.dart';
-import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/models/common/video/video_type.dart';
-import 'package:PiliPlus/pages/common/reply_controller.dart';
-import 'package:PiliPlus/pages/video/controller.dart';
-import 'package:PiliPlus/utils/id_utils.dart';
+import 'package:PiliMiLe/grpc/reply.dart';
+import 'package:PiliMiLe/http/loading_state.dart';
+import 'package:PiliMiLe/models/common/video/video_type.dart';
+import 'package:PiliMiLe/pages/common/reply_controller.dart';
+import 'package:PiliMiLe/pages/video/controller.dart';
+import 'package:PiliMiLe/utils/id_utils.dart';
 import 'package:get/get.dart';
 
 class VideoReplyController extends ReplyController<MainListReply> {

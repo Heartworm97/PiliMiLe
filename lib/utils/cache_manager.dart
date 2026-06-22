@@ -1,8 +1,8 @@
 import 'dart:io' show Directory, File;
 
-import 'package:PiliPlus/utils/extension/file_ext.dart';
-import 'package:PiliPlus/utils/platform_utils.dart';
-import 'package:PiliPlus/utils/storage_pref.dart';
+import 'package:PiliMiLe/utils/extension/file_ext.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
+import 'package:PiliMiLe/utils/storage_pref.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';

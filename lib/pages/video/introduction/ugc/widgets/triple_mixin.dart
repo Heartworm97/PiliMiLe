@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:PiliPlus/pages/video/pay_coins/view.dart';
-import 'package:PiliPlus/utils/global_data.dart';
-import 'package:PiliPlus/utils/platform_utils.dart';
+import 'package:PiliMiLe/pages/video/pay_coins/view.dart';
+import 'package:PiliMiLe/utils/global_data.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';

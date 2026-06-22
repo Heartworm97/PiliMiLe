@@ -1,8 +1,8 @@
-import 'package:PiliPlus/grpc/bilibili/app/viewunite/v1.pb.dart'
+import 'package:PiliMiLe/grpc/bilibili/app/viewunite/v1.pb.dart'
     show ViewReq, ViewReply;
-import 'package:PiliPlus/grpc/grpc_req.dart';
-import 'package:PiliPlus/grpc/url.dart';
-import 'package:PiliPlus/http/loading_state.dart';
+import 'package:PiliMiLe/grpc/grpc_req.dart';
+import 'package:PiliMiLe/grpc/url.dart';
+import 'package:PiliMiLe/http/loading_state.dart';
 
 abstract final class ViewGrpc {
   static Future<LoadingState<ViewReply>> view({

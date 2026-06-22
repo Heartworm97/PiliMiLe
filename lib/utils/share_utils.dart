@@ -1,8 +1,8 @@
 import 'dart:io' show Platform;
 
-import 'package:PiliPlus/utils/device_utils.dart';
-import 'package:PiliPlus/utils/platform_utils.dart';
-import 'package:PiliPlus/utils/utils.dart';
+import 'package:PiliMiLe/utils/device_utils.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
+import 'package:PiliMiLe/utils/utils.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/rendering.dart' show Rect;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';

@@ -1,11 +1,11 @@
 import 'dart:math';
 
-import 'package:PiliPlus/common/assets.dart';
-import 'package:PiliPlus/common/style.dart';
-import 'package:PiliPlus/common/widgets/badge.dart';
-import 'package:PiliPlus/models/common/badge_type.dart';
-import 'package:PiliPlus/models_new/douban/subject.dart';
-import 'package:PiliPlus/utils/extension/num_ext.dart';
+import 'package:PiliMiLe/common/assets.dart';
+import 'package:PiliMiLe/common/style.dart';
+import 'package:PiliMiLe/common/widgets/badge.dart';
+import 'package:PiliMiLe/models/common/badge_type.dart';
+import 'package:PiliMiLe/models_new/douban/subject.dart';
+import 'package:PiliMiLe/utils/extension/num_ext.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:PiliPlus/common/constants.dart';
-import 'package:PiliPlus/grpc/audio.dart';
-import 'package:PiliPlus/grpc/bilibili/app/listener/v1.pb.dart'
+import 'package:PiliMiLe/common/constants.dart';
+import 'package:PiliMiLe/grpc/audio.dart';
+import 'package:PiliMiLe/grpc/bilibili/app/listener/v1.pb.dart'
     show
         DetailItem,
         PlayURLResp,
@@ -12,37 +12,37 @@ import 'package:PiliPlus/grpc/bilibili/app/listener/v1.pb.dart'
         ListOrder,
         DashItem,
         ResponseUrl;
-import 'package:PiliPlus/http/browser_ua.dart';
-import 'package:PiliPlus/http/constants.dart';
-import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/pages/common/common_intro_controller.dart'
+import 'package:PiliMiLe/http/browser_ua.dart';
+import 'package:PiliMiLe/http/constants.dart';
+import 'package:PiliMiLe/http/loading_state.dart';
+import 'package:PiliMiLe/pages/common/common_intro_controller.dart'
     show FavMixin;
-import 'package:PiliPlus/pages/dynamics_repost/view.dart';
-import 'package:PiliPlus/pages/main_reply/view.dart';
-import 'package:PiliPlus/pages/setting/models/play_settings.dart'
+import 'package:PiliMiLe/pages/dynamics_repost/view.dart';
+import 'package:PiliMiLe/pages/main_reply/view.dart';
+import 'package:PiliMiLe/pages/setting/models/play_settings.dart'
     show kMaxVolume;
-import 'package:PiliPlus/pages/sponsor_block/block_mixin.dart';
-import 'package:PiliPlus/pages/video/controller.dart';
-import 'package:PiliPlus/pages/video/introduction/ugc/widgets/triple_mixin.dart';
-import 'package:PiliPlus/plugin/pl_player/controller.dart';
-import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
-import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
-import 'package:PiliPlus/services/service_locator.dart';
-import 'package:PiliPlus/services/shutdown_timer_service.dart';
-import 'package:PiliPlus/utils/accounts.dart';
-import 'package:PiliPlus/utils/connectivity_utils.dart';
-import 'package:PiliPlus/utils/extension/iterable_ext.dart';
-import 'package:PiliPlus/utils/extension/num_ext.dart';
-import 'package:PiliPlus/utils/global_data.dart';
-import 'package:PiliPlus/utils/id_utils.dart';
-import 'package:PiliPlus/utils/page_utils.dart';
-import 'package:PiliPlus/utils/platform_utils.dart';
-import 'package:PiliPlus/utils/share_utils.dart';
-import 'package:PiliPlus/utils/storage.dart';
-import 'package:PiliPlus/utils/storage_key.dart';
-import 'package:PiliPlus/utils/storage_pref.dart';
-import 'package:PiliPlus/utils/utils.dart';
-import 'package:PiliPlus/utils/video_utils.dart';
+import 'package:PiliMiLe/pages/sponsor_block/block_mixin.dart';
+import 'package:PiliMiLe/pages/video/controller.dart';
+import 'package:PiliMiLe/pages/video/introduction/ugc/widgets/triple_mixin.dart';
+import 'package:PiliMiLe/plugin/pl_player/controller.dart';
+import 'package:PiliMiLe/plugin/pl_player/models/play_repeat.dart';
+import 'package:PiliMiLe/plugin/pl_player/models/play_status.dart';
+import 'package:PiliMiLe/services/service_locator.dart';
+import 'package:PiliMiLe/services/shutdown_timer_service.dart';
+import 'package:PiliMiLe/utils/accounts.dart';
+import 'package:PiliMiLe/utils/connectivity_utils.dart';
+import 'package:PiliMiLe/utils/extension/iterable_ext.dart';
+import 'package:PiliMiLe/utils/extension/num_ext.dart';
+import 'package:PiliMiLe/utils/global_data.dart';
+import 'package:PiliMiLe/utils/id_utils.dart';
+import 'package:PiliMiLe/utils/page_utils.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
+import 'package:PiliMiLe/utils/share_utils.dart';
+import 'package:PiliMiLe/utils/storage.dart';
+import 'package:PiliMiLe/utils/storage_key.dart';
+import 'package:PiliMiLe/utils/storage_pref.dart';
+import 'package:PiliMiLe/utils/utils.dart';
+import 'package:PiliMiLe/utils/video_utils.dart';
 import 'package:fixnum/fixnum.dart' show Int64;
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';

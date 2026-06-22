@@ -1,5 +1,5 @@
-import 'package:PiliPlus/http/browser_ua.dart';
-import 'package:PiliPlus/services/logger.dart';
+import 'package:PiliMiLe/http/browser_ua.dart';
+import 'package:PiliMiLe/services/logger.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 

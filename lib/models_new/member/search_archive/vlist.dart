@@ -1,6 +1,6 @@
-import 'package:PiliPlus/models/horizontal_video_model.dart';
-import 'package:PiliPlus/models/model_video.dart';
-import 'package:PiliPlus/utils/duration_utils.dart';
+import 'package:PiliMiLe/models/horizontal_video_model.dart';
+import 'package:PiliMiLe/models/model_video.dart';
+import 'package:PiliMiLe/utils/duration_utils.dart';
 
 class VListItemModel extends HorizontalVideoModel {
   VListItemModel.fromJson(Map<String, dynamic> json) {

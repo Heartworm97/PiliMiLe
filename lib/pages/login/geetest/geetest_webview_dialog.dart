@@ -1,11 +1,11 @@
 import 'dart:convert' show base64, jsonDecode, jsonEncode, utf8;
 import 'dart:io' show Platform;
 
-import 'package:PiliPlus/http/browser_ua.dart';
-import 'package:PiliPlus/http/init.dart';
-import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/main.dart';
-import 'package:PiliPlus/utils/accounts/account.dart';
+import 'package:PiliMiLe/http/browser_ua.dart';
+import 'package:PiliMiLe/http/init.dart';
+import 'package:PiliMiLe/http/loading_state.dart';
+import 'package:PiliMiLe/main.dart';
+import 'package:PiliMiLe/utils/accounts/account.dart';
 import 'package:desktop_webview_window/desktop_webview_window.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
