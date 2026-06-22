@@ -37,10 +37,25 @@ class DoubanHttp {
 
   // ============ 上游镜像站配置 ============
 
-  static final Dio _upstreamDio = Dio(BaseOptions(
-    connectTimeout: const Duration(milliseconds: 12000),
-    receiveTimeout: const Duration(milliseconds: 12000),
-  ));
+  static final Dio _upstreamDio = _createUpstreamDio();
+
+  static Dio _createUpstreamDio() {
+    final d = Dio(BaseOptions(
+      connectTimeout: const Duration(milliseconds: 12000),
+      receiveTimeout: const Duration(milliseconds: 12000),
+    ));
+
+    if (kDebugMode) {
+      d.interceptors.add(InterceptorsWrapper(
+        onRequest: (options, handler) {
+          logger.d('GET ${options.uri}');
+          handler.next(options);
+        },
+      ));
+    }
+
+    return d;
+  }
 
   static const List<String> _upstreamMirrors = [
     'https://asd123sx23xdacsx.top',
@@ -166,6 +181,12 @@ class DoubanHttp {
         final filteredList = rawList
             .where((item) => item.vodName.contains(keyword.trim()))
             .toList();
+
+        if (kDebugMode) {
+          for (final item in filteredList) {
+            logger.d('剧名: ${item.vodName} | 海报: ${item.vodPic}');
+          }
+        }
 
         if (filteredList.isEmpty) {
           return {'status': false, 'data': null, 'msg': '没有相关数据'};
