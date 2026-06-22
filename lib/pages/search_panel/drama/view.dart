@@ -56,7 +56,7 @@ class _SearchDramaPanelState
           mainAxisSpacing: Style.cardSpace - 2,
           crossAxisSpacing: Style.cardSpace,
           crossAxisCount: 3,
-          childAspectRatio: 0.58,
+          childAspectRatio: 0.50,
         ),
         delegate: SliverChildBuilderDelegate(
           (BuildContext context, int index) {
