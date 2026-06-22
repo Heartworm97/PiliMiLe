@@ -85,7 +85,6 @@ class SearchDramaItem extends StatelessWidget {
         title,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
-        style: theme.textTheme.titleMedium,
       );
     }
 
@@ -109,7 +108,6 @@ class SearchDramaItem extends StatelessWidget {
 
     return Text.rich(
       TextSpan(
-        style: theme.textTheme.titleMedium,
         children: spans,
       ),
       maxLines: 2,
