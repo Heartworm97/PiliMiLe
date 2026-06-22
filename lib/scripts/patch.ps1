@@ -69,8 +69,6 @@ switch ($platform.ToLower()) {
         $patches += $BottomSheetIOSFlutterPatch
         $patches += $NavigatorPatch
     }
-    "linux" {
-    }
     "macos" {
     }
     "windows" {

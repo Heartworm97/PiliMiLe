@@ -227,15 +227,13 @@ main() {
     echo "选择要构建的平台 (输入数字，多选用空格分隔，如: 1 3):"
     echo "  1) macOS"
     echo "  2) Windows"
-    echo "  3) Linux"
-    echo "  4) Android (无签名)"
-    echo "  5) iOS (无签名)"
-    echo "  6) 全部"
+    echo "  3) Android (无签名)"
+    echo "  4) iOS (无签名)"
+    echo "  5) 全部"
     read -rp "请选择: " platform_choice
 
     build_mac=false
     build_win=false
-    build_linux=false
     build_android=false
     build_ios=false
 
@@ -243,18 +241,17 @@ main() {
         case "$choice" in
             1) build_mac=true ;;
             2) build_win=true ;;
-            3) build_linux=true ;;
-            4) build_android=true ;;
-            5) build_ios=true ;;
-            6) build_mac=true; build_win=true; build_linux=true; build_android=true; build_ios=true; break ;;
+            3) build_android=true ;;
+            4) build_ios=true ;;
+            5) build_mac=true; build_win=true; build_android=true; build_ios=true; break ;;
             *) warn "无效选择: $choice" ;;
         esac
     done
 
     # 都没选则默认全部
-    if ! $build_mac && ! $build_win && ! $build_linux && ! $build_android && ! $build_ios; then
+    if ! $build_mac && ! $build_win && ! $build_android && ! $build_ios; then
         warn "未有效选择，默认构建全部"
-        build_mac=true; build_win=true; build_linux=true; build_android=true; build_ios=true
+        build_mac=true; build_win=true; build_android=true; build_ios=true
     fi
 
     # 8. 最终确认
@@ -266,7 +263,6 @@ main() {
     echo "  tag:       v$new_version"
     echo "  macOS:     $build_mac"
     echo "  Windows:   $build_win"
-    echo "  Linux:     $build_linux"
     echo "  Android:   $build_android"
     echo "  iOS:       $build_ios"
     echo -e "══════════════════════════════════"
@@ -299,7 +295,6 @@ main() {
         -f build_ios="$build_ios" \
         -f build_mac="$build_mac" \
         -f build_win_x64="$build_win" \
-        -f build_linux_x64="$build_linux" \
         -f tag="v$new_version"
 
     info "CI 已触发！查看进度: https://github.com/$REPO/actions"

@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-**PiliMiLe** — 使用 Flutter 开发的 BiliBili 第三方客户端，支持 Android / iOS / iPad / Windows / macOS / Linux 全平台。
+**PiliMiLe** — 使用 Flutter 开发的 BiliBili 第三方客户端，支持 Android / iOS / iPad / Windows / macOS 全平台。
 
 核心功能：视频/直播播放、弹幕、番剧追番、动态社区、私信聊天、离线下载、DLNA 投屏、多账号管理等完整 B 站客户端体验。
 
@@ -108,13 +108,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ├── ios/                       # iOS 原生
 ├── macos/                     # macOS 原生
 ├── windows/                   # Windows 原生
-├── linux/                     # Linux 原生
 ├── .fvmrc                     # Flutter 版本锁定 (3.44.2)
 ├── pubspec.yaml               # 依赖声明
 ├── build.sh                   # 多目标构建脚本（iOS/macOS/IPA/DMG/清理）
 ├── analysis_options.yaml      # Dart 静态分析配置
 ├── tool/                      # 辅助工具（jnigen 等）
-└── .github/workflows/         # CI/CD（Android/iOS/macOS/Win/Linux）
+└── .github/workflows/         # CI/CD（Android/iOS/macOS/Win）
 ```
 
 ## 开发命令
@@ -148,7 +147,6 @@ flutter build apk --release --split-per-abi
 flutter build ios --release --no-codesign
 flutter build macos --release
 flutter build windows --release
-flutter build linux --release
 
 # 清理编译缓存
 flutter clean
@@ -295,14 +293,13 @@ pages/<feature>/
 ```dart
 // 使用 PlatformUtils 判断平台大类
 PlatformUtils.isMobile     // Android || iOS
-PlatformUtils.isDesktop    // Windows || macOS || Linux
+PlatformUtils.isDesktop    // Windows || macOS
 
 // 具体平台判断直接使用 dart:io 的 Platform
 Platform.isAndroid
 Platform.isIOS
 Platform.isWindows
 Platform.isMacOS
-Platform.isLinux
 ```
 
 ## 禁止修改的目录/文件
