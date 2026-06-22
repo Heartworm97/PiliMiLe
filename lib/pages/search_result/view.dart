@@ -3,6 +3,7 @@ import 'package:PiliMiLe/common/widgets/view_safe_area.dart';
 import 'package:PiliMiLe/models/common/search/search_type.dart';
 import 'package:PiliMiLe/pages/search/controller.dart';
 import 'package:PiliMiLe/pages/search_panel/article/view.dart';
+import 'package:PiliMiLe/pages/search_panel/drama/view.dart';
 import 'package:PiliMiLe/pages/search_panel/live/view.dart';
 import 'package:PiliMiLe/pages/search_panel/pgc/view.dart';
 import 'package:PiliMiLe/pages/search_panel/user/view.dart';
@@ -198,8 +199,12 @@ class _SearchResultPageState extends State<SearchResultPage>
                           keyword: _searchResultController.keyword,
                         ),
                         SearchType.media_bangumi ||
-                        SearchType.media_ft ||
-                        SearchType.drama => SearchPgcPanel(
+                        SearchType.media_ft => SearchPgcPanel(
+                          tag: _tag,
+                          searchType: item,
+                          keyword: _searchResultController.keyword,
+                        ),
+                        SearchType.drama => SearchDramaPanel(
                           tag: _tag,
                           searchType: item,
                           keyword: _searchResultController.keyword,

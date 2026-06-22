@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:PiliMiLe/http/api.dart';
+import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/http/init.dart';
 import 'package:PiliMiLe/http/loading_state.dart';
 import 'package:PiliMiLe/models/common/search/search_type.dart';
@@ -60,8 +61,16 @@ abstract final class SearchHttp {
     required ValueChanged<String> onSuccess,
   }) async {
     if (searchType == SearchType.drama) {
-      final data = SearchPgcData(numResults: 0, list: []) as R;
-      return Success(data);
+      final result = await DoubanHttp.searchVod(
+        keyword: keyword,
+        page: page is int ? page : 1,
+      );
+      if (result['status'] == true && result['data'] != null) {
+        final data = result['data'] as SearchDramaData;
+        return Success(data as R);
+      } else {
+        return Error(result['msg'] ?? '搜索失败');
+      }
     }
     final params = await WbiSign.makSign({
       'search_type': searchType.name,
@@ -120,6 +129,7 @@ abstract final class SearchHttp {
               data = SearchArticleData.fromJson(dataData);
               break;
             case SearchType.drama:
+              data = SearchDramaData.fromJson(dataData);
               break;
           }
           return Success(data);

@@ -449,3 +449,54 @@ class SearchArticleItemModel {
     categoryName = json['category_name'];
   }
 }
+
+class SearchDramaData extends SearchNumData<SearchDramaItemModel> {
+  SearchDramaData({
+    super.numResults,
+    super.list,
+  });
+
+  SearchDramaData.fromJson(Map<String, dynamic> json) {
+    numResults = (json['numResults'] as num?)?.toInt();
+    list = (json['list'] as List?)
+        ?.map<SearchDramaItemModel>(
+            (e) => SearchDramaItemModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+}
+
+class SearchDramaItemModel {
+  final dynamic vodId;
+  final String vodName;
+  final String typeName;
+  final String vodPic;
+  final String vodRemarks;
+  final String vodYear;
+  final String vodActor;
+  final String vodArea;
+
+  SearchDramaItemModel({
+    required this.vodId,
+    required this.vodName,
+    required this.typeName,
+    required this.vodPic,
+    required this.vodRemarks,
+    required this.vodYear,
+    required this.vodActor,
+    required this.vodArea,
+  });
+
+  factory SearchDramaItemModel.fromJson(Map<String, dynamic> json) {
+    final typeName = json['type_name'] ?? '';
+    return SearchDramaItemModel(
+      vodId: json['vod_id'],
+      vodName: json['vod_name'] ?? '',
+      typeName: typeName == '剧集' ? '电视剧' : typeName,
+      vodPic: json['vod_pic'] ?? '',
+      vodRemarks: json['vod_remarks'] ?? '',
+      vodYear: json['vod_year']?.toString() ?? '',
+      vodActor: json['vod_actor'] ?? '',
+      vodArea: json['vod_area'] ?? '',
+    );
+  }
+}
