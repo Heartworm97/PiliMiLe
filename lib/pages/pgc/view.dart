@@ -278,6 +278,8 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                     },
                   ),
                 ),
+              Error(:final errMsg) =>
+                HttpError(isSliver: false, errMsg: errMsg, onReload: controller.onRefresh),
               _ => const SizedBox.shrink(),
             };
           }),

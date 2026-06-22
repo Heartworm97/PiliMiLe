@@ -12,6 +12,7 @@ import 'package:PiliMiLe/services/account_service.dart';
 import 'package:PiliMiLe/utils/extension/scroll_controller_ext.dart';
 import 'package:PiliMiLe/utils/storage_pref.dart';
 import 'package:flutter/widgets.dart' show ScrollController;
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 class PgcController
@@ -188,16 +189,24 @@ class PgcController
       Rx<LoadingState<List<DoubanSubject>>>(LoadingState.loading());
 
   Future<void> queryDramaSections() async {
-    final results = await Future.wait([
-      _queryDramaHot(kind: 'movie', category: '热门', type: '全部'),
-      _queryDramaHot(kind: 'tv', category: 'tv', type: 'tv'),
-      _queryDramaHot(kind: 'tv', category: 'tv', type: 'tv_animation'),
-      _queryDramaHot(kind: 'tv', category: 'tv', type: 'show'),
-    ]);
-    dramaMovieState.value = results[0];
-    dramaTvState.value = results[1];
-    dramaAnimationState.value = results[2];
-    dramaShowState.value = results[3];
+    try {
+      final results = await Future.wait([
+        _queryDramaHot(kind: 'movie', category: '热门', type: '全部'),
+        _queryDramaHot(kind: 'tv', category: 'tv', type: 'tv'),
+        _queryDramaHot(kind: 'tv', category: 'tv', type: 'tv_animation'),
+        _queryDramaHot(kind: 'tv', category: 'tv', type: 'show'),
+      ]);
+      dramaMovieState.value = results[0];
+      dramaTvState.value = results[1];
+      dramaAnimationState.value = results[2];
+      dramaShowState.value = results[3];
+    } catch (_) {
+      dramaMovieState.value = const Error('连接错误，请检查网络重试');
+      dramaTvState.value = const Error('连接错误，请检查网络重试');
+      dramaAnimationState.value = const Error('连接错误，请检查网络重试');
+      dramaShowState.value = const Error('连接错误，请检查网络重试');
+      SmartDialog.showToast('网络连接错误，请检查网络重试');
+    }
   }
 
   Future<LoadingState<List<DoubanSubject>>> _queryDramaHot({
@@ -223,9 +232,9 @@ class PgcController
         );
         return Success(data.items);
       }
-      return const Error('请求失败');
-    } catch (e) {
-      return Error(e.toString());
+      return const Error('连接错误，请检查网络重试');
+    } catch (_) {
+      return const Error('连接错误，请检查网络重试');
     }
   }
 }

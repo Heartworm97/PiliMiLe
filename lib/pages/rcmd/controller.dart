@@ -2,6 +2,7 @@ import 'package:PiliMiLe/http/loading_state.dart';
 import 'package:PiliMiLe/http/video.dart';
 import 'package:PiliMiLe/pages/common/common_list_controller.dart';
 import 'package:PiliMiLe/utils/storage_pref.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class RcmdController extends CommonListController {
   late bool enableSaveLastData = Pref.enableSaveLastData;
@@ -29,7 +30,13 @@ class RcmdController extends CommonListController {
 
   @override
   bool handleError(String? errMsg) {
-    return enableSaveLastData;
+    if (enableSaveLastData) {
+      return true;
+    }
+    if (errMsg != null) {
+      SmartDialog.showToast('网络连接错误，请检查网络重试');
+    }
+    return false;
   }
 
   @override

@@ -261,7 +261,7 @@ class AccountManager extends Interceptor {
         } catch (_) {
           desc = '';
         }
-        return '$desc网络异常 ${error.error}';
+        return '${desc}网络异常';
     }
   }
 }
