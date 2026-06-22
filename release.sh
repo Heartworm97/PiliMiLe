@@ -16,96 +16,101 @@ title() { echo -e "\n${GREEN}$1${NC}"; }
 
 REPO="Heartworm97/PiliMiLe"
 
-# AI 自动分析变更并生成 CHANGELOG.md
+# AI 分析代码变更生成 CHANGELOG 条目，插入文件顶部保留历史
 generate_changelog() {
-    local last_tag new_tag
+    local last_tag new_tag today
     new_tag="v$1"
+    today=$(date +%Y-%m-%d)
 
     last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-
-    echo "## 更新内容" > CHANGELOG.md
-    echo "" >> CHANGELOG.md
+    local new_section=""
 
     if [ -n "$last_tag" ]; then
         info "上次发布: $last_tag → 本次: $new_tag"
 
-        # 收集提交记录
-        local diff_log
+        # 收集代码变更上下文（提交记录 + 文件变更统计）
+        local diff_stat diff_log
+        diff_stat=$(git diff "$last_tag..HEAD" --stat -- '*.dart' 2>/dev/null | head -80)
         diff_log=$(git log "$last_tag..HEAD" --no-merges --pretty=format:"[%h] %s" 2>/dev/null)
 
         if [ -n "$diff_log" ] && command -v claude &> /dev/null; then
             info "AI 正在分析代码变更..."
-            local prompt="根据以下 git 提交记录，生成一份简洁的中文 CHANGELOG 更新内容。
+            local prompt="根据以下 git 提交记录和文件变更统计，分析实际代码改动，生成一份简洁的中文 CHANGELOG 条目。
 请严格按以下格式输出，不要加任何额外说明：
 
-## 变更记录
+## [$1] - $today
 
-### 新增功能
-- (根据提交内容输出，确实没有则写「(无)」)
+### Added
+- (确实没有新增功能则写「(无)」)
 
-### 修复
-- (根据提交内容输出，确实没有则写「(无)」)
+### Changed
+- (确实没有行为变更/优化则写「(无)」)
 
-### 优化
-- (根据提交内容输出，确实没有则写「(无)」)
+### Fixed
+- (确实没有修复则写「(无)」)
 
-### 更新内容
-- (根据提交内容输出，确实没有则写「(无)」)
-
-规则：
-- 根据提交信息判断改动类型，分到对应分类
-- chore/ci/build 类提交放到「优化」或「更新内容」
-- 每条用简短的中文描述，不要照搬 commit message
-- 排除发版相关的 chore 提交（如「chore: 发布」「chore: 发版前自动提交」「chore: 重置」）
+分类规则：
+- Added: 新功能、新特性、新接口
+- Changed: 现有行为变更、优化、重构、UI调整
+- Fixed: Bug 修复、崩溃修复
+- chore: 前缀的提交通常是杂务，只有涉及到具体功能变更时才纳入
+- 每条用简短的中文描述（不超过一行），根据文件变更内容推断实际改动，不要照搬 commit message
+- 排除以下提交：chore: 发布、chore: 发版前自动提交、chore: 会话自动提交、chore: 重置
 - 只输出格式内容，不要多写任何话
+
+文件变更统计：
+$diff_stat
 
 提交记录：
 $diff_log"
 
-            if claude -p "$prompt" --output-format text >> CHANGELOG.md 2>/dev/null; then
-                info "AI 总结完成"
-            else
-                warn "AI 不可用，回退到 git log"
-                {
-                    echo "### 新增功能"
-                    git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "feat|add|new|新增|添加" || echo "- (无)"
-                    echo ""
-                    echo "### 修复"
-                    git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "fix|bug|修复|修正" || echo "- (无)"
-                    echo ""
-                    echo "### 优化"
-                    git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "refactor|perf|optimize|优化|重构|改进|chore" || echo "- (无)"
-                    echo ""
-                } >> CHANGELOG.md
+            new_section=$(claude -p "$prompt" --output-format text 2>/dev/null) || true
+
+            # 校验：AI 输出为空或没有实际条目则生成待填写模板
+            local meaningful_lines
+            meaningful_lines=$(echo "$new_section" | grep -cE '^- [^(无]' 2>/dev/null || echo 0)
+            if [ -z "$new_section" ] || [ "$meaningful_lines" -eq 0 ]; then
+                warn "AI 生成内容为空，生成待填写模板"
+                new_section="## [$1] - $today
+
+### Added
+- (待填写)
+
+### Changed
+- (待填写)
+
+### Fixed
+- (待填写)"
             fi
         else
-            # 无 AI，git log 回退
-            warn "git log 自动生成"
-            {
-                echo "### 新增功能"
-                git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "feat|add|new|新增|添加" || echo "- (无)"
-                echo ""
-                echo "### 修复"
-                git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "fix|bug|修复|修正" || echo "- (无)"
-                echo ""
-                echo "### 优化"
-                git log "$last_tag..HEAD" --no-merges --pretty=format:"- %s" 2>/dev/null | grep -iE "refactor|perf|optimize|优化|重构|改进|chore" || echo "- (无)"
-                echo ""
-            } >> CHANGELOG.md
-        fi
+            warn "AI 不可用，生成待填写模板"
+            new_section="## [$1] - $today
 
-        echo "## 全部提交" >> CHANGELOG.md
-        echo "" >> CHANGELOG.md
-        git log "$last_tag..HEAD" --no-merges --pretty=format:"- \`%h\` %s" >> CHANGELOG.md
+### Added
+- (待填写)
+
+### Changed
+- (待填写)
+
+### Fixed
+- (待填写)"
+        fi
     else
-        warn "未找到历史 tag，生成首次发布的更新内容"
-        echo "## 首次发布" >> CHANGELOG.md
-        echo "" >> CHANGELOG.md
-        echo "初始版本 $new_tag" >> CHANGELOG.md
+        warn "未找到历史 tag，生成首次发布"
+        new_section="## [$1] - $today
+
+### Added
+- 初始版本 $new_tag"
     fi
 
-    echo "" >> CHANGELOG.md
-    info "更新内容已生成: CHANGELOG.md"
+    # 插入到文件顶部，保留已有历史内容
+    if [ -f CHANGELOG.md ] && [ -s CHANGELOG.md ]; then
+        printf '%s\n\n%s\n' "$new_section" "$(cat CHANGELOG.md)" > CHANGELOG.md
+    else
+        printf '%s\n\n' "$new_section" > CHANGELOG.md
+    fi
+
+    info "CHANGELOG.md 已更新（新版本已插入顶部，历史版本保留）"
 }
 
 # ---- 入口 ----
