@@ -8,12 +8,15 @@ class SearchDramaItem extends StatelessWidget {
   const SearchDramaItem({
     super.key,
     required this.item,
+    required this.keyword,
   });
 
   final SearchDramaItemModel item;
+  final String keyword;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     const TextStyle style = TextStyle(fontSize: 13);
     return Material(
       type: MaterialType.transparency,
@@ -53,12 +56,7 @@ class SearchDramaItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 4),
-                    Text(
-                      item.vodName,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+                    _buildTitle(theme),
                     const SizedBox(height: 12),
                     if (item.typeName.isNotEmpty || item.vodArea.isNotEmpty)
                       Text(
@@ -76,6 +74,46 @@ class SearchDramaItem extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTitle(ThemeData theme) {
+    final title = item.vodName;
+    final kw = keyword.trim();
+    if (kw.isEmpty || !title.contains(kw)) {
+      return Text(
+        title,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.titleMedium,
+      );
+    }
+
+    final spans = <TextSpan>[];
+    int start = 0;
+    while (true) {
+      final idx = title.indexOf(kw, start);
+      if (idx == -1) {
+        spans.add(TextSpan(text: title.substring(start)));
+        break;
+      }
+      if (idx > start) {
+        spans.add(TextSpan(text: title.substring(start, idx)));
+      }
+      spans.add(TextSpan(
+        text: kw,
+        style: TextStyle(color: theme.colorScheme.primary),
+      ));
+      start = idx + kw.length;
+    }
+
+    return Text.rich(
+      TextSpan(
+        style: theme.textTheme.titleMedium,
+        children: spans,
+      ),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

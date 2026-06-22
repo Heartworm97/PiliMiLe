@@ -49,7 +49,7 @@ class _SearchDramaPanelState
         if (index == list.length - 1) {
           controller.onLoadMore();
         }
-        return SearchDramaItem(item: list[index]);
+        return SearchDramaItem(item: list[index], keyword: widget.keyword);
       },
       itemCount: list.length,
     );
