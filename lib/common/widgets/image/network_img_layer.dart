@@ -2,6 +2,7 @@ import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/models/common/image_type.dart';
 import 'package:PiliMiLe/utils/extension/num_ext.dart';
+import 'package:PiliMiLe/utils/extension/string_ext.dart';
 import 'package:PiliMiLe/utils/image_utils.dart';
 import 'package:PiliMiLe/utils/storage_pref.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
@@ -21,6 +22,7 @@ class NetworkImgLayer extends StatelessWidget {
     this.getPlaceHolder,
     this.fit = .cover,
     this.alignment = .center,
+    this.skipThumbnail = false,
     this.cacheWidth,
   });
 
@@ -35,6 +37,7 @@ class NetworkImgLayer extends StatelessWidget {
   final ValueGetter<Widget>? getPlaceHolder;
   final BoxFit fit;
   final Alignment alignment;
+  final bool skipThumbnail;
   final bool? cacheWidth;
 
   static Color? reduceLuxColor = Pref.reduceLuxColor;
@@ -70,8 +73,11 @@ class NetworkImgLayer extends StatelessWidget {
     } else {
       memCacheHeight = height.cacheSize(context);
     }
+    final imageUrl = skipThumbnail
+        ? src.http2https
+        : ImageUtils.thumbnailUrl(src, quality);
     return CachedNetworkImage(
-      imageUrl: ImageUtils.thumbnailUrl(src, quality),
+      imageUrl: imageUrl,
       width: width,
       height: height,
       memCacheWidth: memCacheWidth,

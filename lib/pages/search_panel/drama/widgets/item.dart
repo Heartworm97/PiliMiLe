@@ -47,6 +47,7 @@ class SearchDramaItem extends StatelessWidget {
                     width: 111,
                     height: 148,
                     src: item.vodPic,
+                    skipThumbnail: true,
                   ),
                   if (item.vodYear.isNotEmpty)
                     PBadge(
