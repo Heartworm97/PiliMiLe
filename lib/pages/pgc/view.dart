@@ -154,7 +154,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                           color: theme.colorScheme.outline,
                           height: 1.5,
                         ),
-                        children: const [
+                        children: [
                           TextSpan(text: '本页面所有视频资源均'),
                           TextSpan(
                             text: '采集自互联网',
@@ -165,14 +165,21 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                             text: '侵犯了您的版权',
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          TextSpan(
+                          const TextSpan(
                             text: '，请联系APP管理员，我们将在核实后',
                           ),
-                          TextSpan(
+                          const TextSpan(
                             text: '第一时间进行处理',
                             style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          TextSpan(text: '。'),
+                          const TextSpan(text: '。\n\n'),
+                          TextSpan(
+                            text: '— PiliMiLe / 月光下的黑驴子',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
                         ],
                       ),
                     ),
