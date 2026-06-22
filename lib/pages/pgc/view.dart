@@ -179,7 +179,6 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                               ),
                               TextSpan(
                                 text: '不拥有任何素材的著作权、传播授权等相关版权权益',
-                                style: TextStyle(fontWeight: FontWeight.w600),
                               ),
                               TextSpan(text: '。'),
                             ],
