@@ -4,6 +4,7 @@ import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/badge.dart';
 import 'package:PiliMiLe/models/common/badge_type.dart';
+import 'package:PiliMiLe/models/common/search/search_type.dart';
 import 'package:PiliMiLe/models_new/douban/subject.dart';
 import 'package:PiliMiLe/utils/extension/num_ext.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
@@ -64,7 +65,8 @@ class DoubanCard extends StatelessWidget {
         borderRadius: Style.mdRadius,
         onTap: () {
           Get.toNamed('/searchResult',
-            parameters: {'keyword': item.title});
+            parameters: {'keyword': item.title},
+            arguments: {'initIndex': SearchType.drama.index});
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
