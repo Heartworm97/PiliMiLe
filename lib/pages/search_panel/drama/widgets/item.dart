@@ -1,6 +1,6 @@
+import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/badge.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
-import 'package:PiliMiLe/models/common/badge_type.dart';
 import 'package:PiliMiLe/models/search/result.dart';
 import 'package:flutter/material.dart';
 
@@ -14,79 +14,66 @@ class SearchDramaItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    const TextStyle style = TextStyle(fontSize: 13);
+    return Material(
+      type: MaterialType.transparency,
       child: InkWell(
         onTap: () {
           // TODO: navigate to drama detail page
         },
-        borderRadius: BorderRadius.circular(8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-              child: Stack(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Style.safeSpace,
+            vertical: Style.cardSpace,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
                 children: [
                   NetworkImgLayer(
+                    width: 111,
+                    height: 148,
                     src: item.vodPic,
-                    width: 108,
-                    height: 144,
                   ),
                   if (item.vodYear.isNotEmpty)
                     PBadge(
                       text: item.vodYear,
-                      top: 4,
+                      top: 6,
                       right: 4,
                       bottom: null,
                       left: null,
                     ),
                 ],
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    item.vodName,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  if (item.typeName.isNotEmpty || item.vodArea.isNotEmpty)
-                    Text(
-                      [item.typeName, item.vodArea].where((s) => s.isNotEmpty).join(' · '),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: theme.textTheme.labelMedium!.fontSize,
-                        color: theme.colorScheme.outline,
-                      ),
-                    ),
-                  if (item.vodActor.isNotEmpty) ...[
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     const SizedBox(height: 4),
                     Text(
-                      item.vodActor,
+                      item.vodName,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: theme.textTheme.labelMedium!.fontSize,
-                        color: theme.colorScheme.outline,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
+                    const SizedBox(height: 12),
+                    if (item.typeName.isNotEmpty || item.vodArea.isNotEmpty)
+                      Text(
+                        [item.typeName, item.vodArea]
+                            .where((s) => s.isNotEmpty)
+                            .join(' · '),
+                        style: style,
+                      ),
+                    if (item.vodActor.isNotEmpty)
+                      Text(item.vodActor, maxLines: 2, style: style),
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
