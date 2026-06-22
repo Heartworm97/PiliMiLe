@@ -144,8 +144,8 @@ class _AboutPageState extends State<AboutPage> {
             const SizedBox(height: 6),
             _buildCreditCard(
               label: '上游作者',
-              name: 'bggRGjQaUbCoE / PiliMiLe',
-              url: 'https://github.com/bggRGjQaUbCoE/PiliMiLe',
+              name: 'bggRGjQaUbCoE / PiliPlus',
+              url: 'https://github.com/bggRGjQaUbCoE/PiliPlus',
               colorScheme: colorScheme,
               theme: theme,
             ),
