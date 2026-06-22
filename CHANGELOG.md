@@ -3,16 +3,17 @@
 ## 变更记录
 
 ### 新增功能
-- (无)
+- 搜索面板"追剧"Tab 接入上游镜像站搜索API，支持关键词搜索影视资源
+- 上游搜索4线路自动容灾切换，单线路故障自动轮询下一条
 
 ### 修复
-- (无)
+- 修复删除Linux平台支持后 geetest_webview_dialog.dart 残留的 desktop_webview_window 引用导致iOS编译失败
+- 修复搜索面板追剧Tab卡片RenderFlex溢出问题
 
 ### 优化
-- (无)
+- 移除 Linux 平台支持（linux/、assets/linux/、CI工作流、release.sh、pubspec.yaml、patch.ps1、CLAUDE.md）
+- 追剧搜索结果卡片布局对齐番剧/影视Tab风格，支持关键词高亮与长按保存封面
 
-### 更新内容
-- (无)
 ## 全部提交
 
 - `4b3ba3e` chore: 会话自动提交
