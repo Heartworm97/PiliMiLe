@@ -42,15 +42,6 @@ class SearchDramaItem extends StatelessWidget {
                       bottom: null,
                       left: null,
                     ),
-                  if (item.vodRemarks.isNotEmpty)
-                    PBadge(
-                      text: item.vodRemarks,
-                      top: null,
-                      right: null,
-                      bottom: 4,
-                      left: 4,
-                      type: PBadgeType.gray,
-                    ),
                 ],
               ),
             ),
