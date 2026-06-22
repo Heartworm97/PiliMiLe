@@ -1,13 +1,11 @@
 import 'dart:math';
 
-import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/badge.dart';
+import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
 import 'package:PiliMiLe/models/common/badge_type.dart';
 import 'package:PiliMiLe/models/common/search/search_type.dart';
 import 'package:PiliMiLe/models_new/douban/subject.dart';
-import 'package:PiliMiLe/utils/extension/num_ext.dart';
-import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -80,34 +78,14 @@ class DoubanCard extends StatelessWidget {
                   return Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      ClipRRect(
+                      NetworkImgLayer(
+                        width: maxWidth,
+                        height: maxHeight,
+                        src: proxyImg(item.picLarge),
+                        skipThumbnail: true,
                         borderRadius: const BorderRadius.only(
                           topLeft: Style.imgRadius,
                           topRight: Style.imgRadius,
-                        ),
-                        child: CachedNetworkImage(
-                          imageUrl: proxyImg(item.picLarge),
-                          width: maxWidth,
-                          height: maxHeight,
-                          fit: BoxFit.cover,
-                          fadeOutDuration: const Duration(milliseconds: 120),
-                          fadeInDuration: const Duration(milliseconds: 120),
-                          filterQuality: FilterQuality.low,
-                          errorWidget: (_, __, ___) => Container(
-                            clipBehavior: Clip.antiAlias,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.onInverseSurface
-                                  .withValues(alpha: 0.4),
-                            ),
-                            child: Center(
-                              child: Image.asset(
-                                Assets.loading,
-                                width: maxWidth,
-                                height: maxHeight,
-                                cacheWidth: maxWidth.cacheSize(context),
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                       if (item.year.isNotEmpty)
