@@ -34,20 +34,27 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // 播放器区域
-            SizedBox(
-              width: playerWidth,
-              height: playerHeight,
-              child: Obx(() => _buildPlayerArea(playerWidth, playerHeight)),
-            ),
-            // 详情区域
-            Expanded(child: Obx(_buildContent)),
-          ],
-        ),
-      ),
+      body: Obx(() {
+        final isFullScreen = controller.plPlayerController.isFullScreen.value;
+
+        // 全屏时播放器撑满屏幕，移除 SafeArea + 隐藏详情区域
+        if (isFullScreen) {
+          return Obx(() => _buildPlayerArea(size.width, size.height));
+        }
+
+        return SafeArea(
+          child: Column(
+            children: [
+              SizedBox(
+                width: playerWidth,
+                height: playerHeight,
+                child: Obx(() => _buildPlayerArea(playerWidth, playerHeight)),
+              ),
+              Expanded(child: Obx(_buildContent)),
+            ],
+          ),
+        );
+      }),
     );
   }
 
