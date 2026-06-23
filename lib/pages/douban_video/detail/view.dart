@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
@@ -77,22 +79,46 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
       clipBehavior: Clip.none,
       fit: StackFit.expand,
       children: [
-        // 封面 — 整个区域可点播放，对齐 B站 Positioned.fill GestureDetector
+        // 背景层：同一张海报模糊拉伸铺满
+        if (controller.vodPic.value.isNotEmpty)
+          Positioned.fill(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: NetworkImgLayer(
+                src: controller.vodPic.value,
+                width: width,
+                height: height,
+                skipThumbnail: true,
+              ),
+            ),
+          ),
+
+        // 居中海报 + 暗色遮罩层
         Positioned.fill(
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: controller.play,
-            child: controller.vodPic.value.isNotEmpty
-                ? NetworkImgLayer(
-                    src: controller.vodPic.value,
-                    width: width,
-                    height: height,
-                    skipThumbnail: true,
-                    getPlaceHolder: () => const Center(
-                      child: CircularProgressIndicator(color: Colors.white),
-                    ),
-                  )
-                : Container(color: Colors.black),
+            child: Container(
+              color: Colors.black.withValues(alpha: 0.3),
+              child: controller.vodPic.value.isNotEmpty
+                  ? Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: SizedBox(
+                          width: width * 0.45,
+                          height: height * 0.85,
+                          child: NetworkImgLayer(
+                            src: controller.vodPic.value,
+                            width: width * 0.45,
+                            height: height * 0.85,
+                            skipThumbnail: true,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
           ),
         ),
 
