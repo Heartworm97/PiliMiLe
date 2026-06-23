@@ -477,8 +477,6 @@ class DoubanHttp {
         return {'status': false, 'data': null, 'msg': '未找到对应的 videoId'};
       }
 
-      logger.d('[追剧HTTP] 解码请求 vodId=$vodId sid=$sid nid=$nid videoId=$targetVideoId');
-
       // M3U8 直链：无需 WASM 解码，直接播放
       if (targetVideoId.endsWith('.m3u8')) {
         return {
@@ -490,6 +488,8 @@ class DoubanHttp {
           ),
         };
       }
+
+      logger.d('[追剧HTTP] WASM解码 vodId=$vodId sid=$sid nid=$nid videoId=$targetVideoId');
 
       // 聚合线路从 site_key 提取短码：site_xxx_qq → qq
       final siteKey = sid.startsWith('site_') ? sid.split('_').last : sid;
