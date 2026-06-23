@@ -298,8 +298,11 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
               children: [
                 // 简介 Tab
                 SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: Style.safeSpace,
+                  padding: const EdgeInsets.fromLTRB(
+                    Style.safeSpace,
+                    Style.safeSpace,
+                    Style.safeSpace,
+                    0,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,16 +310,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                       _buildCoverInfoRow(theme, detail, infoStyle),
                       if (detail.vodContent.isNotEmpty) ...[
                         const SizedBox(height: 12),
-                        Text(
-                          '简介',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.8),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
                         Text(detail.vodContent, style: infoStyle),
                       ],
                       const SizedBox(height: 12),
@@ -407,29 +400,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                     _infoChip(detail.vodRemarks),
                   ].whereType<Widget>().toList(),
                 ),
-                const SizedBox(height: 6),
-                // 演员
-                if (detail.vodActor.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 2),
-                    child: Text(
-                      '演员：${detail.vodActor}',
-                      style: infoStyle,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                // 导演
-                if (detail.vodDirector.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 2),
-                    child: Text(
-                      '导演：${detail.vodDirector}',
-                      style: infoStyle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
                 const Spacer(),
               ],
             ),
