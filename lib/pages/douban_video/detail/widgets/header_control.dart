@@ -19,15 +19,20 @@ class DoubanVideoHeaderControl extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         children: [
-          _buildBtn(
-            tooltip: '返回',
-            icon: const Icon(
-              FontAwesomeIcons.arrowLeft,
-              size: 15,
-              color: Colors.white,
-            ),
-            onPressed: Get.back,
-          ),
+          Obx(() {
+            final isFullScreen = plPlayerController.isFullScreen.value;
+            return _buildBtn(
+              tooltip: isFullScreen ? '退出全屏' : '返回',
+              icon: Icon(
+                isFullScreen ? Icons.fullscreen_exit : FontAwesomeIcons.arrowLeft,
+                size: isFullScreen ? 20 : 15,
+                color: Colors.white,
+              ),
+              onPressed: isFullScreen
+                  ? () => plPlayerController.triggerFullScreen(status: false)
+                  : Get.back,
+            );
+          }),
           Obx(() {
             final isPortrait =
                 MediaQuery.of(context).orientation == Orientation.portrait;
