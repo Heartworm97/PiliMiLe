@@ -688,6 +688,15 @@ class PlPlayerController with BlockConfigMixin {
         return;
       }
 
+      // 再次确保缓冲状态标记为true，防止媒体源切换期间
+      // stream.buffering 事件覆盖 isBuffering/playerStatus 导致加载指示器提前消失
+      if (!isBuffering.value) {
+        isBuffering.value = true;
+      }
+      if (!playerStatus.isPlaying) {
+        playerStatus.value = PlayerStatus.playing;
+      }
+
       // 获取视频时长 00:00
       this.duration.value = duration ?? _videoPlayerController!.state.duration;
       position = buffered.value = sliderPosition = seekTo ?? Duration.zero;
@@ -896,6 +905,10 @@ class PlPlayerController with BlockConfigMixin {
       }
     }
 
+    // open 前先断开旧 pipeline 的 stream 监听，防止旧 pipeline
+    // 的 buffering/playing 事件在 open 期间覆盖手动设置的状态值
+    _removeListeners();
+
     await player.open(
       Media(
         video,
@@ -904,6 +917,9 @@ class PlPlayerController with BlockConfigMixin {
       ),
       play: false,
     );
+
+    // open 后注册新 pipeline 的 stream 监听器
+    _startListeners(player);
   }
 
   Future<void>? refreshPlayer() {

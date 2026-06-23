@@ -130,7 +130,6 @@ class DoubanVideoDetailController extends GetxController {
       autoplay: false,
     );
     playerReady.value = true;
-    // 显式调用 play 确保不须二次点击
     await plPlayerController.play();
   }
 
