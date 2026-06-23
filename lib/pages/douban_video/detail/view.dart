@@ -70,6 +70,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         headerControl: DoubanVideoHeaderControl(
           plPlayerController: controller.plPlayerController,
           title: controller.vodName.value,
+          doubanController: controller,
         ),
       );
     }
