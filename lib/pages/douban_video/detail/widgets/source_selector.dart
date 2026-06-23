@@ -17,7 +17,7 @@ class SourceSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final available = sources.where((s) => s.decodeStatus != '2').length;
+    final available = sources.where((s) => s.decodeStatus != '2' && s.key != 'JD4K').length;
     final total = sources.length;
 
     return Padding(
@@ -45,7 +45,7 @@ class SourceSelector extends StatelessWidget {
               itemBuilder: (context, index) {
                 final src = sources[index];
                 final isSelected = index == selectedIndex;
-                final isAvailable = src.decodeStatus != '2';
+                final isAvailable = src.decodeStatus != '2' && src.key != 'JD4K';
 
                 return ChoiceChip(
                   label: Text(
