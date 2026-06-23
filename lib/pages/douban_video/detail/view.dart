@@ -308,10 +308,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildCoverInfoRow(theme, detail, infoStyle),
-                      if (detail.vodContent.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        Text(detail.vodContent, style: infoStyle),
-                      ],
                       const SizedBox(height: 12),
                       // 线路选择器
                       Obx(() => SourceSelector(
@@ -400,7 +396,12 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                     _infoChip(detail.vodRemarks),
                   ].whereType<Widget>().toList(),
                 ),
-                const Spacer(),
+                if (detail.vodContent.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Expanded(
+                    child: Text(detail.vodContent, style: infoStyle),
+                  ),
+                ],
               ],
             ),
           ),
