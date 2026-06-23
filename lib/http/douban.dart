@@ -352,6 +352,14 @@ class DoubanHttp {
         // 内置线路按 sort 降序排列
         sources.sort((a, b) => b.sort.compareTo(a.sort));
 
+        // 站外聚合线路：排在后面，内部按 sort 降序
+        final aggregateSources = await _fetchAggregateSources(vodId);
+        if (aggregateSources.isNotEmpty) {
+          aggregateSources.sort((a, b) => b.sort.compareTo(a.sort));
+          debugPrint('[追剧HTTP] 聚合线路数=${aggregateSources.length} 合并后总数=${sources.length + aggregateSources.length}');
+          sources.addAll(aggregateSources);
+        }
+
         return {
           'status': true,
           'data': DoubanVodDetailModel(
@@ -373,6 +381,60 @@ class DoubanHttp {
     } catch (e) {
       logger.e('getVodDetail error: $e');
       return {'status': false, 'data': null, 'msg': '网络错误: $e'};
+    }
+  }
+
+  /// 获取站外聚合线路（search_aggregate 接口）
+  static Future<List<DoubanSourceModel>> _fetchAggregateSources(
+      dynamic vodId) async {
+    try {
+      final resp = await _upstreamGet(
+        '/api.php/web/internal/search_aggregate',
+        params: {'vod_id': vodId.toString()},
+      );
+
+      if (resp.statusCode == 200) {
+        final data = resp.data;
+        if (data['code'] != 200) return [];
+
+        final list = data['data'] as List<dynamic>? ?? [];
+        final sources = <DoubanSourceModel>[];
+
+        for (final item in list) {
+          final siteKey = item['site_key'] as String? ?? '';
+          final siteName = item['site_name'] as String? ?? '';
+          if (siteKey.isEmpty) continue;
+
+          final epRaw = (item['vod_play_url'] as String? ?? '')
+              .split('#')
+              .where((s) => s.trim().isNotEmpty)
+              .toList();
+
+          final episodes = epRaw.asMap().entries.map((entry) {
+            final parts = entry.value.split('\$');
+            return DoubanEpisodeModel(
+              nid: entry.key + 1,
+              title: parts.isNotEmpty ? parts[0] : '第${entry.key + 1}集',
+              videoId: parts.length > 1 ? parts[1] : '',
+            );
+          }).toList();
+
+          sources.add(DoubanSourceModel(
+            key: siteKey,
+            name: siteName,
+            sort: (item['sort'] as num?)?.toInt() ?? 0,
+            decodeStatus: (item['decode_status'] ?? '0').toString(),
+            episodeCount: episodes.length,
+            episodes: episodes,
+          ));
+        }
+
+        return sources;
+      }
+      return [];
+    } catch (_) {
+      // 聚合接口失败不影响主流程
+      return [];
     }
   }
 
