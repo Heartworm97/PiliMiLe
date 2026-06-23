@@ -103,15 +103,12 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
               behavior: HitTestBehavior.opaque,
               onTap: controller.play,
               child: Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: NetworkImgLayer(
-                    src: controller.vodPic.value,
-                    width: width,
-                    height: height,
-                    skipThumbnail: true,
-                    fit: BoxFit.contain,
-                  ),
+                child: NetworkImgLayer(
+                  src: controller.vodPic.value,
+                  width: width,
+                  height: height,
+                  skipThumbnail: true,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
