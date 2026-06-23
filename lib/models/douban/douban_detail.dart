@@ -15,7 +15,7 @@ class DoubanEpisodeModel {
 class DoubanSourceModel {
   final String key;
   final String name;
-  final int sort;
+  final double sort;
   final String decodeStatus; // "1"=正常, 其他=维护中
   final int episodeCount;
   final List<DoubanEpisodeModel> episodes;

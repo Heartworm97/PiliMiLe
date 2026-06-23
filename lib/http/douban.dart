@@ -343,7 +343,7 @@ class DoubanHttp {
           sources.add(DoubanSourceModel(
             key: key,
             name: (cfg['show'] as String?) ?? key,
-            sort: int.tryParse((cfg['sort'] ?? '0').toString()) ?? 0,
+            sort: double.tryParse((cfg['sort'] ?? '0').toString()) ?? 0,
             decodeStatus: (cfg['decode_status'] ?? '0').toString(),
             episodeCount: episodes.length,
             episodes: episodes,
@@ -423,7 +423,7 @@ class DoubanHttp {
           sources.add(DoubanSourceModel(
             key: siteKey,
             name: siteName,
-            sort: (item['sort'] as num?)?.toInt() ?? 0,
+            sort: (item['sort'] as num?)?.toDouble() ?? 0,
             decodeStatus: (item['decode_status'] ?? '0').toString(),
             episodeCount: episodes.length,
             episodes: episodes,
