@@ -220,51 +220,74 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
     );
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: Style.safeSpace),
+    return DefaultTabController(
+      length: 2,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 封面 + 信息横向布局
-          _buildCoverInfoRow(theme, detail, infoStyle),
-
-          const SizedBox(height: 8),
-
-          // 线路选择器
-          Obx(() => SourceSelector(
-            sources: controller.sources,
-            selectedIndex: controller.selectedSourceIndex.value,
-            onSelected: controller.onSelectSource,
-          )),
-
-          // 集数选择器
-          Obx(() => EpisodeSelector(
-            episodes: controller.currentEpisodes,
-            selectedIndex: controller.selectedEpisodeIndex.value,
-            onSelected: controller.onSelectEpisode,
-          )),
-
-          // 简介
-          if (detail.vodContent.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              '简介',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-              ),
+          TabBar(
+            labelColor: theme.colorScheme.onSurface,
+            padding: EdgeInsets.zero,
+            labelStyle: const TextStyle(fontSize: 13),
+            labelPadding: const EdgeInsets.symmetric(horizontal: 10),
+            dividerColor: Colors.transparent,
+            dividerHeight: 0,
+            tabs: const [
+              Tab(text: '简介'),
+              Tab(text: '剧集'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                // 简介 Tab
+                SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Style.safeSpace,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildCoverInfoRow(theme, detail, infoStyle),
+                      if (detail.vodContent.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          '简介',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.8),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(detail.vodContent, style: infoStyle),
+                      ],
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+                // 剧集 Tab
+                SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Obx(() => SourceSelector(
+                        sources: controller.sources,
+                        selectedIndex: controller.selectedSourceIndex.value,
+                        onSelected: controller.onSelectSource,
+                      )),
+                      Obx(() => EpisodeSelector(
+                        episodes: controller.currentEpisodes,
+                        selectedIndex: controller.selectedEpisodeIndex.value,
+                        onSelected: controller.onSelectEpisode,
+                      )),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              detail.vodContent,
-              style: infoStyle,
-              maxLines: 5,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-
-          const SizedBox(height: 24),
+          ),
         ],
       ),
     );
