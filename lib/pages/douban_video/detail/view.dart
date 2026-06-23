@@ -107,9 +107,14 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              blurRadius: 24,
-                              spreadRadius: 4,
+                              color: Colors.white.withValues(alpha: 0.12),
+                              blurRadius: 30,
+                              offset: const Offset(-20, 0),
+                            ),
+                            BoxShadow(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              blurRadius: 30,
+                              offset: const Offset(20, 0),
                             ),
                           ],
                         ),
