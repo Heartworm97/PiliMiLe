@@ -130,6 +130,7 @@ class DoubanVideoDetailController extends GetxController {
       autoplay: false,
     );
     playerReady.value = true;
+    // 显式调用 play 确保不须二次点击
     await plPlayerController.play();
   }
 
@@ -151,17 +152,13 @@ class DoubanVideoDetailController extends GetxController {
     selectedEpisodeIndex.value = matchedIndex;
 
     m3u8Url.value = null;
-    // 暂停当前视频，立即开始解码新线路（保持播放器挂载，避免纹理重建闪帧）
-    plPlayerController.pause(notify: false);
-    play();
+    playerReady.value = false;
   }
 
   void onSelectEpisode(int index) {
     if (index == selectedEpisodeIndex.value) return;
     selectedEpisodeIndex.value = index;
     m3u8Url.value = null;
-    // 暂停当前视频，立即开始解码新剧集（保持播放器挂载，避免纹理重建闪帧）
-    plPlayerController.pause(notify: false);
-    play();
+    playerReady.value = false;
   }
 }

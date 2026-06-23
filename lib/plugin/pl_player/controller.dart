@@ -669,9 +669,6 @@ class PlPlayerController with BlockConfigMixin {
         _clearPreview();
       }
       cancelLongPressTimer();
-      // 先断开旧 pipeline 的 stream 监听，防止随后的 pause() + open()
-      // 触发旧 pipeline 的 playing/buffering 事件覆盖 isBuffering/playerStatus
-      _removeListeners();
       if (_videoPlayerController != null &&
           _videoPlayerController!.state.playing) {
         await pause(notify: false);
@@ -689,25 +686,6 @@ class PlPlayerController with BlockConfigMixin {
         _videoPlayerController = null;
         _videoController = null;
         return;
-      }
-
-      // 钉住 isBuffering 为 true 直到新源的 stream.buffering 自然接管。
-      // 加上 _createVideoController 内部的保护，这已经预防了绝大部分时序窗口。
-      // 残余 20-30% 的复现来自 _startListeners → stream.playing 事件：
-      // player.open(play:false) 后，mpv 对 pause 属性的确认会触发
-      // 'pause' → playingController.add(false) → stream.playing(false)
-      // 将 playerStatus 重置为 paused。_initializePlayer 的 setPlaybackSpeed
-      // 是同步的，但 setRate 是异步的——这段时间新 pipeline 的
-      // stream.buffering 可能还未发 true（需要 mpv EVENT_START_FILE），
-      // 导致 isBuffering=true + playerStatus=paused → 加载指示器消失。
-      //
-      // 修复：在 dataStatus = loaded 之前再次确认状态，覆盖 stream.playing
-      // 可能的异步 false 事件（setRate 的 await 给了一个 yield 窗口）。
-      if (!isBuffering.value) {
-        isBuffering.value = true;
-      }
-      if (!playerStatus.isPlaying) {
-        playerStatus.value = PlayerStatus.playing;
       }
 
       // 获取视频时长 00:00
@@ -846,8 +824,7 @@ class PlPlayerController with BlockConfigMixin {
     Duration? seekTo,
     Volume? volume,
   ) async {
-    isBuffering.value = true;
-    playerStatus.value = PlayerStatus.playing;
+    isBuffering.value = false;
     buffered.value = Duration.zero;
     _heartDuration = 0;
     position = Duration.zero;
@@ -918,10 +895,6 @@ class PlPlayerController with BlockConfigMixin {
       }
     }
 
-    // open 前先断开旧 pipeline 的 stream 监听，防止旧 pipeline
-    // 的 buffering/playing 事件在 open 期间覆盖手动设置的状态值
-    _removeListeners();
-
     await player.open(
       Media(
         video,
@@ -930,9 +903,6 @@ class PlPlayerController with BlockConfigMixin {
       ),
       play: false,
     );
-
-    // open 后注册新 pipeline 的 stream 监听器
-    _startListeners(player);
   }
 
   Future<void>? refreshPlayer() {
