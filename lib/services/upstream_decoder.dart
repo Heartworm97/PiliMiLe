@@ -30,6 +30,11 @@ class UpstreamDecoder {
     required String videoId,
     required String siteKey,
   }) async {
+    // 懒初始化 WASM 桥接层
+    if (!WasmBridge().isReady) {
+      await WasmBridge().init(upstreamHost);
+    }
+
     // 等待 WASM 就绪
     logger.d('[UpstreamDecoder] 等待 WASM 就绪...');
     final ready = await WasmBridge().ready;
