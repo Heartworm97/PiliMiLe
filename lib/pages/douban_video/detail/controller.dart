@@ -89,6 +89,7 @@ class DoubanVideoDetailController extends GetxController {
 
     isDecoding.value = true;
     errorMsg.value = null;
+    SmartDialog.showLoading(msg: '资源获取中...');
     try {
       final resp = await DoubanHttp.decodeVod(
         vodId: vodId,
@@ -101,18 +102,22 @@ class DoubanVideoDetailController extends GetxController {
         if (result.url.isNotEmpty) {
           m3u8Url.value = result.url;
           await _playM3u8(result.url);
+          SmartDialog.dismiss();
         } else {
           errorMsg.value = '解码结果为空';
+          SmartDialog.dismiss();
           SmartDialog.showToast('解码失败，请稍后重试');
         }
       } else {
         debugPrint('[追剧详情] 解码失败: ${resp['msg']}');
         errorMsg.value = resp['msg'] ?? '解码失败';
+        SmartDialog.dismiss();
         SmartDialog.showToast('解码失败，请稍后重试');
       }
     } catch (e) {
       debugPrint('[追剧详情] 解码异常: $e');
       errorMsg.value = '解码错误: $e';
+      SmartDialog.dismiss();
       SmartDialog.showToast('解码失败，请稍后重试');
     } finally {
       isDecoding.value = false;
