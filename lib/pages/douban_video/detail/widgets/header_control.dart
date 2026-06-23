@@ -56,18 +56,25 @@ class DoubanVideoHeaderControl extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             constraints: const BoxConstraints(),
           ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+          // 仅全屏时显示剧名
+          Obx(
+            () => plPlayerController.isFullScreen.value
+                ? Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                : const Spacer(),
           ),
         ],
       ),

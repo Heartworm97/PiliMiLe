@@ -119,9 +119,11 @@ class DoubanVideoDetailController extends GetxController {
     await plPlayerController.setDataSource(
       NetworkSource(videoSource: url, audioSource: null),
       isLive: true,
-      autoplay: true,
+      autoplay: false,
     );
     playerReady.value = true;
+    // 显式调用 play 确保不须二次点击
+    await plPlayerController.play();
   }
 
   void onSelectSource(int index) {
