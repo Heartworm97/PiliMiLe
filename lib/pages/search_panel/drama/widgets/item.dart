@@ -4,7 +4,6 @@ import 'package:PiliMiLe/common/widgets/image/image_save.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
 import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/models/search/result.dart';
-import 'package:PiliMiLe/services/logger.dart';
 import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 
@@ -30,22 +29,22 @@ class SearchDramaItem extends StatelessWidget {
       type: MaterialType.transparency,
       child: InkWell(
         onTap: () async {
-          logger.d('========== 追剧详情: ${item.vodName}(${item.vodId}) ==========');
+          debugPrint('========== 追剧详情: ${item.vodName}(${item.vodId}) ==========');
 
           final result = await DoubanHttp.getVodDetail(item.vodId);
           if (result['status'] == true) {
             final detail = result['data'];
-            logger.d('成功 | 线路:${detail.sources.length}');
+            debugPrint('成功 | 线路:${detail.sources.length}');
             for (final src in detail.sources) {
               final sample = src.episodes.isNotEmpty
                   ? src.episodes.first.videoId
                   : '无';
-              logger.d('  ${src.name}(${src.key}) '
+              debugPrint('  ${src.name}(${src.key}) '
                   '集数:${src.episodeCount} decode:${src.decodeStatus} '
                   '样本: $sample');
             }
           } else {
-            logger.e('失败, msg=${result['msg']}');
+            debugPrint('失败, msg=${result['msg']}');
           }
         },
         onLongPress: onLongPress,
