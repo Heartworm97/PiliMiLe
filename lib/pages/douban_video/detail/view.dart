@@ -3,9 +3,9 @@ import 'package:PiliMiLe/pages/douban_video/detail/controller.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/episode_selector.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/header_control.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/source_selector.dart';
-import 'package:PiliMiLe/plugin/pl_player/view/view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 class DoubanVideoDetailPage extends StatefulWidget {
   const DoubanVideoDetailPage({super.key});
@@ -51,14 +51,23 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
   Widget _buildPlayerArea(double width, double height) {
     // M3U8 就绪 → 播放器
     if (controller.playerReady.value) {
-      return PLVideoPlayer(
-        maxWidth: width,
-        maxHeight: height,
-        plPlayerController: controller.plPlayerController,
-        headerControl: DoubanVideoHeaderControl(
-          plPlayerController: controller.plPlayerController,
-          title: controller.vodName.value,
-        ),
+      final vc = controller.plPlayerController.videoController;
+      if (vc == null) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      return Stack(
+        children: [
+          Video(
+            controller: vc,
+            width: width,
+            height: height,
+            fit: BoxFit.contain,
+          ),
+          DoubanVideoHeaderControl(
+            plPlayerController: controller.plPlayerController,
+            title: controller.vodName.value,
+          ),
+        ],
       );
     }
 
