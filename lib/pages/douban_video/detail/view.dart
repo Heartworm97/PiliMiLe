@@ -1,7 +1,6 @@
 import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
-import 'package:PiliMiLe/models/common/image_type.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/controller.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/episode_selector.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/header_control.dart';
@@ -74,11 +73,10 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         // 封面
         if (controller.vodPic.value.isNotEmpty)
           NetworkImgLayer(
-            type: ImageType.emote,
-            quality: 60,
             src: controller.vodPic.value,
             width: width,
             height: height,
+            skipThumbnail: true,
             getPlaceHolder: () => const Center(
               child: CircularProgressIndicator(color: Colors.white),
             ),
