@@ -102,33 +102,14 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
               color: Colors.black.withValues(alpha: 0.3),
               child: controller.vodPic.value.isNotEmpty
                   ? Center(
-                      child: IntrinsicWidth(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.25),
-                                blurRadius: 40,
-                                offset: const Offset(-16, 0),
-                              ),
-                              BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.25),
-                                blurRadius: 40,
-                                offset: const Offset(16, 0),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: NetworkImgLayer(
-                              src: controller.vodPic.value,
-                              width: double.infinity,
-                              height: height,
-                              skipThumbnail: true,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: NetworkImgLayer(
+                          src: controller.vodPic.value,
+                          width: width,
+                          height: height,
+                          skipThumbnail: true,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     )
