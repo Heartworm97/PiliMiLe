@@ -152,13 +152,17 @@ class DoubanVideoDetailController extends GetxController {
     selectedEpisodeIndex.value = matchedIndex;
 
     m3u8Url.value = null;
-    playerReady.value = false;
+    // 暂停当前视频，立即开始解码新线路（保持播放器挂载，避免纹理重建闪帧）
+    plPlayerController.pause(notify: false);
+    play();
   }
 
   void onSelectEpisode(int index) {
     if (index == selectedEpisodeIndex.value) return;
     selectedEpisodeIndex.value = index;
     m3u8Url.value = null;
-    playerReady.value = false;
+    // 暂停当前视频，立即开始解码新剧集（保持播放器挂载，避免纹理重建闪帧）
+    plPlayerController.pause(notify: false);
+    play();
   }
 }
