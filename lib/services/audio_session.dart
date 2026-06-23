@@ -6,8 +6,12 @@ class AudioSessionHandler {
   late AudioSession session;
   bool _playInterrupted = false;
 
-  Future<bool> setActive(bool active) {
-    return session.setActive(active);
+  Future<bool> setActive(bool active) async {
+    try {
+      return await session.setActive(active);
+    } catch (_) {
+      return false;
+    }
   }
 
   AudioSessionHandler() {
