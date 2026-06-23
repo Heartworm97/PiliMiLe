@@ -30,34 +30,23 @@ class SearchDramaItem extends StatelessWidget {
       type: MaterialType.transparency,
       child: InkWell(
         onTap: () async {
-          logger.d('========== 获取追剧详情 ==========');
-          logger.d('vodId: ${item.vodId}');
-          logger.d('vodName: ${item.vodName}');
+          logger.d('========== 追剧详情: ${item.vodName}(${item.vodId}) ==========');
 
           final result = await DoubanHttp.getVodDetail(item.vodId);
           if (result['status'] == true) {
             final detail = result['data'];
-            logger.d('状态: 成功');
-            logger.d('影片名: ${detail.vodName}');
-            logger.d('年份: ${detail.vodYear}');
-            logger.d('地区: ${detail.vodArea}');
-            logger.d('语言: ${detail.vodLang}');
-            logger.d('演员: ${detail.vodActor}');
-            logger.d('导演: ${detail.vodDirector}');
-            logger.d('简介: ${detail.vodContent}');
-            logger.d('线路数: ${detail.sources.length}');
+            logger.d('成功 | 线路:${detail.sources.length}');
             for (final src in detail.sources) {
-              logger.d('  ── 线路: ${src.name}  key=${src.key}  '
-                  'sort=${src.sort}  decodeStatus=${src.decodeStatus}  '
-                  '集数=${src.episodeCount}');
-              for (final ep in src.episodes) {
-                logger.d('       ${ep.nid}: ${ep.title}  videoId=${ep.videoId}');
-              }
+              final sample = src.episodes.isNotEmpty
+                  ? src.episodes.first.videoId
+                  : '无';
+              logger.d('  ${src.name}(${src.key}) '
+                  '集数:${src.episodeCount} decode:${src.decodeStatus} '
+                  '样本: $sample');
             }
           } else {
-            logger.e('状态: 失败, msg=${result['msg']}');
+            logger.e('失败, msg=${result['msg']}');
           }
-          logger.d('========== 追剧详情结束 ==========');
         },
         onLongPress: onLongPress,
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
