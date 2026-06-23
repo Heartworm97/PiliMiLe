@@ -233,7 +233,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
             dividerHeight: 0,
             tabs: const [
               Tab(text: '简介'),
-              Tab(text: '剧集'),
+              Tab(text: '待规划'),
             ],
           ),
           Expanded(
@@ -262,20 +262,14 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                         const SizedBox(height: 4),
                         Text(detail.vodContent, style: infoStyle),
                       ],
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                ),
-                // 剧集 Tab
-                SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                      const SizedBox(height: 12),
+                      // 线路选择器
                       Obx(() => SourceSelector(
                         sources: controller.sources,
                         selectedIndex: controller.selectedSourceIndex.value,
                         onSelected: controller.onSelectSource,
                       )),
+                      // 集数选择器
                       Obx(() => EpisodeSelector(
                         episodes: controller.currentEpisodes,
                         selectedIndex: controller.selectedEpisodeIndex.value,
@@ -283,6 +277,16 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                       )),
                       const SizedBox(height: 24),
                     ],
+                  ),
+                ),
+                // 待规划 Tab
+                Center(
+                  child: Text(
+                    '待规划',
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface
+                          .withValues(alpha: 0.38),
+                    ),
                   ),
                 ),
               ],
