@@ -1,8 +1,10 @@
+import 'package:PiliMiLe/common/widgets/custom_icon.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/controller.dart';
 import 'package:PiliMiLe/pages/setting/models/play_settings.dart'
     show showPlayerVolumeDialog;
 import 'package:PiliMiLe/pages/setting/widgets/popup_item.dart'
     show PopupListTile, enumItemBuilder, DescPosType;
+import 'package:PiliMiLe/pages/video/introduction/ugc/widgets/menu_row.dart';
 import 'package:PiliMiLe/pages/video/widgets/header_control.dart'
     show HeaderControlState;
 import 'package:PiliMiLe/plugin/pl_player/controller.dart';
@@ -153,6 +155,60 @@ class DoubanVideoHeaderControl extends StatelessWidget {
                 },
                 descPosType: DescPosType.subtitle,
                 descFontSize: 12,
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Obx(
+                      () {
+                        final flipX = plPlayerController.flipX.value;
+                        return ActionRowLineItem(
+                          iconData: Icons.flip,
+                          onTap: () =>
+                              plPlayerController.flipX.value = !flipX,
+                          text: " 左右翻转 ",
+                          selectStatus: flipX,
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                    Obx(
+                      () {
+                        final flipY = plPlayerController.flipY.value;
+                        return ActionRowLineItem(
+                          icon: Icon(
+                            CustomIcons.flip_rotate_90,
+                            size: 13,
+                            color: flipY
+                                ? Theme.of(context).colorScheme.onSecondaryContainer
+                                : Theme.of(context).colorScheme.outline,
+                          ),
+                          onTap: () {
+                            plPlayerController.flipY.value = !flipY;
+                          },
+                          text: " 上下翻转 ",
+                          selectStatus: flipY,
+                        );
+                      },
+                    ),
+                    if (PlatformUtils.isMobile) ...[
+                      const SizedBox(width: 10),
+                      Obx(
+                        () => ActionRowLineItem(
+                          iconData: Icons.play_circle_outline,
+                          onTap:
+                              plPlayerController.setContinuePlayInBackground,
+                          text: " 后台播放 ",
+                          selectStatus: plPlayerController
+                              .continuePlayInBackground
+                              .value,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
               if (plPlayerController.videoPlayerController case final player?)
                 ListTile(
