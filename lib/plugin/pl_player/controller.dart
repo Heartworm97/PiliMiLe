@@ -824,7 +824,8 @@ class PlPlayerController with BlockConfigMixin {
     Duration? seekTo,
     Volume? volume,
   ) async {
-    isBuffering.value = false;
+    isBuffering.value = true;
+    playerStatus.value = PlayerStatus.playing;
     buffered.value = Duration.zero;
     _heartDuration = 0;
     position = Duration.zero;
