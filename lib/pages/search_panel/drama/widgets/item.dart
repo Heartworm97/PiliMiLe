@@ -61,7 +61,6 @@ class SearchDramaItem extends StatelessWidget {
           // ignore: avoid_print — 临时验证，一次性输出多行
           print(buf.toString());
         },
-        },
         onLongPress: onLongPress,
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
         child: Padding(
