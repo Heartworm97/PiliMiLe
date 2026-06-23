@@ -83,7 +83,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         if (controller.vodPic.value.isNotEmpty)
           Positioned.fill(
             child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              imageFilter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
               child: NetworkImgLayer(
                 src: controller.vodPic.value,
                 width: width,
@@ -102,14 +102,26 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
               color: Colors.black.withValues(alpha: 0.3),
               child: controller.vodPic.value.isNotEmpty
                   ? Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: NetworkImgLayer(
-                          src: controller.vodPic.value,
-                          width: width,
-                          height: height,
-                          skipThumbnail: true,
-                          fit: BoxFit.contain,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              blurRadius: 24,
+                              spreadRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: NetworkImgLayer(
+                            src: controller.vodPic.value,
+                            width: width,
+                            height: height,
+                            skipThumbnail: true,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     )
