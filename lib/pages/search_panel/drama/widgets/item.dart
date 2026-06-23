@@ -43,6 +43,23 @@ class SearchDramaItem extends StatelessWidget {
                   '集数:${src.episodeCount} decode:${src.decodeStatus} '
                   '样本: $sample');
             }
+            // 选第一条正常解码的线路试解第一集
+            for (final src in detail.sources) {
+              if (src.decodeStatus == '1' && src.episodes.isNotEmpty) {
+                debugPrint('>> 试解: ${src.name}(${src.key}) 第1集');
+                final decodeR = await DoubanHttp.decodeVod(
+                  vodId: item.vodId,
+                  sid: src.key,
+                  nid: 1,
+                );
+                if (decodeR['status'] == true) {
+                  debugPrint('>> M3U8: ${decodeR['data'].url}');
+                } else {
+                  debugPrint('>> 解码失败: ${decodeR['msg']}');
+                }
+                break;
+              }
+            }
           } else {
             debugPrint('失败, msg=${result['msg']}');
           }
