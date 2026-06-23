@@ -225,6 +225,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
       child: Column(
         children: [
           TabBar(
+            isScrollable: true,
             tabAlignment: TabAlignment.start,
             labelColor: theme.colorScheme.onSurface,
             padding: EdgeInsets.zero,
