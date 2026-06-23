@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/plugin/pl_player/controller.dart';
+import 'package:PiliMiLe/plugin/pl_player/models/play_status.dart';
 import 'package:PiliMiLe/plugin/pl_player/models/data_source.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
@@ -143,7 +144,7 @@ class DoubanVideoDetailController extends GetxController {
   void _startPlayTimeout() {
     _playTimeoutTimer?.cancel();
     _playTimeoutTimer = Timer(const Duration(seconds: 8), () {
-      if (!plPlayerController.playerStatus.isPlaying) {
+      if (plPlayerController.playerStatus.value != PlayerStatus.playing) {
         SmartDialog.showToast('播放失败，请尝试其他线路');
       }
     });
