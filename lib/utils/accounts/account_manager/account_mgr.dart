@@ -182,7 +182,7 @@ class AccountManager extends Interceptor {
         (url.contains('skipSegments') && err.requestOptions.method == 'GET')) {
       // skip
     } else {
-      dioError(err).then((res) => SmartDialog.showToast(res + url));
+      dioError(err).then((res) => SmartDialog.showToast(res));
     }
   }
 
