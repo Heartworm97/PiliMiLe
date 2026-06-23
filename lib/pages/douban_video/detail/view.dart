@@ -55,7 +55,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         maxHeight: height,
         plPlayerController: controller.plPlayerController,
         headerControl: DoubanVideoHeaderControl(
-          plPlayerController: controller.plPlayerController,
           title: controller.vodName.value,
         ),
       );

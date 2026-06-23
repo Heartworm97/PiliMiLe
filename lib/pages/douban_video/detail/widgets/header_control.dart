@@ -1,15 +1,12 @@
-import 'package:PiliMiLe/plugin/pl_player/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DoubanVideoHeaderControl extends StatelessWidget {
   const DoubanVideoHeaderControl({
     super.key,
-    required this.plPlayerController,
     required this.title,
   });
 
-  final PlPlayerController plPlayerController;
   final String title;
 
   @override
@@ -52,21 +49,6 @@ class DoubanVideoHeaderControl extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-          ),
-          IconButton(
-            onPressed: () {
-              plPlayerController.isFullScreen.value =
-                  !plPlayerController.isFullScreen.value;
-            },
-            icon: Obx(() => Icon(
-              plPlayerController.isFullScreen.value
-                  ? Icons.fullscreen_exit
-                  : Icons.fullscreen,
-              size: 20,
-            )),
-            color: Colors.white,
-            padding: const EdgeInsets.all(8),
-            constraints: const BoxConstraints(),
           ),
         ],
       ),
