@@ -2,6 +2,7 @@ import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/plugin/pl_player/controller.dart';
 import 'package:PiliMiLe/plugin/pl_player/models/data_source.dart';
+import 'package:floating_smart_dialog/floating_smart_dialog.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:get/get.dart';
 
@@ -102,14 +103,17 @@ class DoubanVideoDetailController extends GetxController {
           await _playM3u8(result.url);
         } else {
           errorMsg.value = '解码结果为空';
+          SmartDialog.showToast('解码失败，稍后重试');
         }
       } else {
         debugPrint('[追剧详情] 解码失败: ${resp['msg']}');
         errorMsg.value = resp['msg'] ?? '解码失败';
+        SmartDialog.showToast('解码失败，稍后重试');
       }
     } catch (e) {
       debugPrint('[追剧详情] 解码异常: $e');
       errorMsg.value = '解码错误: $e';
+      SmartDialog.showToast('解码失败，稍后重试');
     } finally {
       isDecoding.value = false;
     }
