@@ -35,8 +35,7 @@ class DoubanVideoHeaderControl extends StatelessWidget {
                   size: 15,
                   color: Colors.white,
                 ),
-                onPressed: () =>
-                    plPlayerController.onPopInvokedWithResult(false, null),
+                onPressed: Get.back,
               ),
               Obx(() {
                 final isPortrait =

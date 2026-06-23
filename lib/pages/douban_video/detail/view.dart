@@ -70,19 +70,24 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
       clipBehavior: Clip.none,
       fit: StackFit.expand,
       children: [
-        // 封面
-        if (controller.vodPic.value.isNotEmpty)
-          NetworkImgLayer(
-            src: controller.vodPic.value,
-            width: width,
-            height: height,
-            skipThumbnail: true,
-            getPlaceHolder: () => const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
-          )
-        else
-          Container(color: Colors.black),
+        // 封面 — 整个区域可点播放，对齐 B站 Positioned.fill GestureDetector
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: controller.play,
+            child: controller.vodPic.value.isNotEmpty
+                ? NetworkImgLayer(
+                    src: controller.vodPic.value,
+                    width: width,
+                    height: height,
+                    skipThumbnail: true,
+                    getPlaceHolder: () => const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                  )
+                : Container(color: Colors.black),
+          ),
+        ),
 
         // 顶栏（对齐 B站 manualPlayerWidget）
         Positioned(
