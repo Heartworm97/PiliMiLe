@@ -180,19 +180,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
               ],
             ),
           ),
-
-        // 错误提示
-        if (controller.errorMsg.value != null)
-          Positioned(
-            left: 12,
-            right: 12,
-            bottom: 48,
-            child: Text(
-              controller.errorMsg.value!,
-              style: const TextStyle(color: Colors.redAccent, fontSize: 12),
-              textAlign: TextAlign.center,
-            ),
-          ),
       ],
     );
   }
