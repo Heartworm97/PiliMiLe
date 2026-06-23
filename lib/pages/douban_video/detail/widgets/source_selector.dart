@@ -47,20 +47,36 @@ class SourceSelector extends StatelessWidget {
                 final isSelected = index == selectedIndex;
                 final isAvailable = src.decodeStatus != '2' && src.key != 'JD4K' && src.key != 'NBY';
 
-                return FilterChip(
-                  showCheckmark: false,
+                if (!isAvailable) {
+                  return ActionChip(
+                    label: Text(
+                      src.name,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                      ),
+                    ),
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    onPressed: null,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  );
+                }
+                return ActionChip(
                   label: Text(
                     src.name,
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                       color: isSelected
                           ? theme.colorScheme.onPrimary
                           : theme.colorScheme.onSurface,
                     ),
                   ),
-                  selected: isSelected,
-                  onSelected: isAvailable ? (_) => onSelected(index) : null,
+                  backgroundColor: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.surfaceContainerHighest,
+                  onPressed: () => onSelected(index),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
                   labelPadding: const EdgeInsets.symmetric(horizontal: 8),
