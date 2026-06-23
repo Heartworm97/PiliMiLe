@@ -691,39 +691,28 @@ class PlPlayerController with BlockConfigMixin {
         return;
       }
 
-      // 钉住 isBuffering 为 true 直到新源的 stream.buffering 自然接管。
-      // 加上 _createVideoController 内部的保护，这已经预防了绝大部分时序窗口。
-      // 残余 20-30% 的复现来自 _startListeners → stream.playing 事件：
-      // player.open(play:false) 后，mpv 对 pause 属性的确认会触发
-      // 'pause' → playingController.add(false) → stream.playing(false)
-      // 将 playerStatus 重置为 paused。_initializePlayer 的 setPlaybackSpeed
-      // 是同步的，但 setRate 是异步的——这段时间新 pipeline 的
-      // stream.buffering 可能还未发 true（需要 mpv EVENT_START_FILE），
-      // 导致 isBuffering=true + playerStatus=paused → 加载指示器消失。
-      //
-      // 修复：在 dataStatus = loaded 之前再次确认状态，覆盖 stream.playing
-      // 可能的异步 false 事件（setRate 的 await 给了一个 yield 窗口）。
-      if (!isBuffering.value) {
-        isBuffering.value = true;
-      }
-      if (!playerStatus.isPlaying) {
-        playerStatus.value = PlayerStatus.playing;
-      }
-
       // 获取视频时长 00:00
       this.duration.value = duration ?? _videoPlayerController!.state.duration;
       position = buffered.value = sliderPosition = seekTo ?? Duration.zero;
       updatePositionSecond();
       updateSliderPositionSecond();
       updateBufferedSecond();
-      // 数据加载完成
-      dataStatus.value = DataStatus.loaded;
 
       if (autoFullScreenFlag && autoEnterFullScreen) {
         triggerFullScreen(status: true);
       }
 
       await _initializePlayer();
+      // 兜底：_initializePlayer 内 await setPlaybackSpeed/play 存在 yield 窗口，
+      // stream.buffering(false) / stream.playing(false) 可能在此期间到达并覆盖状态，
+      // 导致 dataStatus=loaded 时 isBuffering/playerStatus 已不是期望值
+      if (!isBuffering.value) {
+        isBuffering.value = true;
+      }
+      if (!playerStatus.isPlaying) {
+        playerStatus.value = PlayerStatus.playing;
+      }
+      dataStatus.value = DataStatus.loaded;
       onInit?.call();
     } catch (err, stackTrace) {
       dataStatus.value = DataStatus.error;
@@ -869,6 +858,10 @@ class PlPlayerController with BlockConfigMixin {
       if (isAnim && superResolutionType.value != .disable) {
         await setShader();
       }
+    } else if (_subscriptions == null) {
+      // 复用 pipeline 时，setDataSource 开头已经 removeListeners，
+      // 重新注册以捕获 open 期间的 START_FILE(buffering=true) 事件
+      _startListeners(player);
     }
 
     final Map<String, String> extras = {};
@@ -918,10 +911,6 @@ class PlPlayerController with BlockConfigMixin {
       }
     }
 
-    // open 前先断开旧 pipeline 的 stream 监听，防止旧 pipeline
-    // 的 buffering/playing 事件在 open 期间覆盖手动设置的状态值
-    _removeListeners();
-
     await player.open(
       Media(
         video,
@@ -930,9 +919,6 @@ class PlPlayerController with BlockConfigMixin {
       ),
       play: false,
     );
-
-    // open 后注册新 pipeline 的 stream 监听器
-    _startListeners(player);
   }
 
   Future<void>? refreshPlayer() {
