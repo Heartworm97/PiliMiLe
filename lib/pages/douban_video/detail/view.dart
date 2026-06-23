@@ -83,7 +83,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         if (controller.vodPic.value.isNotEmpty)
           Positioned.fill(
             child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
               child: NetworkImgLayer(
                 src: controller.vodPic.value,
                 width: width,
@@ -104,16 +104,12 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                   ? Center(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: SizedBox(
-                          width: width * 0.45,
-                          height: height * 0.85,
-                          child: NetworkImgLayer(
-                            src: controller.vodPic.value,
-                            width: width * 0.45,
-                            height: height * 0.85,
-                            skipThumbnail: true,
-                            fit: BoxFit.contain,
-                          ),
+                        child: NetworkImgLayer(
+                          src: controller.vodPic.value,
+                          width: width,
+                          height: height,
+                          skipThumbnail: true,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     )
