@@ -137,8 +137,23 @@ class DoubanVideoDetailController extends GetxController {
 
   void onSelectSource(int index) {
     if (index == selectedSourceIndex.value) return;
+
+    // 当前选中的剧集（切线路前）
+    final currentEp = selectedEpisode;
+
     selectedSourceIndex.value = index;
-    selectedEpisodeIndex.value = 0;
+
+    // 在新线路中优先匹配相同集号
+    final newEpisodes = selectedSource?.episodes ?? [];
+    int matchedIndex = 0;
+    if (currentEp != null) {
+      final matchIdx = newEpisodes.indexWhere(
+        (e) => e.nid == currentEp.nid || e.title == currentEp.title,
+      );
+      if (matchIdx >= 0) matchedIndex = matchIdx;
+    }
+    selectedEpisodeIndex.value = matchedIndex;
+
     m3u8Url.value = null;
     playerReady.value = false;
   }
