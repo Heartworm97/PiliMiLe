@@ -100,13 +100,6 @@ class DoubanVideoDetailController extends GetxController {
       if (resp['status'] == true && resp['data'] != null) {
         final result = resp['data'] as DoubanDecodeResultModel;
         if (result.url.isNotEmpty) {
-          // 校验解码结果是否为可播放的视频地址
-          if (result.url.contains('.jpg') || result.url.contains('.png')) {
-            errorMsg.value = '解码结果无效';
-            SmartDialog.dismiss();
-            SmartDialog.showToast('解码失败，请稍后重试');
-            return;
-          }
           m3u8Url.value = result.url;
           await _playM3u8(result.url);
           SmartDialog.dismiss();
@@ -145,12 +138,10 @@ class DoubanVideoDetailController extends GetxController {
   void onSelectSource(int index) {
     if (index == selectedSourceIndex.value) return;
 
-    // 当前选中的剧集（切线路前）
     final currentEp = selectedEpisode;
-
     selectedSourceIndex.value = index;
 
-    // 在新线路中优先匹配相同集号
+    // 新线路优先匹配相同集号，找不到则第0集
     final newEpisodes = selectedSource?.episodes ?? [];
     int matchedIndex = 0;
     if (currentEp != null) {
