@@ -399,7 +399,18 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                 if (detail.vodContent.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Expanded(
-                    child: Text(detail.vodContent, style: infoStyle),
+                    child: Text(
+                      detail.vodContent
+                          .replaceAll(RegExp(r'<[^>]*>'), '')
+                          .replaceAll('&nbsp;', ' ')
+                          .replaceAll('&amp;', '&')
+                          .replaceAll('&lt;', '<')
+                          .replaceAll('&gt;', '>')
+                          .replaceAll('&quot;', '"'),
+                      maxLines: 5,
+                      overflow: TextOverflow.ellipsis,
+                      style: infoStyle,
+                    ),
                   ),
                 ],
               ],
