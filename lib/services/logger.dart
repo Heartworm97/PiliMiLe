@@ -11,7 +11,7 @@ import 'package:path_provider/path_provider.dart';
 final logger = Logger(
   filter: ProductionFilter(),
   printer: PrettyLogPrinter(
-    dateTimeFormat: PrettyLogPrinter.toEncodableFallback,
+    dateTimeFormat: DateTimeFormat.none,
   ),
   level: kDebugMode ? .trace : .warning,
 );
