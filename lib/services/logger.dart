@@ -12,6 +12,8 @@ final logger = Logger(
   filter: ProductionFilter(),
   printer: PrettyLogPrinter(
     dateTimeFormat: DateTimeFormat.none,
+    noBoxingByDefault: true,
+    printEmojis: false,
   ),
   level: kDebugMode ? .trace : .warning,
 );
