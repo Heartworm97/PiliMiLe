@@ -47,11 +47,13 @@ class SourceSelector extends StatelessWidget {
                 final isSelected = index == selectedIndex;
                 final isAvailable = src.decodeStatus != '2' && src.key != 'JD4K' && src.key != 'NBY';
 
-                return ChoiceChip(
+                return FilterChip(
+                  showCheckmark: false,
                   label: Text(
                     src.name,
                     style: TextStyle(
                       fontSize: 12,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                       color: isSelected
                           ? theme.colorScheme.onPrimary
                           : theme.colorScheme.onSurface,
