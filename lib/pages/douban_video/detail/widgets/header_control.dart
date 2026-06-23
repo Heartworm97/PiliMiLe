@@ -222,7 +222,7 @@ class DoubanVideoHeaderControl extends StatelessWidget {
             ),
             onPressed: () {
               if (plPlayerController.isFullScreen.value) {
-                plPlayerController.triggerFullScreen(status: false);
+                plPlayerController.onPopInvokedWithResult(false, null);
               } else {
                 Get.back();
               }

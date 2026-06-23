@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'dart:ui' show ImageFilter;
 
 import 'package:PiliMiLe/common/assets.dart';
@@ -9,6 +10,7 @@ import 'package:PiliMiLe/pages/douban_video/detail/widgets/header_control.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/source_selector.dart';
 import 'package:PiliMiLe/plugin/pl_player/view/view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
@@ -35,7 +37,21 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     final playerHeight = playerWidth * 9 / 16;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(
+          backgroundColor: Colors.black,
+          toolbarHeight: 0,
+          systemOverlayStyle: Platform.isAndroid
+              ? const SystemUiOverlayStyle(
+                  statusBarIconBrightness: Brightness.light,
+                  systemNavigationBarIconBrightness: Brightness.light,
+                )
+              : null,
+        ),
+      ),
       body: Obx(() {
         final isFullScreen = controller.plPlayerController.isFullScreen.value;
 
@@ -52,12 +68,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                 height: playerHeight,
                 child: Obx(() => _buildPlayerArea(playerWidth, playerHeight)),
               ),
-              Expanded(
-                child: Container(
-                  color: Theme.of(context).colorScheme.surface,
-                  child: Obx(_buildContent),
-                ),
-              ),
+              Expanded(child: Obx(_buildContent)),
             ],
           ),
         );
