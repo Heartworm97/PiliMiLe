@@ -77,7 +77,8 @@ class DoubanVideoDetailController extends GetxController {
       return;
     }
 
-    // 没 URL，需要解码
+    // 没 URL，需要解码 — 先显示播放器加载态
+    playerReady.value = true;
     await _doDecode();
   }
 
@@ -87,7 +88,6 @@ class DoubanVideoDetailController extends GetxController {
     if (src == null || ep == null) return;
 
     isDecoding.value = true;
-    playerReady.value = false;
     errorMsg.value = null;
     try {
       final resp = await DoubanHttp.decodeVod(
