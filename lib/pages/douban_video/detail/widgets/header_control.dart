@@ -10,7 +10,9 @@ import 'package:PiliMiLe/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliMiLe/services/shutdown_timer_service.dart'
     show shutdownTimerService;
 import 'package:PiliMiLe/utils/image_utils.dart';
+import 'package:PiliMiLe/utils/page_utils.dart';
 import 'package:PiliMiLe/utils/platform_utils.dart';
+import 'package:PiliMiLe/utils/storage_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -68,91 +70,103 @@ class DoubanVideoHeaderControl extends StatelessWidget {
 
   void _showMoreMenu(BuildContext context) {
     final isFullScreen = plPlayerController.isFullScreen.value;
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (doubanController.vodPic.value.isNotEmpty)
-            ListTile(
-              dense: true,
-              onTap: () {
-                Get.back();
-                ImageUtils.downloadImg([doubanController.vodPic.value]);
-              },
-              leading: const Icon(Icons.image_outlined, size: 20),
-              title: const Text('保存封面'),
-            ),
-          ListTile(
-            dense: true,
-            onTap: () {
-              Get.back();
-              shutdownTimerService.showScheduleExitDialog(
-                context,
-                isFullScreen: isFullScreen,
-              );
-            },
-            leading: const Icon(Icons.hourglass_top_outlined, size: 20),
-            title: const Text('定时关闭'),
-          ),
-          ListTile(
-            dense: true,
-            onTap: () {
-              Get.back();
-              _showEditPlayUrl(context);
-            },
-            leading: const Icon(Icons.link, size: 20),
-            title: const Text('播放地址'),
-          ),
-          ListTile(
-            dense: true,
-            onTap: () {
-              Get.back();
-              doubanController.m3u8Url.value = null;
-              doubanController.play();
-            },
-            leading: const Icon(Icons.refresh_outlined, size: 20),
-            title: const Text('重载视频'),
-          ),
-          if (PlatformUtils.isMobile)
-            if (plPlayerController.videoPlayerController case final player?)
+    PageUtils.showVideoBottomSheet(
+      context,
+      maxWidth: 512,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Material(
+          clipBehavior: Clip.hardEdge,
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          child: ListView(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            children: [
+              if (doubanController.vodPic.value.isNotEmpty)
+                ListTile(
+                  dense: true,
+                  onTap: () {
+                    Get.back();
+                    ImageUtils.downloadImg([doubanController.vodPic.value]);
+                  },
+                  leading: const Icon(Icons.image_outlined, size: 20),
+                  title: const Text('保存封面'),
+                ),
               ListTile(
                 dense: true,
-                leading: const Icon(Icons.volume_up, size: 20),
-                title: const Text('播放器音量'),
-                onTap: () => showPlayerVolumeDialog(
-                  context,
-                  () => (context as Element).markNeedsBuild(),
-                  onChanged: player.setVolume,
+                onTap: () {
+                  Get.back();
+                  shutdownTimerService.showScheduleExitDialog(
+                    context,
+                    isFullScreen: isFullScreen,
+                  );
+                },
+                leading: const Icon(Icons.hourglass_top_outlined, size: 20),
+                title: const Text('定时关闭'),
+              ),
+              ListTile(
+                dense: true,
+                onTap: () {
+                  Get.back();
+                  _showEditPlayUrl(context);
+                },
+                leading: const Icon(Icons.link, size: 20),
+                title: const Text('播放地址'),
+              ),
+              ListTile(
+                dense: true,
+                onTap: () {
+                  Get.back();
+                  doubanController.m3u8Url.value = null;
+                  doubanController.play();
+                },
+                leading: const Icon(Icons.refresh_outlined, size: 20),
+                title: const Text('重载视频'),
+              ),
+              if (PlatformUtils.isMobile)
+                if (plPlayerController.videoPlayerController case final player?)
+                  ListTile(
+                    dense: true,
+                    leading: const Icon(Icons.volume_up, size: 20),
+                    title: const Text('播放器音量'),
+                    subtitle: Text(
+                      '当前: ${Pref.playerVolume.toStringAsFixed(0)}%',
+                    ),
+                    onTap: () => showPlayerVolumeDialog(
+                      context,
+                      () => (context as Element).markNeedsBuild(),
+                      onChanged: player.setVolume,
+                    ),
+                  ),
+              PopupListTile<PlayRepeat>(
+                dense: true,
+                leading: const Icon(Icons.repeat, size: 20),
+                title: const Text('播放顺序'),
+                value: () {
+                  final value = plPlayerController.playRepeat;
+                  return (value, value.label);
+                },
+                itemBuilder: (_) => enumItemBuilder(PlayRepeat.values),
+                onSelected: (value, setState) {
+                  plPlayerController.setPlayRepeat(value);
+                  setState();
+                },
+                descPosType: DescPosType.subtitle,
+                descFontSize: 12,
+              ),
+              if (plPlayerController.videoPlayerController case final player?)
+                ListTile(
+                  dense: true,
+                  title: const Text('播放信息'),
+                  leading: const Icon(Icons.info_outline, size: 20),
+                  onTap: () => HeaderControlState.showPlayerInfo(
+                    context,
+                    player: player,
+                  ),
                 ),
-              ),
-          PopupListTile<PlayRepeat>(
-            dense: true,
-            leading: const Icon(Icons.repeat, size: 20),
-            title: const Text('播放顺序'),
-            value: () {
-              final value = plPlayerController.playRepeat;
-              return (value, value.label);
-            },
-            itemBuilder: (_) => enumItemBuilder(PlayRepeat.values),
-            onSelected: (value, setState) {
-              plPlayerController.setPlayRepeat(value);
-              setState();
-            },
-            descPosType: DescPosType.subtitle,
-            descFontSize: 12,
+            ],
           ),
-          if (plPlayerController.videoPlayerController case final player?)
-            ListTile(
-              dense: true,
-              title: const Text('播放信息'),
-              leading: const Icon(Icons.info_outline, size: 20),
-              onTap: () => HeaderControlState.showPlayerInfo(
-                context,
-                player: player,
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }
