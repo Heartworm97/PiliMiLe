@@ -1,4 +1,5 @@
 import 'package:PiliMiLe/plugin/pl_player/controller.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,33 @@ class DoubanVideoHeaderControl extends StatelessWidget {
 
   final PlPlayerController plPlayerController;
   final String title;
+
+  Widget _buildAudioOnlyBtn() {
+    return Obx(() {
+      final isOnlyAudio = plPlayerController.onlyPlayAudio.value;
+      return _buildBtn(
+        tooltip: isOnlyAudio ? '退出听视频' : '听视频',
+        icon: Icon(
+          isOnlyAudio ? Icons.headphones : Icons.headphones_outlined,
+          size: 15,
+          color: Colors.white,
+        ),
+        onPressed: plPlayerController.setOnlyPlayAudio,
+      );
+    });
+  }
+
+  Widget _buildPipBtn() {
+    return _buildBtn(
+      tooltip: '画中画',
+      icon: const Icon(
+        Icons.picture_in_picture_outlined,
+        size: 15,
+        color: Colors.white,
+      ),
+      onPressed: plPlayerController.toggleDesktopPip,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +81,15 @@ class DoubanVideoHeaderControl extends StatelessWidget {
             return const SizedBox.shrink();
           }),
           _buildTitle(context),
+          // 右侧操作按钮
+          _buildAudioOnlyBtn(),
+          if (PlatformUtils.isDesktop)
+            Obx(() {
+              if (plPlayerController.isFullScreen.value) {
+                return const SizedBox.shrink();
+              }
+              return _buildPipBtn();
+            }),
         ],
       ),
     );

@@ -26,7 +26,7 @@ class DoubanVideoDetailController extends GetxController {
   final m3u8Url = Rxn<String>();
 
   // 播放器
-  final plPlayerController = PlPlayerController.getInstance(isLive: true);
+  final plPlayerController = PlPlayerController.getInstance(isLive: false);
   final playerReady = false.obs;
 
   // 计算属性
@@ -126,7 +126,7 @@ class DoubanVideoDetailController extends GetxController {
   Future<void> _playM3u8(String url) async {
     await plPlayerController.setDataSource(
       NetworkSource(videoSource: url, audioSource: null),
-      isLive: true,
+      isLive: false,
       autoplay: false,
     );
     playerReady.value = true;
