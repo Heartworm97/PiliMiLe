@@ -233,25 +233,27 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                 ),
               ),
             ),
-            child: const SizedBox(
+            child: SizedBox(
               height: 45,
               child: Row(
                 children: [
                   Flexible(
-                    flex: 2,
+                    flex: 1,
                     child: TabBar(
                       padding: EdgeInsets.zero,
-                      labelStyle: TextStyle(fontSize: 13),
-                      labelPadding: EdgeInsets.symmetric(horizontal: 10),
+                      labelStyle:
+                          TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 13) ??
+                          const TextStyle(fontSize: 13),
+                      labelPadding: const EdgeInsets.symmetric(horizontal: 10),
                       dividerColor: Colors.transparent,
                       dividerHeight: 0,
-                      tabs: [
+                      tabs: const [
                         Tab(text: '简介'),
                         Tab(text: '待规划'),
                       ],
                     ),
                   ),
-                  Flexible(
+                  const Flexible(
                     child: Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
