@@ -481,7 +481,6 @@ class DoubanHttp {
 
       // M3U8 直链：无需 WASM 解码，直接播放
       if (targetVideoId.endsWith('.m3u8')) {
-        logger.d('[追剧HTTP] M3U8 直链播放 $targetVideoId');
         return {
           'status': true,
           'data': DoubanDecodeResultModel(
@@ -501,7 +500,6 @@ class DoubanHttp {
         siteKey: siteKey,
       );
 
-      logger.d('[追剧HTTP] 解码结果 status=${decodeResult['status']} msg=${decodeResult['msg']}');
       if (decodeResult['status'] == true && decodeResult['data'] != null) {
         final data = decodeResult['data'] as Map<String, dynamic>;
         return {

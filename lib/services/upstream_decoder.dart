@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:PiliMiLe/services/logger.dart';
 import 'package:PiliMiLe/services/wasm_bridge.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 
 /// 上游解码服务 — 组合 WASM 编解码 + HTTP 请求
 ///
@@ -36,29 +36,22 @@ class UpstreamDecoder {
     }
 
     // 等待 WASM 就绪
-    logger.d('[UpstreamDecoder] 等待 WASM 就绪...');
     final ready = await WasmBridge().ready;
     if (!ready) {
-      logger.e('[UpstreamDecoder] WASM 未就绪');
       return {'status': false, 'msg': 'WASM 模块初始化中，请稍后重试'};
     }
-    logger.d('[UpstreamDecoder] WASM 已就绪');
 
     // 1. 创建解码请求
     Uint8List reqBytes;
     try {
-      logger.d('[UpstreamDecoder] createDecodeRequest($videoId, $siteKey)');
       reqBytes = await WasmBridge().createDecodeRequest(videoId, siteKey);
-      logger.d('[UpstreamDecoder] 请求 protobuf ${reqBytes.length} 字节');
     } catch (e) {
-      logger.e('[UpstreamDecoder] createDecodeRequest 失败: $e');
       return {'status': false, 'msg': 'WASM 编码失败: $e'};
     }
 
     // 2. POST 到上游
     Response resp;
     try {
-      logger.d('[UpstreamDecoder] POST https://$upstreamHost/api.php/web/decode/url');
       resp = await _dio.post(
         'https://$upstreamHost/api.php/web/decode/url',
         data: Stream.fromIterable([reqBytes]),
@@ -75,11 +68,10 @@ class UpstreamDecoder {
           responseType: ResponseType.bytes,
         ),
       );
-      logger.d('[UpstreamDecoder] HTTP ${resp.statusCode}, ${(resp.data is List ? resp.data.length : 0)} 字节');
     } on DioException catch (e) {
-      logger.e('[UpstreamDecoder] HTTP 失败: ${e.type} ${e.message}');
+      debugPrint('[UpstreamDecoder] HTTP 失败: ${e.type} ${e.message}');
       if (e.response != null) {
-        logger.e('[UpstreamDecoder] 响应体: ${_safeString(e.response?.data)}');
+        debugPrint('[UpstreamDecoder] 响应体: ${_safeString(e.response?.data)}');
       }
       return {'status': false, 'msg': '解码请求失败: ${e.message}'};
     }
@@ -91,7 +83,6 @@ class UpstreamDecoder {
           : (resp.data as List<dynamic>).cast<int>());
 
       final result = await WasmBridge().parseDecodeResponse(respBytes);
-      logger.d('[UpstreamDecoder] 解析: code=${result.code} msg=${result.msg}');
 
       if (result.code != 1 || result.data.isEmpty) {
         final errMsg = result.msg.isNotEmpty
@@ -109,8 +100,8 @@ class UpstreamDecoder {
         },
       };
     } catch (e) {
-      logger.e('[UpstreamDecoder] parseDecodeResponse 失败: $e');
-      logger.e('[UpstreamDecoder] 原始响应 hex: ${_safeHex(resp.data)}');
+      debugPrint('[UpstreamDecoder] parseDecodeResponse 失败: $e');
+      debugPrint('[UpstreamDecoder] 原始响应 hex: ${_safeHex(resp.data)}');
       return {'status': false, 'msg': 'WASM 解码失败: $e'};
     }
   }
