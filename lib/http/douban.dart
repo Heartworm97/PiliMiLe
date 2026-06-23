@@ -350,13 +350,13 @@ class DoubanHttp {
           ));
         }
 
-        // 内置线路按 sort 降序排列
-        sources.sort((a, b) => b.sort.compareTo(a.sort));
+        // 内置线路按 sort 升序排列
+        sources.sort((a, b) => a.sort.compareTo(b.sort));
 
-        // 站外聚合线路：排在后面，内部按 sort 降序
+        // 站外聚合线路：排在后面，内部按 sort 升序
         final aggregateSources = await _fetchAggregateSources(vodId);
         if (aggregateSources.isNotEmpty) {
-          aggregateSources.sort((a, b) => b.sort.compareTo(a.sort));
+          aggregateSources.sort((a, b) => a.sort.compareTo(b.sort));
           debugPrint('[追剧HTTP] 聚合线路数=${aggregateSources.length} 合并后总数=${sources.length + aggregateSources.length}');
           sources.addAll(aggregateSources);
         }
