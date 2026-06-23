@@ -326,6 +326,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       ),
       trackpadScrollCausesScale: false,
     );
+
+    // 同步动画控制器到当前 showControls 初始状态，避免单例残留导致
+    // 锁屏/截图按钮已显示但顶栏/底栏动画未 forward 的问题
+    _onControlChanged(plPlayerController.showControls.value);
   }
 
   @override
