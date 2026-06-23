@@ -223,11 +223,8 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     return DefaultTabController(
       length: 2,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TabBar(
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
             padding: EdgeInsets.zero,
             labelStyle:
                 TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 13) ??
