@@ -1907,7 +1907,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                           ),
                         ),
                       if (plPlayerController.showViewPoints &&
-                          videoDetailController!.viewPointList.isNotEmpty &&
+                          videoDetailController?.viewPointList.isNotEmpty == true &&
                           videoDetailController!.showVP.value)
                         Padding(
                           padding: const .only(bottom: 4.25),
@@ -1928,7 +1928,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                           ),
                         ),
                       if (plPlayerController.showDmChart &&
-                          videoDetailController!.showDmTrendChart.value)
+                          videoDetailController?.showDmTrendChart.value == true)
                         if (videoDetailController!.dmTrend.value?.dataOrNull
                             case final list?)
                           buildDmChart(primary, list, videoDetailController),
