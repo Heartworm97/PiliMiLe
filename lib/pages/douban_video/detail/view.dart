@@ -373,6 +373,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
               src: detail.vodPic,
               width: 115,
               height: 153,
+              skipThumbnail: true,
             ),
           ),
         ),
