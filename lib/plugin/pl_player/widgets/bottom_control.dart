@@ -23,7 +23,7 @@ class BottomControl extends StatelessWidget {
   final bool isFullScreen;
   final PlPlayerController controller;
   final ValueGetter<Widget> buildBottomControl;
-  final VideoDetailController videoDetailController;
+  final VideoDetailController? videoDetailController;
 
   void onDragStart(ThumbDragDetails duration) {
     feedBack();
@@ -93,30 +93,30 @@ class BottomControl extends StatelessWidget {
                       );
                     }),
                     if (controller.enableBlock &&
-                        videoDetailController.segmentProgressList.isNotEmpty)
+                        videoDetailController?.segmentProgressList.isNotEmpty == true)
                       Positioned(
                         left: 0,
                         right: 0,
                         bottom: 5.25,
                         child: SegmentProgressBar(
-                          segments: videoDetailController.segmentProgressList,
+                          segments: videoDetailController!.segmentProgressList,
                         ),
                       ),
                     if (controller.showViewPoints &&
-                        videoDetailController.viewPointList.isNotEmpty &&
-                        videoDetailController.showVP.value)
+                        videoDetailController?.viewPointList.isNotEmpty == true &&
+                        videoDetailController!.showVP.value)
                       Padding(
                         padding: const .only(bottom: 8.75),
                         child: ViewPointSegmentProgressBar(
-                          segments: videoDetailController.viewPointList,
+                          segments: videoDetailController!.viewPointList,
                           onSeek: PlatformUtils.isDesktop
                               ? (position) =>
                                     controller.seekTo(position, isSeek: false)
                               : null,
                         ),
                       ),
-                    if (videoDetailController.showDmTrendChart.value)
-                      if (videoDetailController.dmTrend.value?.dataOrNull
+                    if (videoDetailController?.showDmTrendChart.value == true)
+                      if (videoDetailController!.dmTrend.value?.dataOrNull
                           case final list?)
                         buildDmChart(primary, list, videoDetailController, 4.5),
                   ],

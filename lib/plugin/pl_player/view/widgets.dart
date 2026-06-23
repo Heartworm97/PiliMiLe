@@ -3,7 +3,7 @@ part of 'view.dart';
 Widget buildDmChart(
   Color color,
   List<double> dmTrend,
-  VideoDetailController videoDetailController, [
+  VideoDetailController? videoDetailController, [
   double offset = 0,
 ]) {
   return IgnorePointer(
@@ -11,8 +11,8 @@ Widget buildDmChart(
       height: 12,
       margin: EdgeInsets.only(
         bottom:
-            videoDetailController.viewPointList.isNotEmpty &&
-                videoDetailController.showVP.value
+            (videoDetailController?.viewPointList.isNotEmpty == true &&
+                videoDetailController!.showVP.value)
             ? 19.25 + offset
             : 4.25 + offset,
       ),

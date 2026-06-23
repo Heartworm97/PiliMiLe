@@ -131,9 +131,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   late AnimationController _animationController;
   late VideoController videoController;
-  late final CommonIntroController introController = widget.introController!;
-  late final VideoDetailController videoDetailController =
-      widget.videoDetailController!;
+  CommonIntroController? get introController => widget.introController;
+  VideoDetailController? get videoDetailController => widget.videoDetailController;
 
   final _playerKey = GlobalKey();
   final _videoKey = GlobalKey();
@@ -387,12 +386,136 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     super.dispose();
   }
 
+  // 纯净底部控制条 (追剧等无 B站 controller 的场景)
+  Widget _buildSimpleBottomControl(bool isLandscape) {
+    final isFullScreen = this.isFullScreen;
+    final double widgetWidth = isLandscape && isFullScreen ? 42 : 35;
+
+    Widget progressWidget(BottomControlType bottomControl) =>
+        switch (bottomControl) {
+          BottomControlType.playOrPause => PlayOrPauseButton(
+            plPlayerController: plPlayerController,
+          ),
+          BottomControlType.time => Obx(
+            () => _VideoTime(
+              position: DurationUtils.formatDuration(
+                plPlayerController.positionSeconds.value,
+              ),
+              duration: DurationUtils.formatDuration(
+                plPlayerController.duration.value.inSeconds,
+              ),
+            ),
+          ),
+          BottomControlType.fit => Obx(
+            () {
+              final fit = plPlayerController.videoFit.value;
+              return PopupMenuButton<VideoFitType>(
+                tooltip: '画面比例',
+                requestFocus: false,
+                initialValue: fit,
+                color: Colors.black.withValues(alpha: 0.8),
+                itemBuilder: (context) => VideoFitType.values
+                    .map(
+                      (boxFit) => PopupMenuItem<VideoFitType>(
+                        height: 35,
+                        padding: const EdgeInsets.only(left: 30),
+                        value: boxFit,
+                        onTap: () => plPlayerController.toggleVideoFit(boxFit),
+                        child: Text(
+                          boxFit.desc,
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                        ),
+                      ),
+                    )
+                    .toList(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    fit.desc,
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                ),
+              );
+            },
+          ),
+          BottomControlType.speed => Obx(
+            () => PopupMenuButton<double>(
+              tooltip: '倍速',
+              requestFocus: false,
+              initialValue: plPlayerController.playbackSpeed,
+              color: Colors.black.withValues(alpha: 0.8),
+              itemBuilder: (context) => plPlayerController.speedList
+                  .map(
+                    (double speed) => PopupMenuItem<double>(
+                      height: 35,
+                      padding: const EdgeInsets.only(left: 30),
+                      value: speed,
+                      onTap: () => plPlayerController.setPlaybackSpeed(speed),
+                      child: Text(
+                        "${speed}X",
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        semanticsLabel: "$speed倍速",
+                      ),
+                    ),
+                  )
+                  .toList(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  "${plPlayerController.playbackSpeed}X",
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  semanticsLabel: "${plPlayerController.playbackSpeed}倍速",
+                ),
+              ),
+            ),
+          ),
+          BottomControlType.fullscreen => ComBtn(
+            width: widgetWidth,
+            height: 30,
+            tooltip: isFullScreen ? '退出全屏' : '全屏',
+            icon: isFullScreen
+                ? const Icon(Icons.fullscreen_exit, size: 24, color: Colors.white)
+                : const Icon(Icons.fullscreen, size: 24, color: Colors.white),
+            onTap: () => plPlayerController.triggerFullScreen(status: !isFullScreen),
+            onSecondaryTap: () => plPlayerController.triggerFullScreen(
+              status: !isFullScreen,
+              inAppFullScreen: true,
+            ),
+          ),
+          _ => const SizedBox.shrink(),
+        };
+
+    final flag = isFullScreen || plPlayerController.isDesktopPip || maxWidth >= 500;
+    final List<BottomControlType> left = [.playOrPause, .time];
+    final List<BottomControlType> right = [
+      if (flag) .fit,
+      .speed,
+      if (!plPlayerController.isDesktopPip) .fullscreen,
+    ];
+
+    return PlayerBar(
+      children: [
+        Row(
+          mainAxisSize: .min,
+          children: left.map(progressWidget).toList(),
+        ),
+        Row(
+          mainAxisSize: .min,
+          children: right.map(progressWidget).toList(),
+        ),
+      ],
+    );
+  }
+
   // 动态构建底部控制条
   Widget buildBottomControl(
-    VideoDetailController videoDetailController,
+    VideoDetailController? videoDetailController,
     bool isLandscape,
   ) {
-    final videoDetail = introController.videoDetail.value;
+    if (videoDetailController == null || introController == null) {
+      return _buildSimpleBottomControl(isLandscape);
+    }
+    final videoDetail = introController!.videoDetail.value;
     final isSeason = videoDetail.ugcSeason != null;
     final isPart = videoDetail.pages != null && videoDetail.pages!.length > 1;
     final isPgc = !videoDetailController.isUgc;
@@ -420,7 +543,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           color: Colors.white,
         ),
         onTap: () {
-          if (!introController.prevPlay()) {
+          if (!introController!.prevPlay()) {
             SmartDialog.showToast('已经是第一集了');
           }
         },
@@ -437,7 +560,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           color: Colors.white,
         ),
         onTap: () {
-          if (!introController.nextPlay()) {
+          if (!introController!.nextPlay()) {
             SmartDialog.showToast('已经是最后一集了');
           }
         },
@@ -592,7 +715,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             episodes = videoDetail.pages!;
           } else if (isPgc) {
             episodes =
-                (introController as PgcIntroController).pgcItem.episodes!;
+                (introController! as PgcIntroController).pgcItem.episodes!;
           }
           widget.showEpisodes?.call(
             index,
@@ -900,7 +1023,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     List<BottomControlType> userSpecifyItemLeft = [
       .playOrPause,
       .time,
-      if (!isNotFileSource || anySeason) ...[.pre, .next],
+      if (introController != null && (!isNotFileSource || anySeason)) ...[.pre, .next],
     ];
 
     final flag =
@@ -1772,22 +1895,22 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         );
                       }),
                       if (plPlayerController.enableBlock &&
-                          videoDetailController.segmentProgressList.isNotEmpty)
+                          videoDetailController?.segmentProgressList.isNotEmpty == true)
                         Positioned(
                           left: 0,
                           right: 0,
                           bottom: 0.75,
                           child: SegmentProgressBar(
-                            segments: videoDetailController.segmentProgressList,
+                            segments: videoDetailController!.segmentProgressList,
                           ),
                         ),
                       if (plPlayerController.showViewPoints &&
-                          videoDetailController.viewPointList.isNotEmpty &&
-                          videoDetailController.showVP.value)
+                          videoDetailController!.viewPointList.isNotEmpty &&
+                          videoDetailController!.showVP.value)
                         Padding(
                           padding: const .only(bottom: 4.25),
                           child: ViewPointSegmentProgressBar(
-                            segments: videoDetailController.viewPointList,
+                            segments: videoDetailController!.viewPointList,
                             onSeek: PlatformUtils.isMobile
                                 ? (position) {
                                     if (!plPlayerController
@@ -1803,8 +1926,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                           ),
                         ),
                       if (plPlayerController.showDmChart &&
-                          videoDetailController.showDmTrendChart.value)
-                        if (videoDetailController.dmTrend.value?.dataOrNull
+                          videoDetailController!.showDmTrendChart.value)
+                        if (videoDetailController!.dmTrend.value?.dataOrNull
                             case final list?)
                           buildDmChart(primary, list, videoDetailController),
                     ],
@@ -2096,9 +2219,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   );
 
   Future<void> screenshotWebp() async {
-    final videoInfo = videoDetailController.data;
+    if (videoDetailController == null) return;
+    final videoInfo = videoDetailController!.data;
     final ids = videoInfo.dash!.video!.map((i) => i.id!).toSet();
-    final video = videoDetailController.findVideoByQa(ids.min);
+    final video = videoDetailController!.findVideoByQa(ids.min);
 
     VideoQuality qa = video.quality;
     String? url = video.baseUrl;
@@ -2137,7 +2261,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   title: '选择画质',
                   value: () => qa.code,
                   onSelected: (value) {
-                    final video = videoDetailController.findVideoByQa(value);
+                    final video = videoDetailController!.findVideoByQa(value);
                     url = video.baseUrl;
                     qa = video.quality;
                     return false;
@@ -2275,7 +2399,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     if (_timeRegExp.firstMatch(data) case final timeStr?) {
       final offset = DurationUtils.parseDuration(timeStr.group(0));
       if (0 < offset &&
-          offset * 1000 < videoDetailController.data.timeLength!) {
+          videoDetailController != null &&
+          offset * 1000 < videoDetailController!.data.timeLength!) {
         return offset;
       }
     }
