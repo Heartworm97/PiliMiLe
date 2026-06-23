@@ -30,34 +30,36 @@ class SearchDramaItem extends StatelessWidget {
       type: MaterialType.transparency,
       child: InkWell(
         onTap: () async {
-          logger.d('========== 获取追剧详情 ==========');
-          logger.d('vodId: ${item.vodId}');
-          logger.d('vodName: ${item.vodName}');
+          final buf = StringBuffer();
+          buf.writeln('========== 获取追剧详情 ==========');
+          buf.writeln('vodId: ${item.vodId}');
+          buf.writeln('vodName: ${item.vodName}');
 
           final result = await DoubanHttp.getVodDetail(item.vodId);
           if (result['status'] == true) {
             final detail = result['data'];
-            logger.d('状态: 成功');
-            logger.d('影片名: ${detail.vodName}');
-            logger.d('年份: ${detail.vodYear}');
-            logger.d('地区: ${detail.vodArea}');
-            logger.d('语言: ${detail.vodLang}');
-            logger.d('演员: ${detail.vodActor}');
-            logger.d('导演: ${detail.vodDirector}');
-            logger.d('简介: ${detail.vodContent}');
-            logger.d('线路数: ${detail.sources.length}');
+            buf.writeln('状态: 成功');
+            buf.writeln('影片名: ${detail.vodName}');
+            buf.writeln('年份: ${detail.vodYear}');
+            buf.writeln('地区: ${detail.vodArea}');
+            buf.writeln('语言: ${detail.vodLang}');
+            buf.writeln('演员: ${detail.vodActor}');
+            buf.writeln('导演: ${detail.vodDirector}');
+            buf.writeln('简介: ${detail.vodContent}');
+            buf.writeln('线路数: ${detail.sources.length}');
             for (final src in detail.sources) {
-              logger.d('  ── 线路: ${src.name}  key=${src.key}  '
+              buf.writeln('  ── 线路: ${src.name}  key=${src.key}  '
                   'sort=${src.sort}  decodeStatus=${src.decodeStatus}  '
                   '集数=${src.episodeCount}');
               for (final ep in src.episodes) {
-                logger.d('       ${ep.nid}: ${ep.title}  videoId=${ep.videoId}');
+                buf.writeln('       ${ep.nid}: ${ep.title}  videoId=${ep.videoId}');
               }
             }
           } else {
-            logger.e('状态: 失败, msg=${result['msg']}');
+            buf.writeln('状态: 失败, msg=${result['msg']}');
           }
-          logger.d('========== 追剧详情结束 ==========');
+          buf.writeln('========== 追剧详情结束 ==========');
+          logger.d(buf.toString());
         },
         onLongPress: onLongPress,
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
