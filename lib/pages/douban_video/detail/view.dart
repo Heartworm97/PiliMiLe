@@ -54,10 +54,11 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
       ),
       body: Obx(() {
         final isFullScreen = controller.plPlayerController.isFullScreen.value;
+        final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
-        // 全屏时播放器撑满屏幕，移除 SafeArea + 隐藏详情区域
-        if (isFullScreen) {
-          return Obx(() => _buildPlayerArea(size.width, size.height));
+        // 全屏 / 横屏时播放器撑满，移除 SafeArea + 隐藏详情区域
+        if (isFullScreen || !isPortrait) {
+          return _buildPlayerArea(size.width, size.height);
         }
 
         return SafeArea(
