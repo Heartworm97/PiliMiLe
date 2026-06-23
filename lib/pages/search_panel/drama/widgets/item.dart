@@ -1,3 +1,5 @@
+import 'dart:io' show stdout;
+
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/badge.dart';
 import 'package:PiliMiLe/common/widgets/image/image_save.dart';
@@ -58,8 +60,8 @@ class SearchDramaItem extends StatelessWidget {
             buf.writeln('状态: 失败, msg=${result['msg']}');
           }
           buf.writeln('========== 追剧详情结束 ==========');
-          // ignore: avoid_print — 临时验证，一次性输出多行
-          print(buf.toString());
+          // 临时验证，stdout 绕过日志管道不带时间戳
+          stdout.write(buf.toString());
         },
         onLongPress: onLongPress,
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
