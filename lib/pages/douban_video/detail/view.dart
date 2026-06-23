@@ -165,21 +165,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
           ),
         ),
 
-        // 解码中
-        if (controller.isDecoding.value)
-          const Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.play_circle_outline, color: Colors.white, size: 60),
-                SizedBox(height: 8),
-                Text(
-                  '加载中...',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ],
-            ),
-          ),
       ],
     );
   }
