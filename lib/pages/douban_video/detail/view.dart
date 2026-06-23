@@ -3,6 +3,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
+import 'package:PiliMiLe/common/widgets/custom_icon.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
 import 'package:PiliMiLe/models/common/image_preview_type.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
@@ -224,18 +225,69 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
       length: 2,
       child: Column(
         children: [
-          TabBar(
-            padding: EdgeInsets.zero,
-            labelStyle:
-                TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 13) ??
-                const TextStyle(fontSize: 13),
-            labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-            dividerColor: Colors.transparent,
-            dividerHeight: 0,
-            tabs: const [
-              Tab(text: '简介'),
-              Tab(text: '待规划'),
-            ],
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.dividerColor.withValues(alpha: 0.1),
+                ),
+              ),
+            ),
+            child: const SizedBox(
+              height: 45,
+              child: Row(
+                children: [
+                  Flexible(
+                    flex: 2,
+                    child: TabBar(
+                      padding: EdgeInsets.zero,
+                      labelStyle: TextStyle(fontSize: 13),
+                      labelPadding: EdgeInsets.symmetric(horizontal: 10),
+                      dividerColor: Colors.transparent,
+                      dividerHeight: 0,
+                      tabs: [
+                        Tab(text: '简介'),
+                        Tab(text: '待规划'),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          SizedBox(
+                            height: 32,
+                            child: TextButton(
+                              style: ButtonStyle(
+                                padding: WidgetStatePropertyAll(EdgeInsets.zero),
+                              ),
+                              onPressed: null,
+                              child: Text(
+                                '发弹幕',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 38,
+                            height: 38,
+                            child: IconButton(
+                              onPressed: null,
+                              icon: Icon(
+                                CustomIcons.dm_on,
+                                size: 22,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 14),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           Expanded(
             child: TabBarView(
