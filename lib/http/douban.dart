@@ -4,7 +4,7 @@ import 'package:PiliMiLe/models/search/result.dart';
 import 'package:PiliMiLe/services/logger.dart';
 import 'package:PiliMiLe/utils/storage.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:hive_ce/hive.dart';
 
 class DoubanHttp {
@@ -27,7 +27,8 @@ class DoubanHttp {
     if (kDebugMode) {
       d.interceptors.add(InterceptorsWrapper(
         onRequest: (options, handler) {
-          logger.d('GET ${options.uri}');
+          debugPrint('*** Request ***');
+          debugPrint('uri: ${options.uri}');
           handler.next(options);
         },
       ));
@@ -49,7 +50,8 @@ class DoubanHttp {
     if (kDebugMode) {
       d.interceptors.add(InterceptorsWrapper(
         onRequest: (options, handler) {
-          logger.d('GET ${options.uri}');
+          debugPrint('*** Request ***');
+          debugPrint('uri: ${options.uri}');
           handler.next(options);
         },
       ));
