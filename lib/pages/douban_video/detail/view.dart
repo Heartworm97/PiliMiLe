@@ -227,11 +227,11 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
           TabBar(
             isScrollable: true,
             tabAlignment: TabAlignment.start,
-            labelColor: theme.colorScheme.onSurface,
             padding: EdgeInsets.zero,
-            labelStyle: const TextStyle(fontSize: 13),
+            labelStyle:
+                TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 13) ??
+                const TextStyle(fontSize: 13),
             labelPadding: const EdgeInsets.symmetric(horizontal: 10),
-            indicatorSize: TabBarIndicatorSize.label,
             dividerColor: Colors.transparent,
             dividerHeight: 0,
             tabs: const [
