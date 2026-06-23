@@ -2,7 +2,7 @@ import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/plugin/pl_player/controller.dart';
 import 'package:PiliMiLe/plugin/pl_player/models/data_source.dart';
-import 'package:floating_smart_dialog/floating_smart_dialog.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:get/get.dart';
 
