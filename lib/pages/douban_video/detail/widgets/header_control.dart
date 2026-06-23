@@ -1,12 +1,16 @@
+import 'package:PiliMiLe/plugin/pl_player/controller.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 class DoubanVideoHeaderControl extends StatelessWidget {
   const DoubanVideoHeaderControl({
     super.key,
+    required this.plPlayerController,
     required this.title,
   });
 
+  final PlPlayerController plPlayerController;
   final String title;
 
   @override
@@ -31,9 +35,24 @@ class DoubanVideoHeaderControl extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
+            tooltip: '返回',
             onPressed: Get.back,
-            icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-            color: Colors.white,
+            icon: const Icon(
+              FontAwesomeIcons.arrowLeft,
+              size: 15,
+              color: Colors.white,
+            ),
+            padding: const EdgeInsets.all(8),
+            constraints: const BoxConstraints(),
+          ),
+          IconButton(
+            tooltip: '返回主页',
+            onPressed: plPlayerController.onCloseAll,
+            icon: const Icon(
+              FontAwesomeIcons.house,
+              size: 15,
+              color: Colors.white,
+            ),
             padding: const EdgeInsets.all(8),
             constraints: const BoxConstraints(),
           ),

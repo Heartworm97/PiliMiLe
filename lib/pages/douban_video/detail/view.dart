@@ -1,10 +1,14 @@
+import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
+import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
+import 'package:PiliMiLe/models/common/image_type.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/controller.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/episode_selector.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/header_control.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/source_selector.dart';
 import 'package:PiliMiLe/plugin/pl_player/view/view.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
 class DoubanVideoDetailPage extends StatefulWidget {
@@ -56,61 +60,120 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         maxHeight: height,
         plPlayerController: controller.plPlayerController,
         headerControl: DoubanVideoHeaderControl(
+          plPlayerController: controller.plPlayerController,
           title: controller.vodName.value,
         ),
       );
     }
 
-    // 未播放 → 海报 + 播放按钮 / 解码中
+    // 未播放 → 封面 + 顶栏 + 右下角播放按钮（对齐番剧/影视 manualPlayerWidget）
     return Stack(
+      clipBehavior: Clip.none,
       fit: StackFit.expand,
       children: [
+        // 封面
         if (controller.vodPic.value.isNotEmpty)
-          Image.network(
-            controller.vodPic.value,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => Container(color: Colors.black),
+          NetworkImgLayer(
+            type: ImageType.emote,
+            quality: 60,
+            src: controller.vodPic.value,
+            width: width,
+            height: height,
+            getPlaceHolder: () => const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            ),
           )
         else
           Container(color: Colors.black),
-        // 半透明遮罩
-        Container(color: Colors.black.withValues(alpha: 0.35)),
-        // 播放按钮 或 解码中
-        Center(
-          child: controller.isDecoding.value
-              ? const SizedBox(
-                  width: 36,
-                  height: 36,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: Colors.white,
-                  ),
-                )
-              : GestureDetector(
-                  onTap: controller.play,
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white24,
+
+        // 顶栏（对齐 B站 manualPlayerWidget）
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: AppBar(
+            primary: false,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.transparent,
+            automaticallyImplyLeading: false,
+            title: Row(
+              children: [
+                // 返回
+                SizedBox(
+                  width: 42,
+                  height: 34,
+                  child: IconButton(
+                    tooltip: '返回',
+                    icon: const Icon(
+                      FontAwesomeIcons.arrowLeft,
+                      size: 15,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(blurRadius: 1.5, color: Colors.black),
+                      ],
                     ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.play_arrow_rounded,
-                        size: 36,
-                        color: Colors.white,
-                      ),
-                    ),
+                    onPressed: Get.back,
                   ),
                 ),
+                // 返回主页
+                SizedBox(
+                  width: 42,
+                  height: 34,
+                  child: IconButton(
+                    tooltip: '返回主页',
+                    icon: const Icon(
+                      FontAwesomeIcons.house,
+                      size: 15,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(blurRadius: 1.5, color: Colors.black),
+                      ],
+                    ),
+                    onPressed: controller.plPlayerController.onCloseAll,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        // 解码失败提示
+
+        // 右下角播放按钮（对齐 B站）
+        Positioned(
+          right: 12,
+          bottom: 10,
+          child: IconButton(
+            tooltip: '播放',
+            onPressed: controller.play,
+            icon: Image.asset(
+              Assets.play,
+              width: 60,
+              height: 60,
+              cacheHeight: 60,
+            ),
+          ),
+        ),
+
+        // 解码中
+        if (controller.isDecoding.value)
+          const Center(
+            child: SizedBox(
+              width: 36,
+              height: 36,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: Colors.white,
+              ),
+            ),
+          ),
+
+        // 错误提示
         if (controller.errorMsg.value != null)
           Positioned(
-            bottom: 12,
-            left: 0,
-            right: 0,
+            left: 12,
+            right: 12,
+            bottom: 48,
             child: Text(
               controller.errorMsg.value!,
               style: const TextStyle(color: Colors.redAccent, fontSize: 12),
