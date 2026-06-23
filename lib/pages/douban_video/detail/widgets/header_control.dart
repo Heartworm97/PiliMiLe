@@ -15,49 +15,51 @@ class DoubanVideoHeaderControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      backgroundColor: Colors.transparent,
-      foregroundColor: Colors.white,
-      primary: false,
-      automaticallyImplyLeading: false,
-      flexibleSpace: Column(
-        mainAxisSize: MainAxisSize.min,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.black.withValues(alpha: 0.6),
+            Colors.transparent,
+          ],
+        ),
+      ),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 4,
+        bottom: 8,
+      ),
+      child: Row(
         children: [
-          const SizedBox(height: 11),
-          Row(
-            children: [
-              _buildBtn(
-                tooltip: '返回',
+          _buildBtn(
+            tooltip: '返回',
+            icon: const Icon(
+              FontAwesomeIcons.arrowLeft,
+              size: 15,
+              color: Colors.white,
+            ),
+            onPressed: Get.back,
+          ),
+          Obx(() {
+            final isPortrait =
+                MediaQuery.of(context).orientation == Orientation.portrait;
+            final isFullScreen = plPlayerController.isFullScreen.value;
+            if (!plPlayerController.isDesktopPip &&
+                (!isFullScreen || !isPortrait)) {
+              return _buildBtn(
+                tooltip: '返回主页',
                 icon: const Icon(
-                  FontAwesomeIcons.arrowLeft,
+                  FontAwesomeIcons.house,
                   size: 15,
                   color: Colors.white,
                 ),
-                onPressed: Get.back,
-              ),
-              Obx(() {
-                final isPortrait =
-                    MediaQuery.of(context).orientation == Orientation.portrait;
-                final isFullScreen = plPlayerController.isFullScreen.value;
-                if (!plPlayerController.isDesktopPip &&
-                    (!isFullScreen || !isPortrait)) {
-                  return _buildBtn(
-                    tooltip: '返回主页',
-                    icon: const Icon(
-                      FontAwesomeIcons.house,
-                      size: 15,
-                      color: Colors.white,
-                    ),
-                    onPressed: plPlayerController.onCloseAll,
-                  );
-                }
-                return const SizedBox.shrink();
-              }),
-              _buildTitle(context),
-            ],
-          ),
+                onPressed: plPlayerController.onCloseAll,
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+          _buildTitle(context),
         ],
       ),
     );
