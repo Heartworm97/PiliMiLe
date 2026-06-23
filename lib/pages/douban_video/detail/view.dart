@@ -393,7 +393,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                     _infoChip(detail.vodYear),
                     _infoChip(detail.vodArea),
                     _infoChip(detail.vodLang),
-                    _infoChip(detail.vodRemarks),
                   ].whereType<Widget>().toList(),
                 ),
                 if (detail.vodContent.isNotEmpty) ...[
