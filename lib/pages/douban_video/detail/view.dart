@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
@@ -73,12 +75,26 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
       );
     }
 
-    // 未播放 → 纯黑底 + 居中海报 + 顶栏 + 右下角播放按钮
+    // 未播放 → 模糊海报背景 + 居中海报 + 顶栏 + 右下角播放按钮
     return Stack(
       clipBehavior: Clip.none,
       fit: StackFit.expand,
       children: [
         const Positioned.fill(child: ColoredBox(color: Colors.black)),
+
+        // 背景层：同一张海报模糊拉伸铺满
+        if (controller.vodPic.value.isNotEmpty)
+          Positioned.fill(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: NetworkImgLayer(
+                src: controller.vodPic.value,
+                width: width,
+                height: height,
+                skipThumbnail: true,
+              ),
+            ),
+          ),
 
         // 居中海报
         if (controller.vodPic.value.isNotEmpty)
