@@ -106,13 +106,15 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         // 背景层：同一张海报模糊拉伸铺满
         if (controller.vodPic.value.isNotEmpty)
           Positioned.fill(
-            child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-              child: NetworkImgLayer(
-                src: controller.vodPic.value,
-                width: width,
-                height: height,
-                skipThumbnail: true,
+            child: ClipRect(
+              child: ImageFiltered(
+                imageFilter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                child: NetworkImgLayer(
+                  src: controller.vodPic.value,
+                  width: width,
+                  height: height,
+                  skipThumbnail: true,
+                ),
               ),
             ),
           ),
