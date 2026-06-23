@@ -15,21 +15,8 @@ class DoubanVideoHeaderControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.black.withValues(alpha: 0.6),
-            Colors.transparent,
-          ],
-        ),
-      ),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 4,
-        bottom: 8,
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         children: [
           _buildBtn(
