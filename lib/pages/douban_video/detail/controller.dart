@@ -103,6 +103,12 @@ class DoubanVideoDetailController extends GetxController {
       if (resp['status'] == true && resp['data'] != null) {
         final result = resp['data'] as DoubanDecodeResultModel;
         if (result.url.isNotEmpty) {
+          if (!_isValidVideoUrl(result.url)) {
+            errorMsg.value = '解码结果无效';
+            SmartDialog.dismiss();
+            SmartDialog.showToast('解码失败，请稍后重试');
+            return;
+          }
           m3u8Url.value = result.url;
           await _playM3u8(result.url);
           SmartDialog.dismiss();
@@ -148,6 +154,19 @@ class DoubanVideoDetailController extends GetxController {
         SmartDialog.showToast('播放失败，请尝试其他线路');
       }
     });
+  }
+
+  bool _isValidVideoUrl(String url) {
+    final lower = url.toLowerCase();
+    if (lower.endsWith('.jpg') ||
+        lower.endsWith('.jpeg') ||
+        lower.endsWith('.png') ||
+        lower.endsWith('.webp') ||
+        lower.endsWith('.gif') ||
+        lower.endsWith('.bmp')) {
+      return false;
+    }
+    return true;
   }
 
   void onSelectSource(int index) {
