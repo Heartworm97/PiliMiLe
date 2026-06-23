@@ -106,10 +106,10 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                         borderRadius: BorderRadius.circular(8),
                         child: NetworkImgLayer(
                           src: controller.vodPic.value,
-                          width: height * 2 / 3,
+                          width: width,
                           height: height,
                           skipThumbnail: true,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     )
