@@ -10,7 +10,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# 常用 iOS 模拟器 UDID（flutter devices 查看）
+# 常用 iOS 模拟器 UDID（$FLUTTER_CMD devices 查看）
 IOS_SIMULATOR_UDID="1A49CA42-2DFC-49A2-9BF9-0F1C93EBF10D"
 
 info()  { echo -e "${GREEN}[✓]${NC} $1"; }
@@ -60,17 +60,36 @@ json.dump({
     info "已生成 pili_release.json (version: ${version_name}+${commit_count}, hash: ${commit_hash})"
 }
 
+# 全局 Flutter 命令 — check_prereq 中初始化
+FLUTTER_CMD=""
+
 # ---- 前置检查 ----
 check_prereq() {
     title "前置检查..."
 
-    # Flutter 版本校验
     local required version
+
+    # 确定用于后续所有操作的 flutter 命令
+    if command -v flutter &>/dev/null; then
+        FLUTTER_CMD="flutter"
+    elif command -v fvm &>/dev/null && fvm flutter --version &>/dev/null 2>&1; then
+        FLUTTER_CMD="fvm flutter"
+    elif [ -n "${FLUTTER_ROOT:-}" ] && [ -x "$FLUTTER_ROOT/bin/flutter" ]; then
+        FLUTTER_CMD="$FLUTTER_ROOT/bin/flutter"
+    elif [ -x "$HOME/flutter/bin/flutter" ]; then
+        FLUTTER_CMD="$HOME/flutter/bin/flutter"
+    else
+        err "未找到 Flutter，请先安装 Flutter SDK"
+        err "  macOS: brew install fvm && fvm use 3.44.2"
+        err "  或从 https://flutter.dev 下载后加入 PATH"
+        exit 1
+    fi
+
     required=$(python3 -c "import json; print(json.load(open('.fvmrc'))['flutter'])" 2>/dev/null || echo "")
-    version=$(flutter --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "")
+    version=$($FLUTTER_CMD --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "")
 
     if [ -z "$version" ]; then
-        err "未找到 Flutter，请先安装 Flutter SDK"
+        err "无法获取 Flutter 版本，请检查 Flutter 安装"
         exit 1
     fi
 
@@ -85,8 +104,8 @@ check_prereq() {
 
     # 依赖检查
     if [ ! -f "pubspec.lock" ] || [ "pubspec.yaml" -nt "pubspec.lock" ]; then
-        warn "依赖可能存在变更，正在 flutter pub get..."
-        flutter pub get -q
+        warn "依赖可能存在变更，正在 pub get..."
+        $FLUTTER_CMD pub get -q
     fi
 }
 
@@ -100,7 +119,7 @@ ios_simulator() {
     # 指定了 UDID 则直接使用
     if [ -n "$IOS_SIMULATOR_UDID" ]; then
         # 检查是否已启动
-        if flutter devices 2>/dev/null | grep -q "$IOS_SIMULATOR_UDID"; then
+        if $FLUTTER_CMD devices 2>/dev/null | grep -q "$IOS_SIMULATOR_UDID"; then
             info "使用指定模拟器: $IOS_SIMULATOR_UDID"
         elif xcrun simctl list devices available 2>/dev/null | grep -q "$IOS_SIMULATOR_UDID"; then
             # 存在但未启动，先启动并等待就绪
@@ -115,7 +134,7 @@ ios_simulator() {
             echo "请在 Xcode → Settings → Devices 中确认该设备"
             exit 1
         fi
-        flutter run -d "$IOS_SIMULATOR_UDID" --dart-define-from-file=pili_release.json
+        $FLUTTER_CMD run -d "$IOS_SIMULATOR_UDID" --dart-define-from-file=pili_release.json
         return
     fi
 
@@ -127,8 +146,8 @@ ios_simulator() {
         | head -20)
 
     if [ -z "$simulators" ]; then
-        # 回退到 flutter devices（可能模拟器已启动）
-        simulators=$(flutter devices 2>/dev/null | grep -i 'ios.*simulator' || true)
+        # 回退到 $FLUTTER_CMD devices（可能模拟器已启动）
+        simulators=$($FLUTTER_CMD devices 2>/dev/null | grep -i 'ios.*simulator' || true)
     fi
 
     if [ -z "$simulators" ]; then
@@ -171,7 +190,7 @@ ios_simulator() {
     open -a Simulator 2>/dev/null || true
 
     info "启动到 iOS 模拟器..."
-    flutter run -d "$device_id" --dart-define-from-file=pili_release.json
+    $FLUTTER_CMD run -d "$device_id" --dart-define-from-file=pili_release.json
 }
 
 # ---- 2. macOS 桌面端启动 ----
@@ -180,7 +199,7 @@ macos_run() {
     gen_release_json
     title "macOS 桌面端"
     info "启动 macOS 应用..."
-    flutter run -d macos --dart-define-from-file=pili_release.json
+    $FLUTTER_CMD run -d macos --dart-define-from-file=pili_release.json
 }
 
 # ---- 3. 构建无签名 IPA ----
@@ -195,7 +214,7 @@ build_unsigned_ipa() {
     ipa_path="$project_dir/build/PiliMiLe-unsigned.ipa"
 
     info "使用 Release 模式编译 iOS..."
-    run_quiet flutter build ios --release --no-codesign
+    run_quiet $FLUTTER_CMD build ios --release --no-codesign
 
     # 产物自动在 build/ios/iphoneos/
     # 找到 .app
@@ -239,7 +258,7 @@ build_macos_app() {
     title "构建 macOS 应用"
 
     info "编译 macOS Release..."
-    run_quiet flutter build macos --release
+    run_quiet $FLUTTER_CMD build macos --release
 
     local app_path dmgs_dir
     app_path=$(find "$(pwd)/build/macos/Build/Products/Release" -name '*.app' -type d -maxdepth 1 | head -1)
@@ -352,7 +371,7 @@ build_macos_app() {
 clean() {
     title "清理编译缓存"
     info "清理 Flutter 缓存..."
-    run_quiet flutter clean
+    run_quiet $FLUTTER_CMD clean
     info "清理完成"
     echo "可考虑删除 Pods/Podfile.lock 后重新 pod install"
 }
