@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
@@ -73,19 +75,18 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
       );
     }
 
-    // 未播放 → 纯黑底 + 封面 + 顶栏 + 右下角播放按钮（对齐番剧/影视 videoPlayer）
+    // 未播放 → 模糊海报背景 + 居中海报 + 顶栏 + 右下角播放按钮
     return Stack(
       clipBehavior: Clip.none,
       fit: StackFit.expand,
       children: [
         const Positioned.fill(child: ColoredBox(color: Colors.black)),
 
-        // 封面海报（全尺寸覆盖，fit: cover）
+        // 背景层：同一张海报模糊拉伸铺满
         if (controller.vodPic.value.isNotEmpty)
           Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: controller.play,
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
               child: NetworkImgLayer(
                 src: controller.vodPic.value,
                 width: width,
@@ -94,6 +95,31 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
               ),
             ),
           ),
+
+        // 居中海报 + 暗色遮罩层
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: controller.play,
+            child: Container(
+              color: Colors.black.withValues(alpha: 0.3),
+              child: controller.vodPic.value.isNotEmpty
+                  ? Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: NetworkImgLayer(
+                          src: controller.vodPic.value,
+                          width: width,
+                          height: height,
+                          skipThumbnail: true,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+          ),
+        ),
 
         // 顶栏（对齐 B站 manualPlayerWidget）
         Positioned(
