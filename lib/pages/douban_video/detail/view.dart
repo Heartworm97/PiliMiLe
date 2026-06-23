@@ -229,6 +229,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
             padding: EdgeInsets.zero,
             labelStyle: const TextStyle(fontSize: 13),
             labelPadding: const EdgeInsets.symmetric(horizontal: 10),
+            indicatorSize: TabBarIndicatorSize.label,
             dividerColor: Colors.transparent,
             dividerHeight: 0,
             tabs: const [
