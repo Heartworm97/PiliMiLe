@@ -98,7 +98,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
 
     // 未播放 → 模糊海报背景 + 居中海报 + 顶栏 + 右下角播放按钮
     return Stack(
-      clipBehavior: Clip.none,
+      clipBehavior: Clip.hardEdge,
       fit: StackFit.expand,
       children: [
         const Positioned.fill(child: ColoredBox(color: Colors.black)),
