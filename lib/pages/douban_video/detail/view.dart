@@ -49,6 +49,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
   }
 
   Widget _buildPlayerArea(double width, double height) {
+    // 已播放 → 播放器
     if (controller.playerReady.value) {
       return PLVideoPlayer(
         maxWidth: width,
@@ -60,7 +61,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
       );
     }
 
-    // 加载中 / 解码中 / 出错 → 海报 + 加载指示
+    // 未播放 → 海报 + 播放按钮 / 解码中
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -73,67 +74,54 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         else
           Container(color: Colors.black),
         // 半透明遮罩
-        Container(color: Colors.black.withValues(alpha: 0.4)),
+        Container(color: Colors.black.withValues(alpha: 0.35)),
+        // 播放按钮 或 解码中
         Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(
-                width: 36,
-                height: 36,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.white,
+          child: controller.isDecoding.value
+              ? const SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: Colors.white,
+                  ),
+                )
+              : GestureDetector(
+                  onTap: controller.play,
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white24,
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.play_arrow_rounded,
+                        size: 36,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                controller.isDecoding.value ? '解码中...' : '加载中...',
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
-              ),
-              if (controller.errorMsg.value != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  controller.errorMsg.value!,
-                  style: const TextStyle(color: Colors.redAccent, fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ],
-          ),
         ),
+        // 解码失败提示
+        if (controller.errorMsg.value != null)
+          Positioned(
+            bottom: 12,
+            left: 0,
+            right: 0,
+            child: Text(
+              controller.errorMsg.value!,
+              style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+              textAlign: TextAlign.center,
+            ),
+          ),
       ],
     );
   }
 
   Widget _buildContent() {
-    // 加载中
-    if (controller.isLoading.value) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    // 错误（尚未加载成功，且无 detail）
-    if (controller.errorMsg.value != null && controller.detail.value == null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              controller.errorMsg.value!,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-              ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => controller.retry,
-              child: const Text('重试'),
-            ),
-          ],
-        ),
-      );
-    }
-
     // 无数据
     if (controller.detail.value == null) {
       return const Center(child: Text('暂无数据'));

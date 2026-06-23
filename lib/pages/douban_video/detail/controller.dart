@@ -11,10 +11,10 @@ class DoubanVideoDetailController extends GetxController {
   final vodName = ''.obs;
   final vodPic = ''.obs;
 
-  // 详情
-  final isLoading = true.obs;
-  final errorMsg = Rxn<String>();
+  // 详情（预加载传入）
   final detail = Rxn<DoubanVodDetailModel>();
+  final isLoading = false.obs;
+  final errorMsg = Rxn<String>();
 
   // 选中状态
   final selectedSourceIndex = 0.obs;
@@ -44,7 +44,20 @@ class DoubanVideoDetailController extends GetxController {
     vodId = args?['vodId'];
     vodName.value = args?['vodName'] ?? '';
     vodPic.value = args?['vodPic'] ?? '';
-    _fetchDetail();
+
+    // 接收预加载数据
+    if (args?['preloadedDetail'] case final DoubanVodDetailModel d) {
+      detail.value = d;
+      vodName.value = d.vodName;
+      vodPic.value = d.vodPic;
+      selectedSourceIndex.value =
+          (args?['preloadedSourceIndex'] as int?) ?? 0;
+      selectedEpisodeIndex.value =
+          (args?['preloadedEpisodeIndex'] as int?) ?? 0;
+      if (args?['preloadedM3u8'] case final String url) {
+        m3u8Url.value = url;
+      }
+    }
   }
 
   @override
@@ -53,44 +66,18 @@ class DoubanVideoDetailController extends GetxController {
     super.onClose();
   }
 
-  Future<void> retry() => _fetchDetail();
+  /// 手动播放
+  Future<void> play() async {
+    if (isDecoding.value) return;
 
-  Future<void> _fetchDetail() async {
-    isLoading.value = true;
-    errorMsg.value = null;
-    try {
-      final resp = await DoubanHttp.getVodDetail(vodId);
-      if (resp['status'] == true && resp['data'] != null) {
-        detail.value = resp['data'] as DoubanVodDetailModel;
-        vodName.value = detail.value!.vodName;
-        vodPic.value = detail.value!.vodPic;
-        _autoSelectSource();
-      } else {
-        errorMsg.value = resp['msg'] ?? '加载失败';
-      }
-    } catch (e) {
-      debugPrint('[追剧详情] 获取详情失败: $e');
-      errorMsg.value = '网络错误: $e';
-    } finally {
-      isLoading.value = false;
+    // 已有 M3U8，直接播
+    if (m3u8Url.value != null && m3u8Url.value!.isNotEmpty) {
+      await _playM3u8(m3u8Url.value!);
+      return;
     }
-  }
 
-  void _autoSelectSource() {
-    final list = sources;
-    for (int i = 0; i < list.length; i++) {
-      if (list[i].decodeStatus == '1') {
-        selectedSourceIndex.value = i;
-        selectedEpisodeIndex.value = 0;
-        _doDecode();
-        return;
-      }
-    }
-    // 没有可解码线路，默认选第一条
-    if (list.isNotEmpty) {
-      selectedSourceIndex.value = 0;
-      selectedEpisodeIndex.value = 0;
-    }
+    // 没 URL，需要解码
+    await _doDecode();
   }
 
   Future<void> _doDecode() async {
@@ -99,8 +86,8 @@ class DoubanVideoDetailController extends GetxController {
     if (src == null || ep == null) return;
 
     isDecoding.value = true;
-    m3u8Url.value = null;
     playerReady.value = false;
+    errorMsg.value = null;
     try {
       final resp = await DoubanHttp.decodeVod(
         vodId: vodId,
@@ -111,8 +98,8 @@ class DoubanVideoDetailController extends GetxController {
       if (resp['status'] == true && resp['data'] != null) {
         final result = resp['data'] as DoubanDecodeResultModel;
         if (result.url.isNotEmpty) {
-          await _playM3u8(result.url);
           m3u8Url.value = result.url;
+          await _playM3u8(result.url);
         } else {
           errorMsg.value = '解码结果为空';
         }
@@ -141,12 +128,14 @@ class DoubanVideoDetailController extends GetxController {
     if (index == selectedSourceIndex.value) return;
     selectedSourceIndex.value = index;
     selectedEpisodeIndex.value = 0;
-    _doDecode();
+    m3u8Url.value = null;
+    playerReady.value = false;
   }
 
   void onSelectEpisode(int index) {
     if (index == selectedEpisodeIndex.value) return;
     selectedEpisodeIndex.value = index;
-    _doDecode();
+    m3u8Url.value = null;
+    playerReady.value = false;
   }
 }
