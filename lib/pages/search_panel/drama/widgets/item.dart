@@ -2,10 +2,10 @@ import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/badge.dart';
 import 'package:PiliMiLe/common/widgets/image/image_save.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
-import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/models/search/result.dart';
 import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SearchDramaItem extends StatelessWidget {
   const SearchDramaItem({
@@ -28,41 +28,12 @@ class SearchDramaItem extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
-        onTap: () async {
-          debugPrint('========== 追剧详情: ${item.vodName}(${item.vodId}) ==========');
-
-          final result = await DoubanHttp.getVodDetail(item.vodId);
-          if (result['status'] == true) {
-            final detail = result['data'];
-            debugPrint('成功 | 线路:${detail.sources.length}');
-            for (final src in detail.sources) {
-              final sample = src.episodes.isNotEmpty
-                  ? src.episodes.first.videoId
-                  : '无';
-              debugPrint('  ${src.name}(${src.key}) '
-                  '集数:${src.episodeCount} decode:${src.decodeStatus} '
-                  '样本: $sample');
-            }
-            // 选第一条正常解码的线路试解第一集
-            for (final src in detail.sources) {
-              if (src.decodeStatus == '1' && src.episodes.isNotEmpty) {
-                debugPrint('>> 试解: ${src.name}(${src.key}) 第1集');
-                final decodeR = await DoubanHttp.decodeVod(
-                  vodId: item.vodId,
-                  sid: src.key,
-                  nid: 1,
-                );
-                if (decodeR['status'] == true) {
-                  debugPrint('>> M3U8: ${decodeR['data'].url}');
-                } else {
-                  debugPrint('>> 解码失败: ${decodeR['msg']}');
-                }
-                break;
-              }
-            }
-          } else {
-            debugPrint('失败, msg=${result['msg']}');
-          }
+        onTap: () {
+          Get.toNamed('/doubanVideo', arguments: {
+            'vodId': item.vodId,
+            'vodName': item.vodName,
+            'vodPic': item.vodPic,
+          });
         },
         onLongPress: onLongPress,
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,

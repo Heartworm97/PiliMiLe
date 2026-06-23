@@ -6,6 +6,7 @@ import 'package:PiliMiLe/pages/blacklist/view.dart';
 import 'package:PiliMiLe/pages/bubble/view.dart';
 import 'package:PiliMiLe/pages/danmaku_block/view.dart';
 import 'package:PiliMiLe/pages/dlna/view.dart';
+import 'package:PiliMiLe/pages/douban_video/detail/view.dart';
 import 'package:PiliMiLe/pages/download/view.dart';
 import 'package:PiliMiLe/pages/dynamics/view.dart';
 import 'package:PiliMiLe/pages/dynamics_create_vote/view.dart';
@@ -200,5 +201,6 @@ class Routes {
     GetPage(name: '/ssWeb', page: () => const MemberSSWeb()),
     GetPage(name: '/memberGuard', page: () => const MemberGuard()),
     GetPage(name: '/bubble', page: () => const BubblePage()),
+    GetPage(name: '/doubanVideo', page: () => const DoubanVideoDetailPage()),
   ];
 }
