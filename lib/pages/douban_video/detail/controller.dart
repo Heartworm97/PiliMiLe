@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/plugin/pl_player/controller.dart';
@@ -63,6 +65,7 @@ class DoubanVideoDetailController extends GetxController {
 
   @override
   void onClose() {
+    _playTimeoutTimer?.cancel();
     plPlayerController.dispose();
     super.onClose();
   }
@@ -130,8 +133,20 @@ class DoubanVideoDetailController extends GetxController {
       autoplay: false,
     );
     playerReady.value = true;
-    // 显式调用 play 确保不须二次点击
     await plPlayerController.play();
+
+    // 8秒超时检测：mbedtls TLS握手失败等错误不会触发原生回调，播放器卡在loading
+    _startPlayTimeout();
+  }
+
+  Timer? _playTimeoutTimer;
+  void _startPlayTimeout() {
+    _playTimeoutTimer?.cancel();
+    _playTimeoutTimer = Timer(const Duration(seconds: 8), () {
+      if (!plPlayerController.playerStatus.isPlaying) {
+        SmartDialog.showToast('播放失败，请尝试其他线路');
+      }
+    });
   }
 
   void onSelectSource(int index) {
