@@ -35,7 +35,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     final playerHeight = playerWidth * 9 / 16;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Colors.black,
       body: Obx(() {
         final isFullScreen = controller.plPlayerController.isFullScreen.value;
 
@@ -52,7 +52,12 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                 height: playerHeight,
                 child: Obx(() => _buildPlayerArea(playerWidth, playerHeight)),
               ),
-              Expanded(child: Obx(_buildContent)),
+              Expanded(
+                child: Container(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Obx(_buildContent),
+                ),
+              ),
             ],
           ),
         );
