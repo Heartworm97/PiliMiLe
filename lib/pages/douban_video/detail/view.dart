@@ -96,30 +96,26 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
             ),
           ),
 
-        // 居中海报 + 暗色遮罩层
-        Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: controller.play,
-            child: Container(
-              color: Colors.black.withValues(alpha: 0.3),
-              child: controller.vodPic.value.isNotEmpty
-                  ? Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: NetworkImgLayer(
-                          src: controller.vodPic.value,
-                          width: width,
-                          height: height,
-                          skipThumbnail: true,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    )
-                  : null,
+        // 居中海报
+        if (controller.vodPic.value.isNotEmpty)
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: controller.play,
+              child: Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: NetworkImgLayer(
+                    src: controller.vodPic.value,
+                    width: width,
+                    height: height,
+                    skipThumbnail: true,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
 
         // 顶栏（对齐 B站 manualPlayerWidget）
         Positioned(
