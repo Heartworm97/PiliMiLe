@@ -103,17 +103,17 @@ class DoubanVideoDetailController extends GetxController {
           await _playM3u8(result.url);
         } else {
           errorMsg.value = '解码结果为空';
-          SmartDialog.showToast('解码失败，稍后重试');
+          SmartDialog.showToast('解码失败，请稍后重试');
         }
       } else {
         debugPrint('[追剧详情] 解码失败: ${resp['msg']}');
         errorMsg.value = resp['msg'] ?? '解码失败';
-        SmartDialog.showToast('解码失败，稍后重试');
+        SmartDialog.showToast('解码失败，请稍后重试');
       }
     } catch (e) {
       debugPrint('[追剧详情] 解码异常: $e');
       errorMsg.value = '解码错误: $e';
-      SmartDialog.showToast('解码失败，稍后重试');
+      SmartDialog.showToast('解码失败，请稍后重试');
     } finally {
       isDecoding.value = false;
     }
