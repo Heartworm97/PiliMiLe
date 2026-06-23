@@ -250,7 +250,7 @@ class DoubanHttp {
 
         if (kDebugMode) {
           for (final item in filteredList) {
-            logger.d('剧名: ${item.vodName} | 海报: ${item.vodPic}');
+                debugPrint('剧名: ${item.vodName} | 海报: ${item.vodPic}');
           }
         }
 
