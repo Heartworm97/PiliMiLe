@@ -366,7 +366,7 @@ class DoubanHttp {
           'data': DoubanVodDetailModel(
             vodId: vodId.toString(),
             vodName: vod['vod_name'] ?? '',
-            vodPic: vod['vod_pic'] ?? '',
+            vodPic: cleanVodPic(vod['vod_pic'] ?? ''),
             vodRemarks: vod['vod_remarks'] ?? '',
             vodYear: vod['vod_year']?.toString() ?? '',
             vodArea: vod['vod_area'] ?? '',
