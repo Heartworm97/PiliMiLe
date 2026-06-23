@@ -782,6 +782,10 @@ class PlPlayerController with BlockConfigMixin {
     if (autosync != '0') {
       opt['autosync'] = autosync;
     }
+    // iOS 模拟器无音频硬件，静默 cplayer 日志
+    if (Platform.isIOS) {
+      opt['msg-level'] = 'cplayer=no';
+    }
 
     final player = await Player.create(
       configuration: PlayerConfiguration(
