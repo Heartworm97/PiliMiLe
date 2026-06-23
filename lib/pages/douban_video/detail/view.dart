@@ -4,11 +4,14 @@ import 'dart:ui' show ImageFilter;
 import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/image/network_img_layer.dart';
+import 'package:PiliMiLe/models/common/image_preview_type.dart';
+import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/controller.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/episode_selector.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/header_control.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/source_selector.dart';
 import 'package:PiliMiLe/plugin/pl_player/view/view.dart';
+import 'package:PiliMiLe/utils/page_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -218,48 +221,14 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     );
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(
-        horizontal: Style.safeSpace,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: Style.safeSpace),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 剧名
-          Padding(
-            padding: const EdgeInsets.only(top: 12, bottom: 8),
-            child: Text(
-              detail.vodName,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-            ),
-          ),
+          // 封面 + 信息横向布局
+          _buildCoverInfoRow(theme, detail, infoStyle),
 
-          // 基础信息行
-          Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: [
-              _infoChip(detail.vodYear),
-              _infoChip(detail.vodArea),
-              _infoChip(detail.vodLang),
-              _infoChip(detail.vodRemarks),
-            ].whereType<Widget>().toList(),
-          ),
-
-          const SizedBox(height: 12),
-
-          // 演员
-          if (detail.vodActor.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text('演员：${detail.vodActor}', style: infoStyle),
-            ),
-
-          // 导演
-          if (detail.vodDirector.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text('导演：${detail.vodDirector}', style: infoStyle),
-            ),
+          const SizedBox(height: 8),
 
           // 线路选择器
           Obx(() => SourceSelector(
@@ -298,6 +267,90 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
           const SizedBox(height: 24),
         ],
       ),
+    );
+  }
+
+  Widget _buildCoverInfoRow(
+    ThemeData theme,
+    DoubanVodDetailModel detail,
+    TextStyle infoStyle,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 封面
+        GestureDetector(
+          onTap: () => PageUtils.imageView(
+            imgList: [SourceModel(url: detail.vodPic)],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: NetworkImgLayer(
+              src: detail.vodPic,
+              width: 115,
+              height: 153,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        // 右侧信息
+        Expanded(
+          child: SizedBox(
+            height: 153,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 剧名
+                Text(
+                  detail.vodName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 6),
+                // 元数据标签
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    _infoChip(detail.vodYear),
+                    _infoChip(detail.vodArea),
+                    _infoChip(detail.vodLang),
+                    _infoChip(detail.vodRemarks),
+                  ].whereType<Widget>().toList(),
+                ),
+                const SizedBox(height: 6),
+                // 演员
+                if (detail.vodActor.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      '演员：${detail.vodActor}',
+                      style: infoStyle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                // 导演
+                if (detail.vodDirector.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      '导演：${detail.vodDirector}',
+                      style: infoStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                const Spacer(),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
