@@ -2,6 +2,7 @@ import 'package:PiliMiLe/http/browser_ua.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/models/search/result.dart';
 import 'package:PiliMiLe/services/logger.dart';
+import 'package:PiliMiLe/services/upstream_decoder.dart';
 import 'package:PiliMiLe/utils/storage.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
@@ -440,4 +441,82 @@ class DoubanHttp {
 
   /// 当前活跃线路 host（供播放器设置 Referer）
   static String get serverHost => _activeHost;
+
+  // ============ 上游 API：解码 ============
+
+  /// 解码视频 URL → M3U8
+  static Future<Map<String, dynamic>> decodeVod({
+    required dynamic vodId,
+    required String sid,
+    required int nid,
+    String? videoId,
+  }) async {
+    try {
+      // 如果没有传入 videoId，从详情中获取
+      String targetVideoId = videoId ?? '';
+      if (targetVideoId.isEmpty) {
+        final detailResp = await getVodDetail(vodId);
+        if (detailResp['status'] != true || detailResp['data'] == null) {
+          return {'status': false, 'data': null, 'msg': '获取详情失败'};
+        }
+        final detail = detailResp['data'] as DoubanVodDetailModel;
+        for (final source in detail.sources) {
+          if (source.key == sid) {
+            for (final ep in source.episodes) {
+              if (ep.nid == nid && ep.videoId.isNotEmpty) {
+                targetVideoId = ep.videoId;
+                break;
+              }
+            }
+            break;
+          }
+        }
+      }
+
+      if (targetVideoId.isEmpty) {
+        return {'status': false, 'data': null, 'msg': '未找到对应的 videoId'};
+      }
+
+      logger.d('[追剧HTTP] 解码请求 vodId=$vodId sid=$sid nid=$nid videoId=$targetVideoId');
+
+      // M3U8 直链：无需 WASM 解码，直接播放
+      if (targetVideoId.endsWith('.m3u8')) {
+        logger.d('[追剧HTTP] M3U8 直链播放 $targetVideoId');
+        return {
+          'status': true,
+          'data': DoubanDecodeResultModel(
+            url: targetVideoId,
+            source: sid,
+            episode: nid.toString(),
+          ),
+        };
+      }
+
+      // 聚合线路从 site_key 提取短码：site_xxx_qq → qq
+      final siteKey = sid.startsWith('site_') ? sid.split('_').last : sid;
+      final host = _activeHost.replaceFirst('https://', '');
+      final decodeResult = await UpstreamDecoder.decode(
+        upstreamHost: host,
+        videoId: targetVideoId,
+        siteKey: siteKey,
+      );
+
+      logger.d('[追剧HTTP] 解码结果 status=${decodeResult['status']} msg=${decodeResult['msg']}');
+      if (decodeResult['status'] == true && decodeResult['data'] != null) {
+        final data = decodeResult['data'] as Map<String, dynamic>;
+        return {
+          'status': true,
+          'data': DoubanDecodeResultModel(
+            url: data['m3u8Url'] ?? '',
+            source: data['source'] ?? sid,
+            episode: data['episode']?.toString() ?? '',
+          ),
+        };
+      }
+      return {'status': false, 'data': null, 'msg': decodeResult['msg'] ?? '解码失败'};
+    } catch (e) {
+      logger.e('[追剧HTTP] 解码异常 $e');
+      return {'status': false, 'data': null, 'msg': '网络错误: $e'};
+    }
+  }
 }

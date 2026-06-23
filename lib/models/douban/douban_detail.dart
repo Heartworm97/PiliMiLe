@@ -58,3 +58,24 @@ class DoubanVodDetailModel {
     required this.sources,
   });
 }
+
+/// 追剧解码结果（M3U8 播放地址）
+class DoubanDecodeResultModel {
+  final String url;
+  final String source;
+  final String episode;
+
+  const DoubanDecodeResultModel({
+    required this.url,
+    required this.source,
+    required this.episode,
+  });
+
+  factory DoubanDecodeResultModel.fromJson(Map<String, dynamic> json) {
+    return DoubanDecodeResultModel(
+      url: json['m3u8Url'] ?? json['url'] ?? '',
+      source: json['source'] ?? '',
+      episode: json['episode']?.toString() ?? '',
+    );
+  }
+}
