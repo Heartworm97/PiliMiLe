@@ -26,6 +26,7 @@ class DoubanVideoDetailController extends GetxController {
 
   // 播放器
   final plPlayerController = PlPlayerController.getInstance(isLive: true);
+  final playerReady = false.obs;
 
   // 计算属性
   DoubanSourceModel? get selectedSource =>
@@ -99,6 +100,7 @@ class DoubanVideoDetailController extends GetxController {
 
     isDecoding.value = true;
     m3u8Url.value = null;
+    playerReady.value = false;
     try {
       final resp = await DoubanHttp.decodeVod(
         vodId: vodId,
@@ -109,8 +111,8 @@ class DoubanVideoDetailController extends GetxController {
       if (resp['status'] == true && resp['data'] != null) {
         final result = resp['data'] as DoubanDecodeResultModel;
         if (result.url.isNotEmpty) {
+          await _playM3u8(result.url);
           m3u8Url.value = result.url;
-          _playM3u8(result.url);
         } else {
           errorMsg.value = '解码结果为空';
         }
@@ -126,12 +128,13 @@ class DoubanVideoDetailController extends GetxController {
     }
   }
 
-  void _playM3u8(String url) {
-    plPlayerController.setDataSource(
+  Future<void> _playM3u8(String url) async {
+    await plPlayerController.setDataSource(
       NetworkSource(videoSource: url, audioSource: null),
       isLive: true,
       autoplay: true,
     );
+    playerReady.value = true;
   }
 
   void onSelectSource(int index) {

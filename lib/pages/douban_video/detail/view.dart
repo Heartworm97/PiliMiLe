@@ -49,8 +49,8 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
   }
 
   Widget _buildPlayerArea(double width, double height) {
-    // 有 M3U8 URL → 播放器
-    if (controller.m3u8Url.value != null) {
+    // M3U8 就绪 → 播放器
+    if (controller.playerReady.value) {
       return PLVideoPlayer(
         maxWidth: width,
         maxHeight: height,
