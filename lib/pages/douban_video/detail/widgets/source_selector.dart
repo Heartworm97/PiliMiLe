@@ -118,18 +118,6 @@ class SourceSelector extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: Text(
-                                '${src.episodes.length}集',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: textColor.withValues(alpha: 0.6),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ),
