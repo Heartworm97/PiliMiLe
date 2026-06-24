@@ -41,6 +41,9 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     final playerWidth = size.width;
     final playerHeight = playerWidth * 9 / 16;
 
+    final playerWidth = size.width;
+    final playerHeight = playerWidth * 9 / 16;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -74,7 +77,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                 height: playerHeight,
                 child: Obx(() => _buildPlayerArea(playerWidth, playerHeight)),
               ),
-              Expanded(child: Obx(_buildContent)),
+              Expanded(child: Obx(() => _buildContent(size))),
             ],
           ),
         );
@@ -212,7 +215,13 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(Size screenSize) {
+    // 播放器下方可用高度
+    final statusBarHeight = MediaQuery.of(context).padding.top;
+    final playerHeight = screenSize.width * 9 / 16;
+    final availableBelow =
+        screenSize.height - statusBarHeight - playerHeight;
+
     // 无数据
     if (controller.detail.value == null) {
       return const Center(child: Text('暂无数据'));
@@ -319,6 +328,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                       )),
                       // 集数选择器
                       Obx(() => EpisodeSelector(
+                        maxPanelHeight: availableBelow,
                         episodes: controller.currentEpisodes,
                         selectedIndex: controller.selectedEpisodeIndex.value,
                         onSelected: controller.onSelectEpisode,

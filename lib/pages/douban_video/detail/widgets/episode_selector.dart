@@ -11,11 +11,13 @@ class EpisodeSelector extends StatefulWidget {
     required this.episodes,
     required this.selectedIndex,
     required this.onSelected,
+    this.maxPanelHeight,
   });
 
   final List<DoubanEpisodeModel> episodes;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
+  final double? maxPanelHeight;
 
   @override
   State<EpisodeSelector> createState() => _EpisodeSelectorState();
@@ -70,6 +72,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
       builder: (_) => _DoubanEpisodePanel(
         episodes: widget.episodes,
         selectedIndex: widget.selectedIndex,
+        maxPanelHeight: widget.maxPanelHeight,
         onSelected: (index) {
           _scrollTo(index);
           widget.onSelected(index);
@@ -221,11 +224,13 @@ class _DoubanEpisodePanel extends StatefulWidget {
     required this.episodes,
     required this.selectedIndex,
     required this.onSelected,
+    this.maxPanelHeight,
   });
 
   final List<DoubanEpisodeModel> episodes;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
+  final double? maxPanelHeight;
 
   @override
   State<_DoubanEpisodePanel> createState() => _DoubanEpisodePanelState();
@@ -259,7 +264,9 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bottomPadding = MediaQuery.viewPaddingOf(context).bottom;
-    final panelHeight = MediaQuery.of(context).size.height * 0.7;
+    final maxHeight =
+        widget.maxPanelHeight ?? MediaQuery.of(context).size.height * 0.55;
+    final panelHeight = maxHeight.clamp(150.0, maxHeight);
 
     final content = SizedBox(
       height: panelHeight,
