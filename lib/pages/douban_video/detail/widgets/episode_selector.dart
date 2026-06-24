@@ -313,7 +313,7 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
+            child: SingleChildScrollView(
               controller: _scrollController,
               padding: EdgeInsets.fromLTRB(
                 Style.safeSpace,
@@ -321,86 +321,43 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
                 Style.safeSpace,
                 bottomPadding + 100,
               ),
-              itemCount: widget.episodes.length,
-              itemBuilder: (_, index) {
-                final ep = widget.episodes[index];
-                final isCurrent = index == widget.selectedIndex;
-                final primary = theme.colorScheme.primary;
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: List.generate(widget.episodes.length, (index) {
+                  final ep = widget.episodes[index];
+                  final isCurrent = index == widget.selectedIndex;
+                  final primary = theme.colorScheme.primary;
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: SizedBox(
-                    height: 60,
+                  return SizedBox(
+                    width: 90,
+                    height: 36,
                     child: Material(
-                      type: MaterialType.transparency,
+                      color: isCurrent
+                          ? primary.withValues(alpha: 0.12)
+                          : theme.colorScheme.onInverseSurface,
+                      borderRadius: BorderRadius.circular(6),
                       child: InkWell(
+                        borderRadius: BorderRadius.circular(6),
                         onTap: () {
                           Navigator.of(context).pop();
                           widget.onSelected(index);
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: Style.safeSpace,
-                            vertical: 5,
-                          ),
-                          child: Row(
-                            spacing: 10,
-                            children: [
-                              if (isCurrent)
-                                Image.asset(
-                                  Assets.livingStatic,
-                                  color: primary,
-                                  height: 12,
-                                  cacheHeight: 12.cacheSize(context),
-                                  semanticLabel: "正在播放：",
-                                ),
-                              Expanded(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        '第${ep.nid}集',
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                          fontSize: theme
-                                              .textTheme.bodyMedium!
-                                              .fontSize,
-                                          height: 1.42,
-                                          letterSpacing: 0.3,
-                                          fontWeight:
-                                              isCurrent ? FontWeight.bold : null,
-                                          color:
-                                              isCurrent ? primary : null,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    if (ep.title.isNotEmpty &&
-                                        ep.title != '第${ep.nid}集')
-                                      Text(
-                                        ep.title,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          height: 1,
-                                          color: theme.colorScheme.outline,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                        child: Center(
+                          child: Text(
+                            '第${ep.nid}集',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: isCurrent ? FontWeight.bold : null,
+                              color: isCurrent ? primary : null,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                }),
+              ),
             ),
           ),
         ],
