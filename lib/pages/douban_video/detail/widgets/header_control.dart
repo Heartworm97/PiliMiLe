@@ -31,21 +31,6 @@ class DoubanVideoHeaderControl extends StatelessWidget {
   final String title;
   final DoubanVideoDetailController doubanController;
 
-  Widget _buildAudioOnlyBtn() {
-    return Obx(() {
-      final isOnlyAudio = plPlayerController.onlyPlayAudio.value;
-      return _buildBtn(
-        tooltip: isOnlyAudio ? '退出听视频' : '听视频',
-        icon: Icon(
-          isOnlyAudio ? Icons.headphones : Icons.headphones_outlined,
-          size: 15,
-          color: Colors.white,
-        ),
-        onPressed: plPlayerController.setOnlyPlayAudio,
-      );
-    });
-  }
-
   Widget _buildPipBtn() {
     return _buildBtn(
       tooltip: '画中画',
@@ -304,7 +289,6 @@ class DoubanVideoHeaderControl extends StatelessWidget {
           }),
           _buildTitle(context),
           // 右侧操作按钮
-          _buildAudioOnlyBtn(),
           if (PlatformUtils.isDesktop)
             Obx(() {
               if (plPlayerController.isFullScreen.value) {
