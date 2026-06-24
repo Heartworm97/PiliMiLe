@@ -236,29 +236,36 @@ class _DoubanEpisodePanel extends StatefulWidget {
   State<_DoubanEpisodePanel> createState() => _DoubanEpisodePanelState();
 }
 
-class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
-  final _scrollController = ScrollController();
+class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
+    with SingleTickerProviderStateMixin {
   static const _segmentSize = 50;
+
+  late final TabController _tabController;
+  int _segmentCount = 1;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToCurrent();
-    });
-  }
-
-  void _scrollToCurrent() {
-    if (!_scrollController.hasClients) return;
-    final offset = widget.selectedIndex ~/ _segmentSize * 52.0;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    _scrollController.jumpTo(offset.clamp(0.0, maxScroll));
+    _segmentCount = (widget.episodes.length / _segmentSize).ceil();
+    final initialSegment = widget.selectedIndex ~/ _segmentSize;
+    _tabController = TabController(
+      length: _segmentCount,
+      vsync: this,
+      initialIndex: initialSegment.clamp(0, _segmentCount - 1),
+    );
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _tabController.dispose();
     super.dispose();
+  }
+
+  void _jumpToCurrent() {
+    final seg = widget.selectedIndex ~/ _segmentSize;
+    if (seg < _segmentCount) {
+      _tabController.animateTo(seg);
+    }
   }
 
   @override
@@ -304,7 +311,7 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
                   iconSize: 22,
                   tooltip: '跳至当前',
                   icon: const Icon(Icons.my_location),
-                  onPressed: _scrollToCurrent,
+                  onPressed: _jumpToCurrent,
                 ),
                 const Spacer(),
                 Text(
@@ -323,43 +330,37 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
               ],
             ),
           ),
+          // 分段 TabBar
+          if (showSegments)
+            SizedBox(
+              height: 40,
+              child: TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                tabAlignment: TabAlignment.start,
+                dividerColor: Colors.transparent,
+                indicatorSize: TabBarIndicatorSize.label,
+                labelStyle: const TextStyle(fontSize: 13),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                tabs: segments
+                    .map((s) => Tab(text: '${s.start}-${s.end}'))
+                    .toList(),
+              ),
+            ),
           Expanded(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              padding: EdgeInsets.fromLTRB(
-                Style.safeSpace,
-                8,
-                Style.safeSpace,
-                bottomPadding + 100,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: segments.map((seg) {
-                  return Padding(
-                    padding: EdgeInsets.only(
-                      top: seg != segments.first ? 16 : 0,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (showSegments)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Text(
-                              '${seg.start}-${seg.end}',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                        _buildEpisodeGrid(theme, seg),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
+            child: TabBarView(
+              controller: _tabController,
+              children: segments.map((seg) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    Style.safeSpace,
+                    8,
+                    Style.safeSpace,
+                    bottomPadding + 100,
+                  ),
+                  child: _buildEpisodeGrid(theme, seg),
+                );
+              }).toList(),
             ),
           ),
         ],
