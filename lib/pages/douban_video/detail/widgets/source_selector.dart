@@ -80,10 +80,15 @@ class SourceSelector extends StatelessWidget {
                         ),
                         child: Stack(
                           children: [
-                            const Align(child: Text(
-                              src.name,
-                              style: TextStyle(fontSize: 13),
-                            )),
+                            Align(
+                              child: Text(
+                                src.name,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: textColor,
+                                ),
+                              ),
+                            ),
                             Positioned(
                               top: 0,
                               left: 0,
