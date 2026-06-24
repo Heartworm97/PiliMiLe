@@ -113,6 +113,12 @@ class SearchPanelController<R extends SearchNumData<T>, T>
   );
 
   @override
+  bool handleError(String? errMsg) {
+    // 搜索面板已有 HttpError 组件展示错误，无需弹 toast
+    return false;
+  }
+
+  @override
   Future<void> onReload() {
     scrollController.jumpToTop();
     return super.onReload();
