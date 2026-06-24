@@ -116,6 +116,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                           ),
                         )
                       : null,
+                  padding: isSelected ? const EdgeInsets.all(1.5) : null,
                   child: Material(
                     color: isSelected
                         ? theme.colorScheme.primary.withValues(alpha: 0.08)
