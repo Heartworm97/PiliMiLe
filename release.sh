@@ -225,6 +225,7 @@ main() {
     if [[ "$edit_ans" == "y" || "$edit_ans" == "Y" ]]; then
         info "请手动编辑 CHANGELOG.md 文件，完成后按回车继续..."
         read -r
+    fi
 
     # 7. 确认平台
     echo ""
