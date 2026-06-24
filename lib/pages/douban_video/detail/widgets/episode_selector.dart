@@ -218,7 +218,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
   }
 }
 
-/// 全集列表，对齐番剧 EpisodePanel 风格：固定 70% 屏高 + toolbar + 竖向列表
+/// 全集列表弹窗：TabBar 分段 + 横排按钮网格
 class _DoubanEpisodePanel extends StatefulWidget {
   const _DoubanEpisodePanel({
     required this.episodes,
@@ -277,7 +277,6 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
     final panelHeight = maxHeight.clamp(150.0, maxHeight);
     final showSegments = widget.episodes.length > _segmentSize;
 
-    // 构建分段数据
     final segments = <_EpisodeSegment>[];
     for (int i = 0; i < widget.episodes.length; i += _segmentSize) {
       final end = (i + _segmentSize).clamp(0, widget.episodes.length);
@@ -403,8 +402,8 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
               height: 45,
               child: Material(
                 color: isCurrent
-                    ? primary.withValues(alpha: 0.12)
-                    : theme.colorScheme.onInverseSurface,
+                    ? primary.withValues(alpha: 0.18)
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(6),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(6),
