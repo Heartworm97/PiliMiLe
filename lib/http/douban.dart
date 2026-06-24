@@ -68,15 +68,99 @@ class DoubanHttp {
     'https://zdki6k23cdsec.top',
   ];
 
+  static const _publishPage = 'https://bubuzhuiju.com/js/config.js';
+  static const _syncIntervalMs = 86400000; // 24小时
+
+  /// 从 localCache 获取域名列表，无缓存时回退硬编码
+  static List<String> get _cachedMirrors {
+    final cached = GStorage.localCache.get('upstreamMirrors');
+    if (cached is List && cached.isNotEmpty) {
+      return cached.cast<String>();
+    }
+    return _upstreamMirrors;
+  }
+
+  /// 测速同步域名列表（启动时异步调用，不阻塞）
+  static Future<void> ensureMirrors() async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final lastSync = GStorage.localCache.get('upstreamMirrorsUpdatedAt');
+    if (lastSync is int && (now - lastSync) < _syncIntervalMs) return;
+    await _syncUpstreamMirrors();
+  }
+
+  static Future<void> _syncUpstreamMirrors() async {
+    try {
+      final resp = await _upstreamDio.get(
+        _publishPage,
+        options: Options(
+          responseType: ResponseType.plain,
+          connectTimeout: const Duration(seconds: 10),
+          receiveTimeout: const Duration(seconds: 10),
+        ),
+      );
+      final hosts = _parseHosts(resp.data?.toString() ?? '');
+      if (hosts.isEmpty) return;
+
+      // 并发 ping 测速
+      final results = await Future.wait(
+        hosts.map(_pingHost),
+      );
+      final reachable = <MapEntry<String, int>>[];
+      for (int i = 0; i < hosts.length; i++) {
+        if (results[i] != null) {
+          reachable.add(MapEntry(hosts[i], results[i]!));
+        }
+      }
+      reachable.sort((a, b) => a.value.compareTo(b.value));
+      final sorted = reachable.map((e) => 'https://${e.key}').toList();
+
+      if (sorted.isNotEmpty) {
+        GStorage.localCache.put('upstreamMirrors', sorted);
+        GStorage.localCache.put(
+          'upstreamMirrorsUpdatedAt',
+          DateTime.now().millisecondsSinceEpoch,
+        );
+        _activeMirrorIndex = 0;
+        debugPrint('[DoubanHttp] 域名同步完成: ${sorted.length}条, 最快=${sorted.first}');
+      }
+    } catch (_) {
+      // 静默失败
+    }
+  }
+
+  static List<String> _parseHosts(String jsContent) {
+    final regex = RegExp(r"host:\s*'([^']+)'");
+    return regex
+        .allMatches(jsContent)
+        .map((m) => m.group(1)!)
+        .toList();
+  }
+
+  static Future<int?> _pingHost(String host) async {
+    try {
+      final sw = Stopwatch()..start();
+      await _upstreamDio.head(
+        'https://$host/favicon.ico',
+        options: Options(
+          connectTimeout: const Duration(seconds: 3),
+          receiveTimeout: const Duration(seconds: 3),
+        ),
+      );
+      return sw.elapsedMilliseconds;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static const String _webSign = 'f65f3a83d6d9ad6f';
   static const String _xClient = '8f3d2a1c7b6e5d4c9a0b1f2e3d4c5b6a';
 
   static int _activeMirrorIndex = -1;
 
   static String get _activeHost {
-    if (_activeMirrorIndex >= 0 &&
-        _activeMirrorIndex < _upstreamMirrors.length) {
-      return _upstreamMirrors[_activeMirrorIndex];
+    final mirrors = _cachedMirrors;
+    if (_activeMirrorIndex >= 0 && _activeMirrorIndex < mirrors.length) {
+      return mirrors[_activeMirrorIndex];
     }
     final Box<dynamic> cache = GStorage.localCache;
     final cached = cache.get('upstreamMirrorIndex');
@@ -88,12 +172,12 @@ class DoubanHttp {
       }
     }
     _activeMirrorIndex = 0;
-    return _upstreamMirrors[0];
+    return mirrors[0];
   }
 
   static void _switchToNextHost() {
     _activeMirrorIndex++;
-    if (_activeMirrorIndex >= _upstreamMirrors.length) {
+    if (_activeMirrorIndex >= _cachedMirrors.length) {
       _activeMirrorIndex = 0;
     }
     GStorage.localCache.put('upstreamMirrorIndex', _activeMirrorIndex);

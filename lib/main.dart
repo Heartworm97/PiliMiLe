@@ -7,6 +7,7 @@ import 'package:PiliMiLe/common/widgets/custom_toast.dart';
 import 'package:PiliMiLe/common/widgets/route_aware_mixin.dart';
 import 'package:PiliMiLe/common/widgets/scale_app.dart';
 import 'package:PiliMiLe/common/widgets/scroll_behavior.dart';
+import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/http/init.dart';
 import 'package:PiliMiLe/models/common/theme/theme_color_type.dart';
 import 'package:PiliMiLe/plugin/pl_player/utils/fullscreen.dart';
@@ -100,6 +101,7 @@ void main() async {
     exit(0);
   }
   ScaledWidgetsFlutterBinding.instance.scaleFactor = Pref.uiScale;
+  DoubanHttp.ensureMirrors(); // 异步同步上游域名，不阻塞启动
   await Future.wait([
     _initDownPath(),
     _initTmpPath(),
