@@ -273,7 +273,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                             width: 38,
                             height: 38,
                             child: IconButton(
-                              onPressed: null,
+                              onPressed: () {},
                               icon: Icon(
                                 Icons.manage_search,
                                 size: 22,
