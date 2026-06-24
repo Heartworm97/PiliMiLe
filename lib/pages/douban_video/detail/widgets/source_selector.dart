@@ -46,7 +46,7 @@ class SourceSelector extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           SizedBox(
-            height: 60,
+            height: 42,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: sources.length,
@@ -68,8 +68,8 @@ class SourceSelector extends StatelessWidget {
                     : theme.colorScheme.onSurface.withValues(alpha: 0.38);
 
                 return Container(
-                  width: 150,
-                  height: 60,
+                  width: 120,
+                  height: 42,
                   margin: index != sources.length - 1
                       ? const EdgeInsets.only(right: 10)
                       : null,

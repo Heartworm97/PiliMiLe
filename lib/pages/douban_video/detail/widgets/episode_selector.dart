@@ -47,7 +47,7 @@ class EpisodeSelector extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           SizedBox(
-            height: 60,
+            height: 42,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: episodes.length,
@@ -56,8 +56,8 @@ class EpisodeSelector extends StatelessWidget {
                 final isSelected = index == selectedIndex;
 
                 return Container(
-                  width: 150,
-                  height: 60,
+                  width: 120,
+                  height: 42,
                   margin: index != episodes.length - 1
                       ? const EdgeInsets.only(right: 10)
                       : null,
