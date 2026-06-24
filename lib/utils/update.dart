@@ -65,15 +65,6 @@ abstract final class Update {
                       ),
                       const SizedBox(height: 8),
                       Text('${data['body']}'),
-                      TextButton(
-                        onPressed: () => PageUtils.launchURL(
-                          '${Constants.sourceCodeUrl}/commits/main',
-                        ),
-                        child: Text(
-                          "点此查看完整更新(即commit)内容",
-                          style: TextStyle(color: colorScheme.primary),
-                        ),
-                      ),
                     ],
                   ),
                 ),
