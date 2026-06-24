@@ -24,7 +24,11 @@ class DynamicsTabController
   @override
   void onInit() {
     super.onInit();
-    queryData();
+    if (accountService.isLogin.value) {
+      queryData();
+    } else {
+      loadingState.value = const Error(null);
+    }
   }
 
   @override
@@ -92,4 +96,10 @@ class DynamicsTabController
 
   @override
   void onChangeAccount(bool isLogin) => onReload();
+
+  @override
+  bool handleError(String? errMsg) {
+    if (!accountService.isLogin.value) return true;
+    return super.handleError(errMsg);
+  }
 }
