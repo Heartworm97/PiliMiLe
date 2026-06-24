@@ -403,7 +403,7 @@ show_menu() {
 
 # ---- 入口 ----
 main() {
-    cd "$(dirname "$0")"
+    cd "$(cd "$(dirname "$0")" && pwd)"
 
     # 支持命令行参数直接跳转
     if [ "${1:-}" != "" ]; then
