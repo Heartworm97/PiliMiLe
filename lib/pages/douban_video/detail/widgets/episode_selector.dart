@@ -82,7 +82,7 @@ class EpisodeSelector extends StatelessWidget {
                                     child: Padding(
                                       padding: const EdgeInsets.only(right: 6),
                                       child: Image.asset(
-                                        Assets.livingStatic,
+                                        Assets.livingChart,
                                         color: theme.colorScheme.primary,
                                         height: 12,
                                         cacheHeight: 12.cacheSize(context),
