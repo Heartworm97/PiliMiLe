@@ -284,6 +284,24 @@ class DoubanHttp {
     return url;
   }
 
+  /// 最长公共子序列匹配率：关键词逐字在名称中的出现比例
+  static double _lcsRatio(String keyword, String name) {
+    if (keyword.isEmpty || name.isEmpty) return 0;
+    final kLen = keyword.length;
+    final nLen = name.length;
+    final dp = List.generate(kLen + 1, (_) => List.filled(nLen + 1, 0));
+    for (int i = 1; i <= kLen; i++) {
+      for (int j = 1; j <= nLen; j++) {
+        if (keyword[i - 1] == name[j - 1]) {
+          dp[i][j] = dp[i - 1][j - 1] + 1;
+        } else {
+          dp[i][j] = dp[i - 1][j] > dp[i][j - 1] ? dp[i - 1][j] : dp[i][j - 1];
+        }
+      }
+    }
+    return dp[kLen][nLen] / kLen;
+  }
+
   // ============ 上游搜索 ============
 
   static Future<Map<String, dynamic>> searchVod({
@@ -329,8 +347,12 @@ class DoubanHttp {
                 .toList() ??
             [];
 
+        final keywordTrimmed = keyword.trim();
+        final keywordForMatch = keywordTrimmed.replaceAll(' ', '');
         final filteredList = rawList
-            .where((item) => item.vodName.contains(keyword.trim()))
+            .where((item) =>
+                item.vodName.contains(keywordTrimmed) ||
+                _lcsRatio(keywordForMatch, item.vodName) >= 0.5)
             .toList();
 
         if (kDebugMode) {
