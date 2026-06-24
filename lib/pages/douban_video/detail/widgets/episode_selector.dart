@@ -45,33 +45,42 @@ class EpisodeSelector extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           SizedBox(
-            height: 36,
-            child: ListView.separated(
+            height: 60,
+            child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: episodes.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final ep = episodes[index];
                 final isSelected = index == selectedIndex;
 
-                return Material(
-                  color: theme.colorScheme.onInverseSurface,
-                  borderRadius: const BorderRadius.all(Radius.circular(6)),
-                  child: InkWell(
+                return Container(
+                  width: 150,
+                  height: 60,
+                  margin: index != episodes.length - 1
+                      ? const EdgeInsets.only(right: 10)
+                      : null,
+                  child: Material(
+                    color: theme.colorScheme.onInverseSurface,
                     borderRadius: const BorderRadius.all(Radius.circular(6)),
-                    onTap: () => onSelected(index),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 10,
-                      ),
-                      child: Text(
-                        ep.title,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isSelected
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.onSurface,
+                    child: InkWell(
+                      borderRadius: const BorderRadius.all(Radius.circular(6)),
+                      onTap: () => onSelected(index),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 10,
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            ep.title,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isSelected
+                                  ? theme.colorScheme.primary
+                                  : theme.colorScheme.onSurface,
+                            ),
+                          ),
                         ),
                       ),
                     ),

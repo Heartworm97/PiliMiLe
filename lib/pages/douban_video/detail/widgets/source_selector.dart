@@ -46,11 +46,10 @@ class SourceSelector extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           SizedBox(
-            height: 36,
-            child: ListView.separated(
+            height: 60,
+            child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: sources.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final src = sources[index];
                 final isSelected = index == selectedIndex;
@@ -62,22 +61,32 @@ class SourceSelector extends StatelessWidget {
                         : theme.colorScheme.onSurface
                     : theme.colorScheme.onSurface.withValues(alpha: 0.38);
 
-                return Material(
-                  color: theme.colorScheme.onInverseSurface,
-                  borderRadius: const BorderRadius.all(Radius.circular(6)),
-                  child: InkWell(
+                return Container(
+                  width: 150,
+                  height: 60,
+                  margin: index != sources.length - 1
+                      ? const EdgeInsets.only(right: 10)
+                      : null,
+                  child: Material(
+                    color: theme.colorScheme.onInverseSurface,
                     borderRadius: const BorderRadius.all(Radius.circular(6)),
-                    onTap: isAvailable ? () => onSelected(index) : null,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 10,
-                      ),
-                      child: Text(
-                        src.name,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: textColor,
+                    child: InkWell(
+                      borderRadius: const BorderRadius.all(Radius.circular(6)),
+                      onTap: isAvailable ? () => onSelected(index) : null,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 10,
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            src.name,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: textColor,
+                            ),
+                          ),
                         ),
                       ),
                     ),
