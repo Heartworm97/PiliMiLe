@@ -9,11 +9,13 @@ class EpisodeSelector extends StatelessWidget {
     required this.episodes,
     required this.selectedIndex,
     required this.onSelected,
+    required this.isPlaying,
   });
 
   final List<DoubanEpisodeModel> episodes;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
+  final bool isPlaying;
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +84,9 @@ class EpisodeSelector extends StatelessWidget {
                                     child: Padding(
                                       padding: const EdgeInsets.only(right: 6),
                                       child: Image.asset(
-                                        Assets.livingStatic,
+                                        isPlaying
+                                            ? Assets.livingChart
+                                            : Assets.livingStatic,
                                         color: theme.colorScheme.primary,
                                         height: 12,
                                         cacheHeight: 12.cacheSize(context),
