@@ -22,11 +22,25 @@ class EpisodeSelector extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '剧集列表（${episodes.length}集）',
-            style: TextStyle(
-              fontSize: 13,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          Text.rich(
+            TextSpan(
+              children: [
+                const TextSpan(
+                  text: '剧集列表',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (episodes.isNotEmpty)
+                  TextSpan(
+                    text: ' 正在播放：第${episodes[selectedIndex].title}集',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+              ],
             ),
           ),
           const SizedBox(height: 8),
