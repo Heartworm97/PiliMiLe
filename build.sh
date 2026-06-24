@@ -105,7 +105,7 @@ check_prereq() {
     # 依赖检查
     if [ ! -f "pubspec.lock" ] || [ "pubspec.yaml" -nt "pubspec.lock" ]; then
         warn "依赖可能存在变更，正在 pub get..."
-        $FLUTTER_CMD pub get -q
+        $FLUTTER_CMD pub get
     fi
 }
 
