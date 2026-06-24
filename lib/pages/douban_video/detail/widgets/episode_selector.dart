@@ -1,4 +1,6 @@
+import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
+import 'package:PiliMiLe/utils/extension/cache_size.dart';
 import 'package:flutter/material.dart';
 
 class EpisodeSelector extends StatelessWidget {
@@ -71,13 +73,32 @@ class EpisodeSelector extends StatelessWidget {
                           horizontal: 10,
                         ),
                         child: Center(
-                          child: Text(
-                            ep.title,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isSelected
-                                  ? theme.colorScheme.primary
-                                  : theme.colorScheme.onSurface,
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                if (isSelected)
+                                  WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 6),
+                                      child: Image.asset(
+                                        Assets.livingStatic,
+                                        color: theme.colorScheme.primary,
+                                        height: 12,
+                                        cacheHeight: 12.cacheSize(context),
+                                      ),
+                                    ),
+                                  ),
+                                TextSpan(
+                                  text: ep.title,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: isSelected
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
