@@ -91,13 +91,12 @@ class SourceSelector extends StatelessWidget {
                             ),
                             Positioned(
                               top: 0,
-                              left: 0,
+                              right: 0,
                               child: Text(
-                                '${index + 1}',
+                                '${src.episodes.length}集',
                                 style: TextStyle(
                                   fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: textColor.withValues(alpha: 0.85),
+                                  color: textColor.withValues(alpha: 0.6),
                                 ),
                               ),
                             ),
