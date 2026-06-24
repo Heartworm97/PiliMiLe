@@ -347,6 +347,13 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
                     .toList(),
               ),
             ),
+          // 分隔符
+          if (showSegments)
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: theme.dividerColor.withValues(alpha: 0.1),
+            ),
           Expanded(
             child: TabBarView(
               controller: _tabController,
