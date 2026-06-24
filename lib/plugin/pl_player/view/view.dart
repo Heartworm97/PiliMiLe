@@ -2197,6 +2197,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             key: _videoKey,
             child: Obx(
               () {
+                final videoController = plPlayerController.videoController;
+                if (videoController == null) return const SizedBox.shrink();
                 final videoFit = plPlayerController.videoFit.value;
                 return Transform.flip(
                   flipX: plPlayerController.flipX.value,
@@ -2205,7 +2207,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     fit: videoFit.boxFit,
                     alignment: widget.alignment,
                     child: SimpleVideo(
-                      controller: plPlayerController.videoController!,
+                      controller: videoController,
                       fill: widget.fill,
                       aspectRatio: videoFit.aspectRatio,
                     ),
