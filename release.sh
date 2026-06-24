@@ -66,6 +66,12 @@ $diff_log"
 
             new_section=$(claude -p "$prompt" --output-format text 2>/dev/null) || true
 
+            # 切除 AI 输出中 ## [ 之前的废话（如"根据分析…以下是…"）
+            if [[ "$new_section" == *'## ['* ]]; then
+                new_section="${new_section#*$'\n'## [}"
+                new_section="## [${new_section}"
+            fi
+
             # 校验：AI 输出为空或没有实际条目则生成待填写模板
             local meaningful_lines
             meaningful_lines=$(echo "$new_section" | grep -cE '^- [^(无]' 2>/dev/null || echo 0)
