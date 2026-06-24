@@ -27,7 +27,6 @@ class DoubanVideoDetailPage extends StatefulWidget {
 
 class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
   late final DoubanVideoDetailController controller;
-  final _playerKey = GlobalKey();
 
   @override
   void initState() {
@@ -40,24 +39,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     final size = MediaQuery.of(context).size;
     final playerWidth = size.width;
     final playerHeight = playerWidth * 9 / 16;
-
-    // 播放器 Widget 始终保留，全屏切换时通过位置/尺寸变化而非销毁重建
-    final playerWidget = Obx(() {
-      if (!controller.playerReady.value) {
-        return const SizedBox.shrink();
-      }
-      return PLVideoPlayer(
-        key: _playerKey,
-        maxWidth: size.width,
-        maxHeight: size.height,
-        plPlayerController: controller.plPlayerController,
-        headerControl: DoubanVideoHeaderControl(
-          plPlayerController: controller.plPlayerController,
-          title: controller.vodName.value,
-          doubanController: controller,
-        ),
-      );
-    });
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -79,9 +60,9 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         final isFullScreen = controller.plPlayerController.isFullScreen.value;
         final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
-        // 全屏 / 横屏时播放器撑满
+        // 全屏 / 横屏时播放器撑满，移除 SafeArea + 隐藏详情区域
         if (isFullScreen || !isPortrait) {
-          return playerWidget;
+          return _buildPlayerArea(size.width, size.height);
         }
 
         return SafeArea(
@@ -90,7 +71,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
               SizedBox(
                 width: playerWidth,
                 height: playerHeight,
-                child: playerWidget,
+                child: Obx(() => _buildPlayerArea(playerWidth, playerHeight)),
               ),
               Expanded(child: Obx(_buildContent)),
             ],
