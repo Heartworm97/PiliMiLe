@@ -28,6 +28,7 @@ class DoubanVideoDetailPage extends StatefulWidget {
 class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
   late final DoubanVideoDetailController controller;
   final _playerKey = GlobalKey();
+  bool _dmEnabled = false;
 
   @override
   void initState() {
@@ -263,7 +264,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                       ],
                     ),
                   ),
-                  const Flexible(
+                  Flexible(
                     child: Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -285,9 +286,9 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                             width: 38,
                             height: 38,
                             child: IconButton(
-                              onPressed: null,
+                              onPressed: () => setState(() => _dmEnabled = !_dmEnabled),
                               icon: Icon(
-                                CustomIcons.dm_on,
+                                _dmEnabled ? CustomIcons.dm_on : CustomIcons.dm_off,
                                 size: 22,
                               ),
                             ),
