@@ -409,7 +409,6 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
 
     return Material(
       color: theme.colorScheme.surface,
-      borderRadius: const BorderRadius.vertical(top: Style.imgRadius),
       child: content,
     );
   }
