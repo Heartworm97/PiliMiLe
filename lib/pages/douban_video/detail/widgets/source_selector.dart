@@ -95,8 +95,9 @@ class SourceSelector extends StatelessWidget {
                               child: Text(
                                 '${index + 1}',
                                 style: TextStyle(
-                                  fontSize: 11,
-                                  color: textColor.withValues(alpha: 0.5),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: textColor.withValues(alpha: 0.85),
                                 ),
                               ),
                             ),
