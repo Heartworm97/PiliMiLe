@@ -72,7 +72,8 @@ class EpisodeSelector extends StatelessWidget {
                           vertical: 8,
                           horizontal: 10,
                         ),
-                        child: Center(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
                           child: Text.rich(
                             TextSpan(
                               children: [
