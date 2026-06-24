@@ -1,4 +1,5 @@
 import 'package:PiliMiLe/common/assets.dart';
+import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/utils/extension/num_ext.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,155 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
     });
   }
 
+  void _showAllEpisodes(BuildContext context) {
+    final theme = Theme.of(context);
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Style.imgRadius),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.6,
+            minChildSize: 0.3,
+            maxChildSize: 0.85,
+            expand: false,
+            builder: (_, scrollController) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 16,
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          '全部集数',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '共${widget.episodes.length}集',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
+                      ),
+                      itemCount: widget.episodes.length,
+                      itemBuilder: (_, index) {
+                        final ep = widget.episodes[index];
+                        final isSelected = index == widget.selectedIndex;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Material(
+                            color: isSelected
+                                ? theme.colorScheme.primary.withValues(alpha: 0.08)
+                                : theme.colorScheme.onInverseSurface,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8)),
+                            child: InkWell(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8)),
+                              onTap: () {
+                                Navigator.of(sheetContext).pop();
+                                _scrollTo(index);
+                                widget.onSelected(index);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(8),
+                                  ),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? theme.colorScheme.primary
+                                        : Colors.transparent,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 14,
+                                ),
+                                child: Row(
+                                  children: [
+                                    if (isSelected)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8),
+                                        child: Image.asset(
+                                          Assets.livingChart,
+                                          color: theme.colorScheme.primary,
+                                          height: 16,
+                                          cacheHeight:
+                                              16.cacheSize(context),
+                                        ),
+                                      ),
+                                    Text(
+                                      '第${ep.nid}集',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: isSelected
+                                            ? theme.colorScheme.primary
+                                            : theme.colorScheme.onSurface,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : null,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    if (ep.title.isNotEmpty &&
+                                        ep.title != '第${ep.nid}集')
+                                      Flexible(
+                                        child: Text(
+                                          ep.title,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: theme
+                                                .colorScheme.onSurface
+                                                .withValues(alpha: 0.5),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -69,26 +219,52 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text.rich(
-            TextSpan(
-              children: [
-                const TextSpan(
-                  text: '选集',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+          Row(
+            children: [
+              Expanded(
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: '选集',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      if (widget.episodes.isNotEmpty)
+                        TextSpan(
+                          text:
+                              ' 正在播放：第${widget.episodes[widget.selectedIndex].nid}集',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-                if (widget.episodes.isNotEmpty)
-                  TextSpan(
-                    text: ' 正在播放：第${widget.episodes[widget.selectedIndex].nid}集',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+              if (widget.episodes.length > 1)
+                InkWell(
+                  onTap: () => _showAllEpisodes(context),
+                  borderRadius: const BorderRadius.all(Radius.circular(4)),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 4,
+                    ),
+                    child: Text(
+                      '查看更多',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
           const SizedBox(height: 8),
           SizedBox(
@@ -122,7 +298,8 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                         : theme.colorScheme.onInverseSurface,
                     borderRadius: const BorderRadius.all(Radius.circular(6)),
                     child: InkWell(
-                      borderRadius: const BorderRadius.all(Radius.circular(6)),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(6)),
                       onTap: () {
                         _scrollTo(index);
                         widget.onSelected(index);
@@ -141,12 +318,14 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                                   WidgetSpan(
                                     alignment: PlaceholderAlignment.middle,
                                     child: Padding(
-                                      padding: const EdgeInsets.only(right: 6),
+                                      padding:
+                                          const EdgeInsets.only(right: 6),
                                       child: Image.asset(
                                         Assets.livingChart,
                                         color: theme.colorScheme.primary,
                                         height: 16,
-                                        cacheHeight: 16.cacheSize(context),
+                                        cacheHeight:
+                                            16.cacheSize(context),
                                       ),
                                     ),
                                   ),
