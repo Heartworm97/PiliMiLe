@@ -68,6 +68,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      isDismissible: false,
       backgroundColor: Colors.transparent,
       builder: (_) => _DoubanEpisodePanel(
         episodes: widget.episodes,
@@ -402,7 +403,7 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
               height: 45,
               child: Material(
                 color: isCurrent
-                    ? primary.withValues(alpha: 0.12)
+                    ? primary.withValues(alpha: 0.08)
                     : theme.colorScheme.onInverseSurface,
                 borderRadius: BorderRadius.circular(6),
                 child: InkWell(
@@ -411,13 +412,21 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
                     Navigator.of(context).pop();
                     widget.onSelected(globalIndex);
                   },
-                  child: Center(
-                    child: Text(
-                      '第${entry.value.nid}集',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: isCurrent ? FontWeight.bold : null,
-                        color: isCurrent ? primary : null,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: isCurrent
+                          ? Border.all(color: primary, width: 1.5)
+                          : null,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '第${entry.value.nid}集',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: isCurrent ? FontWeight.bold : null,
+                          color: isCurrent ? primary : null,
+                        ),
                       ),
                     ),
                   ),
