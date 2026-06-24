@@ -36,7 +36,7 @@ class EpisodeSelector extends StatelessWidget {
                   TextSpan(
                     text: ' 正在播放：${episodes[selectedIndex].title}',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 13,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
