@@ -25,12 +25,11 @@ abstract final class Update {
         options: Options(
           headers: {
             'user-agent': BrowserUa.mob,
-            'Authorization': 'Bearer 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',
           },
           extra: {'account': const NoAccount()},
         ),
       );
-      if (res.data is Map || res.data.isEmpty) {
+      if (res.data is! List || res.data.isEmpty) {
         if (!isAuto) {
           SmartDialog.showToast('检查更新失败，GitHub接口未返回数据，请检查网络');
         }
