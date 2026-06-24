@@ -45,7 +45,7 @@ class EpisodeSelector extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           SizedBox(
-            height: 32,
+            height: 36,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: episodes.length,
@@ -54,23 +54,28 @@ class EpisodeSelector extends StatelessWidget {
                 final ep = episodes[index];
                 final isSelected = index == selectedIndex;
 
-                return ActionChip(
-                  label: Text(
-                    ep.title,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isSelected
-                          ? theme.colorScheme.onPrimary
-                          : theme.colorScheme.onSurface,
+                return Material(
+                  color: theme.colorScheme.onInverseSurface,
+                  borderRadius: const BorderRadius.all(Radius.circular(6)),
+                  child: InkWell(
+                    borderRadius: const BorderRadius.all(Radius.circular(6)),
+                    onTap: () => onSelected(index),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 10,
+                      ),
+                      child: Text(
+                        ep.title,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isSelected
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onSurface,
+                        ),
+                      ),
                     ),
                   ),
-                  backgroundColor: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.surfaceContainerHighest,
-                  onPressed: () => onSelected(index),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 8),
                 );
               },
             ),

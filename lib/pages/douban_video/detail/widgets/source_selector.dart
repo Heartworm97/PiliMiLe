@@ -46,7 +46,7 @@ class SourceSelector extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           SizedBox(
-            height: 32,
+            height: 36,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: sources.length,
@@ -56,39 +56,32 @@ class SourceSelector extends StatelessWidget {
                 final isSelected = index == selectedIndex;
                 final isAvailable = src.decodeStatus != '2' && src.key != 'JD4K' && src.key != 'NBY';
 
-                if (!isAvailable) {
-                  return ActionChip(
-                    label: Text(
-                      src.name,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                final textColor = isAvailable
+                    ? isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurface
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.38);
+
+                return Material(
+                  color: theme.colorScheme.onInverseSurface,
+                  borderRadius: const BorderRadius.all(Radius.circular(6)),
+                  child: InkWell(
+                    borderRadius: const BorderRadius.all(Radius.circular(6)),
+                    onTap: isAvailable ? () => onSelected(index) : null,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 10,
+                      ),
+                      child: Text(
+                        src.name,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: textColor,
+                        ),
                       ),
                     ),
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                    onPressed: null,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                    labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-                  );
-                }
-                return ActionChip(
-                  label: Text(
-                    src.name,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isSelected
-                          ? theme.colorScheme.onPrimary
-                          : theme.colorScheme.onSurface,
-                    ),
                   ),
-                  backgroundColor: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.surfaceContainerHighest,
-                  onPressed: () => onSelected(index),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 8),
                 );
               },
             ),
