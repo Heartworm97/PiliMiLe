@@ -3,7 +3,7 @@ import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/utils/extension/num_ext.dart';
 import 'package:flutter/material.dart';
 
-class EpisodeSelector extends StatelessWidget {
+class EpisodeSelector extends StatefulWidget {
   const EpisodeSelector({
     super.key,
     required this.episodes,
@@ -14,6 +14,49 @@ class EpisodeSelector extends StatelessWidget {
   final List<DoubanEpisodeModel> episodes;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
+
+  @override
+  State<EpisodeSelector> createState() => _EpisodeSelectorState();
+}
+
+class _EpisodeSelectorState extends State<EpisodeSelector> {
+  late final ScrollController _scrollCtr;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollCtr = ScrollController(
+      initialScrollOffset: widget.selectedIndex * 140.0,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant EpisodeSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedIndex != widget.selectedIndex) {
+      _scrollToIndex();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollCtr.dispose();
+    super.dispose();
+  }
+
+  void _scrollToIndex() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollCtr.hasClients) return;
+      _scrollCtr.animateTo(
+        (widget.selectedIndex * 140.0).clamp(
+          _scrollCtr.position.minScrollExtent,
+          _scrollCtr.position.maxScrollExtent,
+        ),
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +77,9 @@ class EpisodeSelector extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                if (episodes.isNotEmpty)
+                if (widget.episodes.isNotEmpty)
                   TextSpan(
-                    text: ' 正在播放：${episodes[selectedIndex].title}',
+                    text: ' 正在播放：${widget.episodes[widget.selectedIndex].title}',
                     style: TextStyle(
                       fontSize: 13,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -50,15 +93,16 @@ class EpisodeSelector extends StatelessWidget {
             height: 48,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: episodes.length,
+              controller: _scrollCtr,
+              itemCount: widget.episodes.length,
               itemBuilder: (context, index) {
-                final ep = episodes[index];
-                final isSelected = index == selectedIndex;
+                final ep = widget.episodes[index];
+                final isSelected = index == widget.selectedIndex;
 
                 return Container(
                   width: 130,
                   height: 48,
-                  margin: index != episodes.length - 1
+                  margin: index != widget.episodes.length - 1
                       ? const EdgeInsets.only(right: 10)
                       : null,
                   decoration: isSelected
@@ -77,7 +121,7 @@ class EpisodeSelector extends StatelessWidget {
                     borderRadius: const BorderRadius.all(Radius.circular(6)),
                     child: InkWell(
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
-                      onTap: () => onSelected(index),
+                      onTap: () => widget.onSelected(index),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 8,
