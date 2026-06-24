@@ -184,8 +184,8 @@ class _SourceSelectorState extends State<SourceSelector> {
                               top: 0,
                               right: 0,
                               child: Container(
-                                width: 8,
-                                height: 8,
+                                width: 6,
+                                height: 6,
                                 decoration: BoxDecoration(
                                   color: indicatorColor,
                                   shape: BoxShape.circle,
