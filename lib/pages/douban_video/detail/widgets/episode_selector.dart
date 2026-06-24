@@ -1,6 +1,6 @@
 import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
-import 'package:PiliMiLe/utils/extension/cache_size.dart';
+import 'package:PiliMiLe/utils/extension/num_ext.dart';
 import 'package:flutter/material.dart';
 
 class EpisodeSelector extends StatelessWidget {
