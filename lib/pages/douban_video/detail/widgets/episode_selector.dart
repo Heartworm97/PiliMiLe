@@ -317,7 +317,7 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
                   tooltip: '正序',
                   icon: Icon(
                     Icons.vertical_align_top,
-                    size: 24,
+                    size: 20,
                     color: _isReversed ? null : theme.colorScheme.primary,
                   ),
                   onPressed: () => _setOrder(false),
@@ -327,7 +327,7 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
                   tooltip: '倒序',
                   icon: Icon(
                     Icons.vertical_align_bottom,
-                    size: 24,
+                    size: 20,
                     color: _isReversed ? theme.colorScheme.primary : null,
                   ),
                   onPressed: () => _setOrder(true),
