@@ -27,6 +27,7 @@ class DoubanVideoDetailPage extends StatefulWidget {
 
 class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
   late final DoubanVideoDetailController controller;
+  final _playerKey = GlobalKey();
 
   @override
   void initState() {
@@ -85,6 +86,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     // 已播放 → 播放器
     if (controller.playerReady.value) {
       return PLVideoPlayer(
+        key: _playerKey,
         maxWidth: width,
         maxHeight: height,
         plPlayerController: controller.plPlayerController,
