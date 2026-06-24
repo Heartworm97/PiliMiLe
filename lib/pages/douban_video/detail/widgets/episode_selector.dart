@@ -402,8 +402,8 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
               height: 45,
               child: Material(
                 color: isCurrent
-                    ? primary.withValues(alpha: 0.15)
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                    ? primary.withValues(alpha: 0.18)
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(6),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(6),
