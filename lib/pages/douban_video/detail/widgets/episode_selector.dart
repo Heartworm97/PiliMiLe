@@ -34,7 +34,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
   void didUpdateWidget(covariant EpisodeSelector oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedIndex != widget.selectedIndex) {
-      _scrollToIndex();
+      _scrollTo(widget.selectedIndex);
     }
   }
 
@@ -44,11 +44,11 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
     super.dispose();
   }
 
-  void _scrollToIndex() {
+  void _scrollTo(int index) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollCtr.hasClients) return;
       _scrollCtr.animateTo(
-        (widget.selectedIndex * 140.0).clamp(
+        (index * 140.0).clamp(
           _scrollCtr.position.minScrollExtent,
           _scrollCtr.position.maxScrollExtent,
         ),
@@ -121,7 +121,10 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                     borderRadius: const BorderRadius.all(Radius.circular(6)),
                     child: InkWell(
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
-                      onTap: () => widget.onSelected(index),
+                      onTap: () {
+                        _scrollTo(index);
+                        widget.onSelected(index);
+                      },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 8,

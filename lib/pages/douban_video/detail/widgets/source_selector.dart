@@ -35,7 +35,8 @@ class _SourceSelectorState extends State<SourceSelector> {
   void didUpdateWidget(covariant SourceSelector oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.selectedIndex != widget.selectedIndex) {
-      _scrollToIndex();
+      final displayIndex = _sortedIndices.indexOf(widget.selectedIndex);
+      if (displayIndex >= 0) _scrollTo(displayIndex);
     }
   }
 
@@ -60,11 +61,9 @@ class _SourceSelectorState extends State<SourceSelector> {
     return indices;
   }
 
-  void _scrollToIndex() {
+  void _scrollTo(int displayIndex) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollCtr.hasClients) return;
-      final displayIndex = _sortedIndices.indexOf(widget.selectedIndex);
-      if (displayIndex < 0) return;
       _scrollCtr.animateTo(
         (displayIndex * 140.0).clamp(
           _scrollCtr.position.minScrollExtent,
@@ -157,7 +156,12 @@ class _SourceSelectorState extends State<SourceSelector> {
                     borderRadius: const BorderRadius.all(Radius.circular(6)),
                     child: InkWell(
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
-                      onTap: isAvailable ? () => widget.onSelected(originalIndex) : null,
+                      onTap: isAvailable
+                          ? () {
+                              _scrollTo(displayIndex);
+                              widget.onSelected(originalIndex);
+                            }
+                          : null,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 8,
