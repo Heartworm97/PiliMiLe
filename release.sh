@@ -221,10 +221,10 @@ main() {
     awk '/^## \[/ { if (h++) exit } { print }' CHANGELOG.md
     echo -e "${GREEN}────────────────────────────────${NC}"
     echo ""
-    read -rp "是否编辑更新内容? (将用编辑器打开，不需要编辑则按 n) [y/N] " edit_ans
+    read -rp "是否需要手动编辑 CHANGELOG.md 内容? [y/N] " edit_ans
     if [[ "$edit_ans" == "y" || "$edit_ans" == "Y" ]]; then
-        ${EDITOR:-code} --wait CHANGELOG.md
-    fi
+        info "请手动编辑 CHANGELOG.md 文件，完成后按回车继续..."
+        read -r
 
     # 7. 确认平台
     echo ""
