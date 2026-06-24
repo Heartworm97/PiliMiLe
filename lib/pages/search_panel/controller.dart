@@ -86,6 +86,13 @@ class SearchPanelController<R extends SearchNumData<T>, T>
     if (isRefresh) {
       searchResultController?.count[searchType.index] =
           response.response.numResults ?? 0;
+    } else if (searchType == SearchType.drama) {
+      final ctrl = searchResultController;
+      if (ctrl != null) {
+        final current = ctrl.count[searchType.index];
+        ctrl.count[searchType.index] =
+            (current > 0 ? current : 0) + (response.response.numResults ?? 0);
+      }
     }
     return false;
   }
