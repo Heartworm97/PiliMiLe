@@ -218,7 +218,7 @@ main() {
     # 显示并让用户确认
     echo ""
     echo -e "${GREEN}──────── 更新内容预览 ────────${NC}"
-    awk '/^## \[/ && NR>1 { exit } { print }' CHANGELOG.md
+    awk '/^## \[/ { if (h++) exit } { print }' CHANGELOG.md
     echo -e "${GREEN}────────────────────────────────${NC}"
     echo ""
     read -rp "是否编辑更新内容? (将用编辑器打开，不需要编辑则按 n) [y/N] " edit_ans
