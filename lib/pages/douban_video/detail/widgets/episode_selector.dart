@@ -400,7 +400,7 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
 
             return SizedBox(
               width: itemWidth,
-              height: 40,
+              height: 45,
               child: Material(
                 color: isCurrent
                     ? primary.withValues(alpha: 0.12)
