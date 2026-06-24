@@ -25,6 +25,17 @@ class EpisodeSelector extends StatelessWidget {
           Text.rich(
             TextSpan(
               children: [
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: Icon(
+                      Icons.list,
+                      size: 18,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
                 const TextSpan(
                   text: '选集',
                   style: TextStyle(
