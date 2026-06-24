@@ -2035,6 +2035,32 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         ],
 
         Obx(() {
+          if (plPlayerController.dataStatus.error) {
+            return Center(
+              child: GestureDetector(
+                onTap: plPlayerController.refreshPlayer,
+                child: const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.white, size: 32),
+                    SizedBox(height: 8),
+                    Text(
+                      '播放失败',
+                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '点击重试',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
           if (plPlayerController.dataStatus.loading ||
               (plPlayerController.isBuffering.value &&
                   plPlayerController.playerStatus.isPlaying)) {

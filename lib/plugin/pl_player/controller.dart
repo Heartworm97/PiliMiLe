@@ -376,6 +376,8 @@ class PlPlayerController with BlockConfigMixin {
   late int? cacheVideoQa = PlatformUtils.isMobile ? null : Pref.defaultVideoQa;
   late int cacheAudioQa = Pref.defaultAudioQa;
   bool enableHeart = true;
+  int _errorRetryCount = 0;
+  static const _maxErrorRetry = 2;
   late final String? hwdec = Pref.enableHA ? Pref.hardwareDecoding : null;
 
   late final progressType = Pref.btmProgressBehavior;
@@ -656,6 +658,7 @@ class PlPlayerController with BlockConfigMixin {
       // _playbackSpeed.value = speed;
       // 初始化数据加载状态
       dataStatus.value = DataStatus.loading;
+    _errorRetryCount = 0;
       // 初始化全屏方向
       _isVertical = isVertical ?? false;
       _aid = aid;
@@ -772,6 +775,8 @@ class PlPlayerController with BlockConfigMixin {
     assert(_videoPlayerController == null);
     final opt = {
       'video-sync': Pref.videoSync,
+      'network-timeout': '15',
+      'stream-timeout': '15',
       if (Platform.isAndroid) 'ao': Pref.audioOutput,
       'volume':
           (PlatformUtils.isMobile ? Pref.playerVolume : volume.value * 100)
@@ -1061,6 +1066,15 @@ class PlPlayerController with BlockConfigMixin {
                 //   debugPrint("_buffered.value: ${_buffered.value}");
                 // }
                 if (isBuffering.value && buffered.value == Duration.zero) {
+                  if (_errorRetryCount >= _maxErrorRetry) {
+                    dataStatus.value = DataStatus.error;
+                    SmartDialog.showToast(
+                      '播放失败，请尝试切换线路',
+                      displayTime: const Duration(milliseconds: 1500),
+                    );
+                    return;
+                  }
+                  _errorRetryCount++;
                   SmartDialog.showToast(
                     '视频链接打开失败，重试中',
                     displayTime: const Duration(milliseconds: 500),
@@ -1645,7 +1659,6 @@ class PlPlayerController with BlockConfigMixin {
       AndroidHelper$ToDart.onUserLeaveHint = null;
     }
     _timer?.cancel();
-    // _position.close();
     // _playerEventSubs?.cancel();
     // _sliderPosition.close();
     // _sliderTempPosition.close();
