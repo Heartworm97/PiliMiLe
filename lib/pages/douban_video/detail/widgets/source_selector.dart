@@ -1,4 +1,3 @@
-import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:flutter/material.dart';
 
@@ -21,10 +20,7 @@ class SourceSelector extends StatelessWidget {
     final total = sources.length;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: Style.safeSpace,
-        vertical: 8,
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
