@@ -96,6 +96,7 @@ class SourceSelector extends StatelessWidget {
                                 '${src.episodes.length}集',
                                 style: TextStyle(
                                   fontSize: 10,
+                                  fontWeight: FontWeight.w600,
                                   color: textColor.withValues(alpha: 0.6),
                                 ),
                               ),
