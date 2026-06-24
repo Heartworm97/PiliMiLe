@@ -68,7 +68,6 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      isDismissible: false,
       backgroundColor: Colors.transparent,
       builder: (_) => _DoubanEpisodePanel(
         episodes: widget.episodes,
