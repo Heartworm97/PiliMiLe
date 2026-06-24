@@ -41,9 +41,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     final playerWidth = size.width;
     final playerHeight = playerWidth * 9 / 16;
 
-    final playerWidth = size.width;
-    final playerHeight = playerWidth * 9 / 16;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
