@@ -238,6 +238,7 @@ class _DoubanEpisodePanel extends StatefulWidget {
 
 class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
   final _scrollController = ScrollController();
+  static const _segmentSize = 50;
 
   @override
   void initState() {
@@ -249,7 +250,7 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
 
   void _scrollToCurrent() {
     if (!_scrollController.hasClients) return;
-    final offset = widget.selectedIndex * 60.0;
+    final offset = widget.selectedIndex ~/ _segmentSize * 52.0;
     final maxScroll = _scrollController.position.maxScrollExtent;
     _scrollController.jumpTo(offset.clamp(0.0, maxScroll));
   }
@@ -267,12 +268,25 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
     final maxHeight =
         widget.maxPanelHeight ?? MediaQuery.of(context).size.height * 0.55;
     final panelHeight = maxHeight.clamp(150.0, maxHeight);
+    final showSegments = widget.episodes.length > _segmentSize;
+
+    // 构建分段数据
+    final segments = <_EpisodeSegment>[];
+    for (int i = 0; i < widget.episodes.length; i += _segmentSize) {
+      final end = (i + _segmentSize).clamp(0, widget.episodes.length);
+      segments.add(_EpisodeSegment(
+        start: i + 1,
+        end: end,
+        episodes: widget.episodes.sublist(i, end),
+        baseIndex: i,
+      ));
+    }
 
     final content = SizedBox(
       height: panelHeight,
       child: Column(
         children: [
-          // toolbar — 对齐 EpisodePanel._buildToolbar
+          // toolbar
           Container(
             height: 45,
             padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -285,10 +299,7 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
             ),
             child: Row(
               children: [
-                Text(
-                  '选集',
-                  style: theme.textTheme.titleMedium,
-                ),
+                Text('选集', style: theme.textTheme.titleMedium),
                 iconButton(
                   iconSize: 22,
                   tooltip: '跳至当前',
@@ -321,42 +332,33 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
                 Style.safeSpace,
                 bottomPadding + 100,
               ),
-              child: Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: List.generate(widget.episodes.length, (index) {
-                  final ep = widget.episodes[index];
-                  final isCurrent = index == widget.selectedIndex;
-                  final primary = theme.colorScheme.primary;
-
-                  return SizedBox(
-                    width: 90,
-                    height: 36,
-                    child: Material(
-                      color: isCurrent
-                          ? primary.withValues(alpha: 0.12)
-                          : theme.colorScheme.onInverseSurface,
-                      borderRadius: BorderRadius.circular(6),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(6),
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          widget.onSelected(index);
-                        },
-                        child: Center(
-                          child: Text(
-                            '第${ep.nid}集',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: isCurrent ? FontWeight.bold : null,
-                              color: isCurrent ? primary : null,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: segments.map((seg) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      top: seg != segments.first ? 16 : 0,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (showSegments)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Text(
+                              '${seg.start}-${seg.end}',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.onSurface,
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                        _buildEpisodeGrid(theme, seg),
+                      ],
                     ),
                   );
-                }),
+                }).toList(),
               ),
             ),
           ),
@@ -369,4 +371,58 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
       child: content,
     );
   }
+
+  Widget _buildEpisodeGrid(ThemeData theme, _EpisodeSegment seg) {
+    final primary = theme.colorScheme.primary;
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: seg.episodes.asMap().entries.map((entry) {
+        final globalIndex = seg.baseIndex + entry.key;
+        final isCurrent = globalIndex == widget.selectedIndex;
+
+        return SizedBox(
+          width: 90,
+          height: 36,
+          child: Material(
+            color: isCurrent
+                ? primary.withValues(alpha: 0.12)
+                : theme.colorScheme.onInverseSurface,
+            borderRadius: BorderRadius.circular(6),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(6),
+              onTap: () {
+                Navigator.of(context).pop();
+                widget.onSelected(globalIndex);
+              },
+              child: Center(
+                child: Text(
+                  '第${entry.value.nid}集',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: isCurrent ? FontWeight.bold : null,
+                    color: isCurrent ? primary : null,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _EpisodeSegment {
+  const _EpisodeSegment({
+    required this.start,
+    required this.end,
+    required this.episodes,
+    required this.baseIndex,
+  });
+  final int start;
+  final int end;
+  final List<DoubanEpisodeModel> episodes;
+  final int baseIndex;
 }
