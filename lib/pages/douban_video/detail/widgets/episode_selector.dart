@@ -306,19 +306,12 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
             child: Row(
               children: [
                 Text('选集', style: theme.textTheme.titleMedium),
+                const Spacer(),
                 iconButton(
                   iconSize: 22,
                   tooltip: '跳至当前',
                   icon: const Icon(Icons.my_location),
                   onPressed: _jumpToCurrent,
-                ),
-                const Spacer(),
-                Text(
-                  '共${widget.episodes.length}集',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
                 ),
                 iconButton(
                   iconSize: 22,
