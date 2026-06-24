@@ -1545,6 +1545,9 @@ class PlPlayerController with BlockConfigMixin {
         (playerStatus.isPaused && !isManual)) {
       return null;
     }
+    if (cid == null && this.cid == null) {
+      return null;
+    }
 
     Future<void> send() {
       return VideoHttp.heartBeat(
