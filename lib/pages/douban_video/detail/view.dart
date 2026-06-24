@@ -108,7 +108,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
           Positioned.fill(
             child: ClipRect(
               child: ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                imageFilter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
                 child: NetworkImgLayer(
                   src: controller.vodPic.value,
                   width: width,
