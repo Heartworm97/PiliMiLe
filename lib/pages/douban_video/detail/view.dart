@@ -320,7 +320,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                         episodes: controller.currentEpisodes,
                         selectedIndex: controller.selectedEpisodeIndex.value,
                         onSelected: controller.onSelectEpisode,
-                        isPlaying: controller.plPlayerController.playerStatus.isPlaying,
                       )),
                       const SizedBox(height: 24),
                     ],
