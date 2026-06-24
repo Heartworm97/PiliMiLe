@@ -375,42 +375,52 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
 
   Widget _buildEpisodeGrid(ThemeData theme, _EpisodeSegment seg) {
     final primary = theme.colorScheme.primary;
+    const crossAxisCount = 5;
+    const spacing = 10.0;
 
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: seg.episodes.asMap().entries.map((entry) {
-        final globalIndex = seg.baseIndex + entry.key;
-        final isCurrent = globalIndex == widget.selectedIndex;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final itemWidth =
+            (constraints.maxWidth - (crossAxisCount - 1) * spacing) /
+                crossAxisCount;
 
-        return SizedBox(
-          width: 90,
-          height: 36,
-          child: Material(
-            color: isCurrent
-                ? primary.withValues(alpha: 0.12)
-                : theme.colorScheme.onInverseSurface,
-            borderRadius: BorderRadius.circular(6),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(6),
-              onTap: () {
-                Navigator.of(context).pop();
-                widget.onSelected(globalIndex);
-              },
-              child: Center(
-                child: Text(
-                  '第${entry.value.nid}集',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: isCurrent ? FontWeight.bold : null,
-                    color: isCurrent ? primary : null,
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: seg.episodes.asMap().entries.map((entry) {
+            final globalIndex = seg.baseIndex + entry.key;
+            final isCurrent = globalIndex == widget.selectedIndex;
+
+            return SizedBox(
+              width: itemWidth,
+              height: 36,
+              child: Material(
+                color: isCurrent
+                    ? primary.withValues(alpha: 0.12)
+                    : theme.colorScheme.onInverseSurface,
+                borderRadius: BorderRadius.circular(6),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(6),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    widget.onSelected(globalIndex);
+                  },
+                  child: Center(
+                    child: Text(
+                      '第${entry.value.nid}集',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: isCurrent ? FontWeight.bold : null,
+                        color: isCurrent ? primary : null,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 }
