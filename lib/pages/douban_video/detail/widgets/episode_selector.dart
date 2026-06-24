@@ -67,7 +67,6 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      constraints: const BoxConstraints(),
       builder: (_) => _DoubanEpisodePanel(
         episodes: widget.episodes,
         selectedIndex: widget.selectedIndex,
@@ -401,6 +400,12 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
       ],
     );
 
-    return SafeArea(child: content);
+    return SafeArea(
+      child: Material(
+        color: theme.colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Style.imgRadius),
+        child: content,
+      ),
+    );
   }
 }
