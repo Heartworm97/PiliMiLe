@@ -227,6 +227,9 @@ main() {
     awk '/^## \[/ { if (h++) exit } { print }' CHANGELOG.md
     echo -e "${GREEN}────────────────────────────────${NC}"
     echo ""
+
+    # 提取最新版本块，供 CI 创建 Release body
+    awk '/^## \[/ { if (h++) exit } { print }' CHANGELOG.md > CHANGELOG_LATEST.md
     read -rp "是否需要手动编辑 CHANGELOG.md 内容? 不需要编辑则按 n [y/N] " edit_ans
     if [[ "$edit_ans" == "y" || "$edit_ans" == "Y" ]]; then
         info "请手动编辑 CHANGELOG.md 文件，完成后按回车继续..."
@@ -290,7 +293,7 @@ main() {
 
     # 10. 提交推送
     title "提交并推送..."
-    git add pubspec.yaml CHANGELOG.md
+    git add pubspec.yaml CHANGELOG.md CHANGELOG_LATEST.md
     git commit -m "chore: 发布 $new_version" || true
     if ! git push; then
         err "推送失败，请检查网络或权限后重试"
