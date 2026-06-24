@@ -79,7 +79,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                 ),
                 if (widget.episodes.isNotEmpty)
                   TextSpan(
-                    text: ' 正在播放：${widget.episodes[widget.selectedIndex].title}',
+                    text: ' 正在播放：第${widget.episodes[widget.selectedIndex].nid}集',
                     style: TextStyle(
                       fontSize: 13,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -149,7 +149,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                                     ),
                                   ),
                                 TextSpan(
-                                  text: ep.title,
+                                  text: '第${ep.nid}集',
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: isSelected
