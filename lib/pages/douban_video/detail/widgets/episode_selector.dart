@@ -218,7 +218,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
   }
 }
 
-/// 全集列表弹窗：TabBar 分段 + 横排按钮网格
+/// 全集列表弹窗：TabBar 分段 + 横排按钮网格 + 正序/倒序切换
 class _DoubanEpisodePanel extends StatefulWidget {
   const _DoubanEpisodePanel({
     required this.episodes,
@@ -242,12 +242,27 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
 
   late final TabController _tabController;
   int _segmentCount = 1;
+  bool _isReversed = false;
+
+  List<DoubanEpisodeModel> get _orderedEpisodes => _isReversed
+      ? widget.episodes.reversed.toList()
+      : widget.episodes;
+
+  int _globalIndex(int displayIndex, int baseIndex) =>
+      _isReversed ? widget.episodes.length - 1 - (baseIndex + displayIndex) : baseIndex + displayIndex;
 
   @override
   void initState() {
     super.initState();
+    _initTab();
+  }
+
+  void _initTab() {
     _segmentCount = (widget.episodes.length / _segmentSize).ceil();
-    final initialSegment = widget.selectedIndex ~/ _segmentSize;
+    final initialDisplayIndex = _isReversed
+        ? widget.episodes.length - 1 - widget.selectedIndex
+        : widget.selectedIndex;
+    final initialSegment = initialDisplayIndex ~/ _segmentSize;
     _tabController = TabController(
       length: _segmentCount,
       vsync: this,
@@ -255,17 +270,28 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
     );
   }
 
+  void _toggleOrder() {
+    setState(() {
+      _isReversed = !_isReversed;
+      _tabController.dispose();
+      _initTab();
+    });
+  }
+
+  void _jumpToCurrent() {
+    final displayIndex = _isReversed
+        ? widget.episodes.length - 1 - widget.selectedIndex
+        : widget.selectedIndex;
+    final seg = displayIndex ~/ _segmentSize;
+    if (seg < _segmentCount) {
+      _tabController.animateTo(seg);
+    }
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  void _jumpToCurrent() {
-    final seg = widget.selectedIndex ~/ _segmentSize;
-    if (seg < _segmentCount) {
-      _tabController.animateTo(seg);
-    }
   }
 
   @override
@@ -277,13 +303,14 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
     final panelHeight = maxHeight.clamp(150.0, maxHeight);
     final showSegments = widget.episodes.length > _segmentSize;
 
+    final allEpisodes = _orderedEpisodes;
     final segments = <_EpisodeSegment>[];
-    for (int i = 0; i < widget.episodes.length; i += _segmentSize) {
-      final end = (i + _segmentSize).clamp(0, widget.episodes.length);
+    for (int i = 0; i < allEpisodes.length; i += _segmentSize) {
+      final end = (i + _segmentSize).clamp(0, allEpisodes.length);
       segments.add(_EpisodeSegment(
         start: i + 1,
         end: end,
-        episodes: widget.episodes.sublist(i, end),
+        episodes: allEpisodes.sublist(i, end),
         baseIndex: i,
       ));
     }
@@ -307,6 +334,15 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
               children: [
                 Text('选集', style: theme.textTheme.titleMedium),
                 const Spacer(),
+                iconButton(
+                  iconSize: 22,
+                  tooltip: _isReversed ? '当前倒序，点击切换正序' : '当前正序，点击切换倒序',
+                  icon: Icon(
+                    _isReversed ? Icons.arrow_upward : Icons.arrow_downward,
+                    size: 18,
+                  ),
+                  onPressed: _toggleOrder,
+                ),
                 iconButton(
                   iconSize: 22,
                   tooltip: '跳至当前',
@@ -387,7 +423,8 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
           spacing: spacing,
           runSpacing: spacing,
           children: seg.episodes.asMap().entries.map((entry) {
-            final globalIndex = seg.baseIndex + entry.key;
+            final globalIndex =
+                _globalIndex(entry.key, seg.baseIndex);
             final isCurrent = globalIndex == widget.selectedIndex;
 
             return SizedBox(
