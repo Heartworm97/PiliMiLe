@@ -270,15 +270,13 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           SizedBox(
-                            height: 32,
-                            child: TextButton(
-                              style: ButtonStyle(
-                                padding: WidgetStatePropertyAll(EdgeInsets.zero),
-                              ),
+                            width: 38,
+                            height: 38,
+                            child: IconButton(
                               onPressed: null,
-                              child: Text(
-                                '发弹幕',
-                                style: TextStyle(fontSize: 12),
+                              icon: Icon(
+                                Icons.manage_search,
+                                size: 22,
                               ),
                             ),
                           ),
