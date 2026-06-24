@@ -30,37 +30,59 @@ class SourceSelector extends StatelessWidget {
         children: [
           Text(
             '播放源（$available/$total 可用）',
-            style: TextStyle(
-              fontSize: 13,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 12,
-            runSpacing: 4,
-            children: List.generate(sources.length, (index) {
-              final src = sources[index];
-              final isSelected = index == selectedIndex;
-              final isAvailable = src.decodeStatus != '2' && src.key != 'JD4K' && src.key != 'NBY';
+          SizedBox(
+            height: 32,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: sources.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final src = sources[index];
+                final isSelected = index == selectedIndex;
+                final isAvailable = src.decodeStatus != '2' && src.key != 'JD4K' && src.key != 'NBY';
 
-              return GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: isAvailable ? () => onSelected(index) : null,
-                child: Text(
-                  src.name,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: isAvailable
-                        ? isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurface
-                        : theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                if (!isAvailable) {
+                  return ActionChip(
+                    label: Text(
+                      src.name,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                      ),
+                    ),
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    onPressed: null,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  );
+                }
+                return ActionChip(
+                  label: Text(
+                    src.name,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isSelected
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurface,
+                    ),
                   ),
-                ),
-              );
-            }),
+                  backgroundColor: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.surfaceContainerHighest,
+                  onPressed: () => onSelected(index),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+                );
+              },
+            ),
           ),
         ],
       ),
