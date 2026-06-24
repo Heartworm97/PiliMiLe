@@ -142,16 +142,15 @@ class _SourceSelectorState extends State<SourceSelector> {
                   margin: displayIndex != _sortedIndices.length - 1
                       ? const EdgeInsets.only(right: 10)
                       : null,
-                  decoration: isSelected && isAvailable
-                      ? BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(6)),
-                          border: Border.all(
-                            color: theme.colorScheme.primary,
-                            width: 1.5,
-                          ),
-                        )
-                      : null,
-                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(6)),
+                    border: Border.all(
+                      color: isSelected && isAvailable
+                          ? theme.colorScheme.primary
+                          : Colors.transparent,
+                      width: 1.5,
+                    ),
+                  ),
                   child: Material(
                     color: isSelected && isAvailable
                         ? theme.colorScheme.primary.withValues(alpha: 0.08)

@@ -107,16 +107,15 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                   margin: index != widget.episodes.length - 1
                       ? const EdgeInsets.only(right: 10)
                       : null,
-                  decoration: isSelected
-                      ? BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(6)),
-                          border: Border.all(
-                            color: theme.colorScheme.primary,
-                            width: 1.5,
-                          ),
-                        )
-                      : null,
-                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(6)),
+                    border: Border.all(
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : Colors.transparent,
+                      width: 1.5,
+                    ),
+                  ),
                   child: Material(
                     color: isSelected
                         ? theme.colorScheme.primary.withValues(alpha: 0.08)
