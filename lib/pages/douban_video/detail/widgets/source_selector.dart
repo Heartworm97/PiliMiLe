@@ -1,7 +1,7 @@
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:flutter/material.dart';
 
-class SourceSelector extends StatelessWidget {
+class SourceSelector extends StatefulWidget {
   const SourceSelector({
     super.key,
     required this.sources,
@@ -14,22 +14,76 @@ class SourceSelector extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    // 可用在前，被禁止在后
-    final sortedIndices = List.generate(sources.length, (i) => i);
-    sortedIndices.sort((a, b) {
-      final aAvailable =
-          sources[a].decodeStatus != '2' && sources[a].key != 'JD4K' && sources[a].key != 'NBY';
-      final bAvailable =
-          sources[b].decodeStatus != '2' && sources[b].key != 'JD4K' && sources[b].key != 'NBY';
+  State<SourceSelector> createState() => _SourceSelectorState();
+}
+
+class _SourceSelectorState extends State<SourceSelector> {
+  late final ScrollController _scrollCtr;
+  late List<int> _sortedIndices;
+
+  @override
+  void initState() {
+    super.initState();
+    _sortedIndices = _buildSortedIndices();
+    final selectedDisplayIndex = _sortedIndices.indexOf(widget.selectedIndex);
+    _scrollCtr = ScrollController(
+      initialScrollOffset: (selectedDisplayIndex >= 0 ? selectedDisplayIndex : 0) * 140.0,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant SourceSelector oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedIndex != widget.selectedIndex) {
+      _scrollToIndex();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollCtr.dispose();
+    super.dispose();
+  }
+
+  List<int> _buildSortedIndices() {
+    final indices = List.generate(widget.sources.length, (i) => i);
+    indices.sort((a, b) {
+      final aAvailable = widget.sources[a].decodeStatus != '2' &&
+          widget.sources[a].key != 'JD4K' &&
+          widget.sources[a].key != 'NBY';
+      final bAvailable = widget.sources[b].decodeStatus != '2' &&
+          widget.sources[b].key != 'JD4K' &&
+          widget.sources[b].key != 'NBY';
       if (aAvailable == bAvailable) return 0;
       return aAvailable ? -1 : 1;
     });
-    final available = sortedIndices
-        .where((i) => sources[i].decodeStatus != '2' && sources[i].key != 'JD4K' && sources[i].key != 'NBY')
+    return indices;
+  }
+
+  void _scrollToIndex() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollCtr.hasClients) return;
+      final displayIndex = _sortedIndices.indexOf(widget.selectedIndex);
+      if (displayIndex < 0) return;
+      _scrollCtr.animateTo(
+        (displayIndex * 140.0).clamp(
+          _scrollCtr.position.minScrollExtent,
+          _scrollCtr.position.maxScrollExtent,
+        ),
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final sortedIndices = _sortedIndices;
+    final available = _sortedIndices
+        .where((i) => widget.sources[i].decodeStatus != '2' && widget.sources[i].key != 'JD4K' && widget.sources[i].key != 'NBY')
         .length;
-    final total = sources.length;
+    final total = widget.sources.length;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -61,11 +115,12 @@ class SourceSelector extends StatelessWidget {
             height: 48,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: sortedIndices.length,
+              controller: _scrollCtr,
+              itemCount: _sortedIndices.length,
               itemBuilder: (context, displayIndex) {
-                final originalIndex = sortedIndices[displayIndex];
-                final src = sources[originalIndex];
-                final isSelected = originalIndex == selectedIndex;
+                final originalIndex = _sortedIndices[displayIndex];
+                final src = widget.sources[originalIndex];
+                final isSelected = originalIndex == widget.selectedIndex;
                 final isAvailable = src.decodeStatus != '2' && src.key != 'JD4K' && src.key != 'NBY';
                 final isBuiltin = !src.key.startsWith('site_');
                 final indicatorColor = !isAvailable
@@ -83,7 +138,7 @@ class SourceSelector extends StatelessWidget {
                 return Container(
                   width: 130,
                   height: 48,
-                  margin: displayIndex != sortedIndices.length - 1
+                  margin: displayIndex != _sortedIndices.length - 1
                       ? const EdgeInsets.only(right: 10)
                       : null,
                   decoration: isSelected && isAvailable
@@ -102,7 +157,7 @@ class SourceSelector extends StatelessWidget {
                     borderRadius: const BorderRadius.all(Radius.circular(6)),
                     child: InkWell(
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
-                      onTap: isAvailable ? () => onSelected(originalIndex) : null,
+                      onTap: isAvailable ? () => widget.onSelected(originalIndex) : null,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 8,
