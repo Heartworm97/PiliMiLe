@@ -204,7 +204,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
             ),
           ),
         ),
-        const SliverPadding(padding: EdgeInsets.only(bottom: 100)),
+        const SliverPadding(padding: EdgeInsets.only(bottom: 16)),
       ],
       ),
     );
