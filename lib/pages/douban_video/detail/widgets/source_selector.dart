@@ -28,7 +28,7 @@ class SourceSelector extends StatelessWidget {
             TextSpan(
               children: [
                 const TextSpan(
-                  text: '播放源',
+                  text: '换源',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -78,15 +78,24 @@ class SourceSelector extends StatelessWidget {
                           vertical: 8,
                           horizontal: 10,
                         ),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            src.name,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: textColor,
+                        child: Stack(
+                          children: [
+                            const Align(child: Text(
+                              src.name,
+                              style: TextStyle(fontSize: 13),
+                            )),
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              child: Text(
+                                '${index + 1}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: textColor.withValues(alpha: 0.5),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     ),

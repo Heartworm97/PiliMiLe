@@ -26,7 +26,7 @@ class EpisodeSelector extends StatelessWidget {
             TextSpan(
               children: [
                 const TextSpan(
-                  text: '剧集列表',
+                  text: '选集',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -70,8 +70,7 @@ class EpisodeSelector extends StatelessWidget {
                           vertical: 8,
                           horizontal: 10,
                         ),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
+                        child: Center(
                           child: Text(
                             ep.title,
                             style: TextStyle(
