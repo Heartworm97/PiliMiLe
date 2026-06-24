@@ -54,6 +54,12 @@ class SourceSelector extends StatelessWidget {
                 final src = sources[index];
                 final isSelected = index == selectedIndex;
                 final isAvailable = src.decodeStatus != '2' && src.key != 'JD4K' && src.key != 'NBY';
+                final isBuiltin = !src.key.startsWith('site_');
+                final indicatorColor = !isAvailable
+                    ? Colors.red
+                    : isBuiltin
+                        ? Colors.green
+                        : Colors.orange;
 
                 final textColor = isAvailable
                     ? isSelected
@@ -97,6 +103,18 @@ class SourceSelector extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: textColor,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: indicatorColor,
+                                  shape: BoxShape.circle,
                                 ),
                               ),
                             ),
