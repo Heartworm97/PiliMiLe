@@ -61,8 +61,19 @@ class EpisodeSelector extends StatelessWidget {
                   margin: index != episodes.length - 1
                       ? const EdgeInsets.only(right: 10)
                       : null,
+                  decoration: isSelected
+                      ? BoxDecoration(
+                          borderRadius: const BorderRadius.all(Radius.circular(6)),
+                          border: Border.all(
+                            color: theme.colorScheme.primary,
+                            width: 1.5,
+                          ),
+                        )
+                      : null,
                   child: Material(
-                    color: theme.colorScheme.onInverseSurface,
+                    color: isSelected
+                        ? theme.colorScheme.primary.withValues(alpha: 0.08)
+                        : theme.colorScheme.onInverseSurface,
                     borderRadius: const BorderRadius.all(Radius.circular(6)),
                     child: InkWell(
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
