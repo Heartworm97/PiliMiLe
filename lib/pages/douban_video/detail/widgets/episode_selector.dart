@@ -84,8 +84,8 @@ class EpisodeSelector extends StatelessWidget {
                                       child: Image.asset(
                                         Assets.livingChart,
                                         color: theme.colorScheme.primary,
-                                        height: 12,
-                                        cacheHeight: 12.cacheSize(context),
+                                        height: 16,
+                                        cacheHeight: 16.cacheSize(context),
                                       ),
                                     ),
                                   ),
