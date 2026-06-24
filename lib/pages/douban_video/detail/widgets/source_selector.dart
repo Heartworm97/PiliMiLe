@@ -29,7 +29,7 @@ class SourceSelector extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '播放线路（$available/$total 可用）',
+            '播放源（$available/$total 可用）',
             style: TextStyle(
               fontSize: 13,
               color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
