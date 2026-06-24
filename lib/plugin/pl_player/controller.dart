@@ -1626,7 +1626,7 @@ class PlPlayerController with BlockConfigMixin {
     }
 
     _playerCount = 0;
-    if (removeSafeArea) {
+    if (!removeSafeArea) {
       showSystemBar();
     }
     danmakuController = null;
