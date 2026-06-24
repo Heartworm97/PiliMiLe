@@ -30,7 +30,7 @@ class SourceSelector extends StatelessWidget {
                 const TextSpan(
                   text: '播放源',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

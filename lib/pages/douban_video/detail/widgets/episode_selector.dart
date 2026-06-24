@@ -28,13 +28,13 @@ class EpisodeSelector extends StatelessWidget {
                 const TextSpan(
                   text: '剧集列表',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 if (episodes.isNotEmpty)
                   TextSpan(
-                    text: ' 正在播放：第${episodes[selectedIndex].title}集',
+                    text: ' 正在播放：${episodes[selectedIndex].title}',
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
