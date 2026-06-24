@@ -16,7 +16,19 @@ class SourceSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final available = sources.where((s) => s.decodeStatus != '2' && s.key != 'JD4K' && s.key != 'NBY').length;
+    // 可用在前，被禁止在后
+    final sortedIndices = List.generate(sources.length, (i) => i);
+    sortedIndices.sort((a, b) {
+      final aAvailable =
+          sources[a].decodeStatus != '2' && sources[a].key != 'JD4K' && sources[a].key != 'NBY';
+      final bAvailable =
+          sources[b].decodeStatus != '2' && sources[b].key != 'JD4K' && sources[b].key != 'NBY';
+      if (aAvailable == bAvailable) return 0;
+      return aAvailable ? -1 : 1;
+    });
+    final available = sortedIndices
+        .where((i) => sources[i].decodeStatus != '2' && sources[i].key != 'JD4K' && sources[i].key != 'NBY')
+        .length;
     final total = sources.length;
 
     return Padding(
@@ -49,10 +61,11 @@ class SourceSelector extends StatelessWidget {
             height: 48,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: sources.length,
-              itemBuilder: (context, index) {
-                final src = sources[index];
-                final isSelected = index == selectedIndex;
+              itemCount: sortedIndices.length,
+              itemBuilder: (context, displayIndex) {
+                final originalIndex = sortedIndices[displayIndex];
+                final src = sources[originalIndex];
+                final isSelected = originalIndex == selectedIndex;
                 final isAvailable = src.decodeStatus != '2' && src.key != 'JD4K' && src.key != 'NBY';
                 final isBuiltin = !src.key.startsWith('site_');
                 final indicatorColor = !isAvailable
@@ -70,7 +83,7 @@ class SourceSelector extends StatelessWidget {
                 return Container(
                   width: 130,
                   height: 48,
-                  margin: index != sources.length - 1
+                  margin: displayIndex != sortedIndices.length - 1
                       ? const EdgeInsets.only(right: 10)
                       : null,
                   decoration: isSelected && isAvailable
@@ -89,7 +102,7 @@ class SourceSelector extends StatelessWidget {
                     borderRadius: const BorderRadius.all(Radius.circular(6)),
                     child: InkWell(
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
-                      onTap: isAvailable ? () => onSelected(index) : null,
+                      onTap: isAvailable ? () => onSelected(originalIndex) : null,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 8,
