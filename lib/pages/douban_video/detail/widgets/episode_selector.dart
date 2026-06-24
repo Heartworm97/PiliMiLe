@@ -1,5 +1,6 @@
 import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
+import 'package:PiliMiLe/common/widgets/button/icon_button.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/utils/extension/num_ext.dart';
 import 'package:flutter/material.dart';
@@ -65,10 +66,9 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Style.imgRadius),
-      ),
-      builder: (_) => _DoubanEpisodeList(
+      backgroundColor: Colors.transparent,
+      constraints: const BoxConstraints(),
+      builder: (_) => _DoubanEpisodePanel(
         episodes: widget.episodes,
         selectedIndex: widget.selectedIndex,
         onSelected: (index) {
@@ -216,9 +216,9 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
   }
 }
 
-/// 全集列表 BottomSheet 内容
-class _DoubanEpisodeList extends StatelessWidget {
-  const _DoubanEpisodeList({
+/// 全集列表，对齐 [EpisodePanel] 风格：toolbar + 竖向列表
+class _DoubanEpisodePanel extends StatefulWidget {
+  const _DoubanEpisodePanel({
     required this.episodes,
     required this.selectedIndex,
     required this.onSelected,
@@ -229,129 +229,178 @@ class _DoubanEpisodeList extends StatelessWidget {
   final ValueChanged<int> onSelected;
 
   @override
+  State<_DoubanEpisodePanel> createState() => _DoubanEpisodePanelState();
+}
+
+class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrent();
+    });
+  }
+
+  void _scrollToCurrent() {
+    if (!_scrollController.hasClients) return;
+    final offset = widget.selectedIndex * 60.0;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    _scrollController.jumpTo(offset.clamp(0.0, maxScroll));
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bottomPadding = MediaQuery.viewPaddingOf(context).bottom;
-
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: Row(
-              children: [
-                Text(
-                  '全部集数',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  '共${episodes.length}集',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-              ],
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // toolbar — 对齐 EpisodePanel._buildToolbar
+        Container(
+          height: 45,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: theme.dividerColor.withValues(alpha: 0.1),
+              ),
             ),
           ),
-          const Divider(height: 1),
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.6,
+          child: Row(
+            children: [
+              Text(
+                '选集',
+                style: theme.textTheme.titleMedium,
+              ),
+              iconButton(
+                iconSize: 22,
+                tooltip: '跳至当前',
+                icon: const Icon(Icons.my_location),
+                onPressed: _scrollToCurrent,
+              ),
+              const Spacer(),
+              Text(
+                '共${widget.episodes.length}集',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+              iconButton(
+                iconSize: 22,
+                tooltip: '关闭',
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        ),
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.6,
+          ),
+          child: ListView.builder(
+            controller: _scrollController,
+            shrinkWrap: true,
+            padding: EdgeInsets.fromLTRB(
+              Style.safeSpace,
+              8,
+              Style.safeSpace,
+              bottomPadding + 100,
             ),
-            child: ListView.builder(
-              shrinkWrap: true,
-              padding: EdgeInsets.fromLTRB(12, 8, 12, bottomPadding + 8),
-              itemCount: episodes.length,
-              itemBuilder: (_, index) {
-                final ep = episodes[index];
-                final isSelected = index == selectedIndex;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
+            itemCount: widget.episodes.length,
+            itemBuilder: (_, index) {
+              final ep = widget.episodes[index];
+              final isCurrent = index == widget.selectedIndex;
+              final primary = theme.colorScheme.primary;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: SizedBox(
+                  height: 60,
                   child: Material(
-                    color: isSelected
-                        ? theme.colorScheme.primary.withValues(alpha: 0.08)
-                        : theme.colorScheme.onInverseSurface,
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    type: MaterialType.transparency,
                     child: InkWell(
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(8)),
                       onTap: () {
                         Navigator.of(context).pop();
-                        onSelected(index);
+                        widget.onSelected(index);
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(8)),
-                          border: Border.all(
-                            color: isSelected
-                                ? theme.colorScheme.primary
-                                : Colors.transparent,
-                            width: 1.5,
-                          ),
-                        ),
+                      child: Padding(
                         padding: const EdgeInsets.symmetric(
-                          vertical: 12,
-                          horizontal: 14,
+                          horizontal: Style.safeSpace,
+                          vertical: 5,
                         ),
                         child: Row(
+                          spacing: 10,
                           children: [
-                            if (isSelected)
-                              Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: Image.asset(
-                                  Assets.livingChart,
-                                  color: theme.colorScheme.primary,
-                                  height: 16,
-                                  cacheHeight: 16.cacheSize(context),
-                                ),
+                            if (isCurrent)
+                              Image.asset(
+                                Assets.livingStatic,
+                                color: primary,
+                                height: 12,
+                                cacheHeight: 12.cacheSize(context),
+                                semanticLabel: "正在播放：",
                               ),
-                            Text(
-                              '第${ep.nid}集',
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: isSelected
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.onSurface,
-                                fontWeight:
-                                    isSelected ? FontWeight.w600 : null,
+                            Expanded(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      '第${ep.nid}集',
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(
+                                        fontSize: theme
+                                            .textTheme.bodyMedium!
+                                            .fontSize,
+                                        height: 1.42,
+                                        letterSpacing: 0.3,
+                                        fontWeight:
+                                            isCurrent ? FontWeight.bold : null,
+                                        color:
+                                            isCurrent ? primary : null,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (ep.title.isNotEmpty &&
+                                      ep.title != '第${ep.nid}集')
+                                    Text(
+                                      ep.title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        height: 1,
+                                        color: theme.colorScheme.outline,
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
-                            const Spacer(),
-                            if (ep.title.isNotEmpty &&
-                                ep.title != '第${ep.nid}集')
-                              Flexible(
-                                child: Text(
-                                  ep.title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: theme
-                                        .colorScheme.onSurface
-                                        .withValues(alpha: 0.5),
-                                  ),
-                                ),
-                              ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
+
+    return SafeArea(child: content);
   }
 }
