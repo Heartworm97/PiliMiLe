@@ -269,8 +269,9 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
     );
   }
 
-  void _toggleOrder() {
-    _isReversed = !_isReversed;
+  void _setOrder(bool reversed) {
+    if (_isReversed == reversed) return;
+    _isReversed = reversed;
     _tabController.dispose();
     setState(_initTab);
   }
@@ -333,12 +334,23 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
                 const Spacer(),
                 iconButton(
                   iconSize: 22,
-                  tooltip: _isReversed ? '正序' : '倒序',
+                  tooltip: '正序',
                   icon: Icon(
-                    _isReversed ? Icons.arrow_downward : Icons.arrow_upward,
+                    Icons.arrow_downward,
                     size: 18,
+                    color: _isReversed ? null : theme.colorScheme.primary,
                   ),
-                  onPressed: _toggleOrder,
+                  onPressed: () => _setOrder(false),
+                ),
+                iconButton(
+                  iconSize: 22,
+                  tooltip: '倒序',
+                  icon: Icon(
+                    Icons.arrow_upward,
+                    size: 18,
+                    color: _isReversed ? theme.colorScheme.primary : null,
+                  ),
+                  onPressed: () => _setOrder(true),
                 ),
                 iconButton(
                   iconSize: 22,
