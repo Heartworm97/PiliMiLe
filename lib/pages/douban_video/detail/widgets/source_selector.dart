@@ -64,8 +64,10 @@ class _SourceSelectorState extends State<SourceSelector> {
   void _scrollTo(int displayIndex) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollCtr.hasClients) return;
+      final viewport = _scrollCtr.position.viewportDimension;
+      final offset = (displayIndex * 140.0) - (viewport - 130) / 2;
       _scrollCtr.animateTo(
-        (displayIndex * 140.0).clamp(
+        offset.clamp(
           _scrollCtr.position.minScrollExtent,
           _scrollCtr.position.maxScrollExtent,
         ),

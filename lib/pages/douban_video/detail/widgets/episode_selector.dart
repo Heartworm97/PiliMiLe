@@ -47,8 +47,10 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
   void _scrollTo(int index) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollCtr.hasClients) return;
+      final viewport = _scrollCtr.position.viewportDimension;
+      final offset = (index * 140.0) - (viewport - 130) / 2;
       _scrollCtr.animateTo(
-        (index * 140.0).clamp(
+        offset.clamp(
           _scrollCtr.position.minScrollExtent,
           _scrollCtr.position.maxScrollExtent,
         ),
