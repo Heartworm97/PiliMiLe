@@ -63,11 +63,6 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
   }
 
   void _showEpisodePanel() {
-    final mediaQuery = MediaQuery.of(context);
-    final screenHeight = mediaQuery.size.height;
-    final playerHeight = mediaQuery.size.width * 9 / 16;
-    final maxHeight = screenHeight - playerHeight - mediaQuery.padding.top;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -75,7 +70,6 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
       builder: (_) => _DoubanEpisodePanel(
         episodes: widget.episodes,
         selectedIndex: widget.selectedIndex,
-        maxHeight: maxHeight,
         onSelected: (index) {
           _scrollTo(index);
           widget.onSelected(index);
@@ -226,13 +220,11 @@ class _DoubanEpisodePanel extends StatefulWidget {
   const _DoubanEpisodePanel({
     required this.episodes,
     required this.selectedIndex,
-    required this.maxHeight,
     required this.onSelected,
   });
 
   final List<DoubanEpisodeModel> episodes;
   final int selectedIndex;
-  final double maxHeight;
   final ValueChanged<int> onSelected;
 
   @override
@@ -267,10 +259,10 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bottomPadding = MediaQuery.viewPaddingOf(context).bottom;
-    final content = SizedBox(
-      height: widget.maxHeight,
-      child: Column(
-        children: [
+    final maxListHeight = MediaQuery.of(context).size.height * 0.5;
+    final content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
         // toolbar — 对齐 EpisodePanel._buildToolbar
         Container(
           height: 45,
@@ -311,9 +303,11 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
             ],
           ),
         ),
-        Expanded(
+        ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxListHeight),
           child: ListView.builder(
             controller: _scrollController,
+            shrinkWrap: true,
             padding: EdgeInsets.fromLTRB(
               Style.safeSpace,
               8,
@@ -403,7 +397,6 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
           ),
         ),
       ],
-      ),
     );
 
     return Material(
