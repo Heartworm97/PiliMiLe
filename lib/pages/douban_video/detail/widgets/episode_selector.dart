@@ -215,7 +215,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
   }
 }
 
-/// 全集列表，对齐 [EpisodePanel] 风格：toolbar + 竖向列表
+/// 全集列表，对齐番剧 EpisodePanel 风格：固定 70% 屏高 + toolbar + 竖向列表
 class _DoubanEpisodePanel extends StatefulWidget {
   const _DoubanEpisodePanel({
     required this.episodes,
@@ -259,144 +259,145 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bottomPadding = MediaQuery.viewPaddingOf(context).bottom;
-    final maxListHeight = MediaQuery.of(context).size.height * 0.5;
-    final content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // toolbar — 对齐 EpisodePanel._buildToolbar
-        Container(
-          height: 45,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: theme.dividerColor.withValues(alpha: 0.1),
-              ),
-            ),
-          ),
-          child: Row(
-            children: [
-              Text(
-                '选集',
-                style: theme.textTheme.titleMedium,
-              ),
-              iconButton(
-                iconSize: 22,
-                tooltip: '跳至当前',
-                icon: const Icon(Icons.my_location),
-                onPressed: _scrollToCurrent,
-              ),
-              const Spacer(),
-              Text(
-                '共${widget.episodes.length}集',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+    final panelHeight = MediaQuery.of(context).size.height * 0.7;
+
+    final content = SizedBox(
+      height: panelHeight,
+      child: Column(
+        children: [
+          // toolbar — 对齐 EpisodePanel._buildToolbar
+          Container(
+            height: 45,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.dividerColor.withValues(alpha: 0.1),
                 ),
               ),
-              iconButton(
-                iconSize: 22,
-                tooltip: '关闭',
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-        ),
-        ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: maxListHeight),
-          child: ListView.builder(
-            controller: _scrollController,
-            shrinkWrap: true,
-            padding: EdgeInsets.fromLTRB(
-              Style.safeSpace,
-              8,
-              Style.safeSpace,
-              bottomPadding + 100,
             ),
-            itemCount: widget.episodes.length,
-            itemBuilder: (_, index) {
-              final ep = widget.episodes[index];
-              final isCurrent = index == widget.selectedIndex;
-              final primary = theme.colorScheme.primary;
+            child: Row(
+              children: [
+                Text(
+                  '选集',
+                  style: theme.textTheme.titleMedium,
+                ),
+                iconButton(
+                  iconSize: 22,
+                  tooltip: '跳至当前',
+                  icon: const Icon(Icons.my_location),
+                  onPressed: _scrollToCurrent,
+                ),
+                const Spacer(),
+                Text(
+                  '共${widget.episodes.length}集',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+                iconButton(
+                  iconSize: 22,
+                  tooltip: '关闭',
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: EdgeInsets.fromLTRB(
+                Style.safeSpace,
+                8,
+                Style.safeSpace,
+                bottomPadding + 100,
+              ),
+              itemCount: widget.episodes.length,
+              itemBuilder: (_, index) {
+                final ep = widget.episodes[index];
+                final isCurrent = index == widget.selectedIndex;
+                final primary = theme.colorScheme.primary;
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 2),
-                child: SizedBox(
-                  height: 60,
-                  child: Material(
-                    type: MaterialType.transparency,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        widget.onSelected(index);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: Style.safeSpace,
-                          vertical: 5,
-                        ),
-                        child: Row(
-                          spacing: 10,
-                          children: [
-                            if (isCurrent)
-                              Image.asset(
-                                Assets.livingStatic,
-                                color: primary,
-                                height: 12,
-                                cacheHeight: 12.cacheSize(context),
-                                semanticLabel: "正在播放：",
-                              ),
-                            Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      '第${ep.nid}集',
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        fontSize: theme
-                                            .textTheme.bodyMedium!
-                                            .fontSize,
-                                        height: 1.42,
-                                        letterSpacing: 0.3,
-                                        fontWeight:
-                                            isCurrent ? FontWeight.bold : null,
-                                        color:
-                                            isCurrent ? primary : null,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  if (ep.title.isNotEmpty &&
-                                      ep.title != '第${ep.nid}集')
-                                    Text(
-                                      ep.title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        height: 1,
-                                        color: theme.colorScheme.outline,
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: SizedBox(
+                    height: 60,
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          widget.onSelected(index);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: Style.safeSpace,
+                            vertical: 5,
+                          ),
+                          child: Row(
+                            spacing: 10,
+                            children: [
+                              if (isCurrent)
+                                Image.asset(
+                                  Assets.livingStatic,
+                                  color: primary,
+                                  height: 12,
+                                  cacheHeight: 12.cacheSize(context),
+                                  semanticLabel: "正在播放：",
+                                ),
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        '第${ep.nid}集',
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(
+                                          fontSize: theme
+                                              .textTheme.bodyMedium!
+                                              .fontSize,
+                                          height: 1.42,
+                                          letterSpacing: 0.3,
+                                          fontWeight:
+                                              isCurrent ? FontWeight.bold : null,
+                                          color:
+                                              isCurrent ? primary : null,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                ],
+                                    if (ep.title.isNotEmpty &&
+                                        ep.title != '第${ep.nid}集')
+                                      Text(
+                                        ep.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          height: 1,
+                                          color: theme.colorScheme.outline,
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
 
     return Material(
