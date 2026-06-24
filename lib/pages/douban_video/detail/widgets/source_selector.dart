@@ -151,9 +151,7 @@ class _SourceSelectorState extends State<SourceSelector> {
                           ),
                         )
                       : null,
-                  padding: isSelected && isAvailable
-                      ? const EdgeInsets.all(1.5)
-                      : null,
+                  padding: const EdgeInsets.all(1.5),
                   child: Material(
                     color: isSelected && isAvailable
                         ? theme.colorScheme.primary.withValues(alpha: 0.08)
