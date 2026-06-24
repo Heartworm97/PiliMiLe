@@ -27,7 +27,7 @@ class _SourceSelectorState extends State<SourceSelector> {
     _sortedIndices = _buildSortedIndices();
     final selectedDisplayIndex = _sortedIndices.indexOf(widget.selectedIndex);
     _scrollCtr = ScrollController(
-      initialScrollOffset: (selectedDisplayIndex >= 0 ? selectedDisplayIndex : 0) * 140.0,
+      initialScrollOffset: (selectedDisplayIndex >= 0 ? selectedDisplayIndex : 0) * 110.0,
     );
   }
 
@@ -65,7 +65,7 @@ class _SourceSelectorState extends State<SourceSelector> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollCtr.hasClients) return;
       final viewport = _scrollCtr.position.viewportDimension;
-      final offset = (displayIndex * 140.0) - (viewport - 130) / 2;
+      final offset = (displayIndex * 110.0) - (viewport - 100) / 2;
       _scrollCtr.animateTo(
         offset.clamp(
           _scrollCtr.position.minScrollExtent,
@@ -130,14 +130,14 @@ class _SourceSelectorState extends State<SourceSelector> {
                         ? Colors.green
                         : Colors.orange;
 
-                final textColor = isAvailable
-                    ? isSelected
+                final textColor = !isAvailable
+                    ? theme.colorScheme.onSurface.withValues(alpha: 0.38)
+                    : isSelected
                         ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.38);
+                        : theme.colorScheme.onSurface;
 
                 return Container(
-                  width: 130,
+                  width: 100,
                   height: 48,
                   margin: displayIndex != _sortedIndices.length - 1
                       ? const EdgeInsets.only(right: 10)
