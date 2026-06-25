@@ -67,6 +67,7 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
   );
 
   void _statusListener(AnimationStatus status) {
+    if (_morphs.length <= 1) return;
     if (status == AnimationStatus.completed) {
       _startAnimation();
     }
@@ -76,6 +77,12 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
     _morphIndex++;
     _morphRotationTarget =
         (_morphRotationTarget + _quarterRotation) % _fullRotation;
+    if (_morphs.length <= 1) {
+      _controller
+        ..duration = const Duration(milliseconds: _globalRotationDurationMs)
+        ..repeat();
+      return;
+    }
     _controller.animateWith(_morphAnimationSpec);
   }
 
@@ -83,13 +90,17 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
   void initState() {
     super.initState();
     _morphs = widget.morphs ?? Morphs.loadingMorphs;
-    _controller =
-        AnimationController(
-            vsync: this,
-            duration: const Duration(milliseconds: _morphIntervalMs),
-          )
-          ..addStatusListener(_statusListener)
-          ..animateWith(_morphAnimationSpec);
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: _morphIntervalMs),
+    )..addStatusListener(_statusListener);
+    if (_morphs.length <= 1) {
+      _controller
+        ..duration = const Duration(milliseconds: _globalRotationDurationMs)
+        ..repeat();
+    } else {
+      _controller.animateWith(_morphAnimationSpec);
+    }
   }
 
   @override
@@ -101,6 +112,9 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
   }
 
   double _calcAngle(double progress) {
+    if (_morphs.length <= 1) {
+      return progress * _fullRotation;
+    }
     final elapsedInMs =
         _morphIntervalMs * (_morphIndex - 1) +
         (_controller.lastElapsedDuration?.inMilliseconds ?? 0);
@@ -118,7 +132,7 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        final progress = _controller.value;
+        final progress = _morphs.length <= 1 ? 0.0 : _controller.value;
         return RawM3ELoadingIndicator(
           // key: widget.childKey,
           morph: _morphs[_morphIndex % _morphs.length],
