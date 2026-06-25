@@ -45,7 +45,7 @@ class M3ELoadingIndicator extends StatefulWidget {
 
 class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
     with SingleTickerProviderStateMixin {
-  static const int _morphIntervalMs = 650;
+  static const int _morphIntervalMs = 4550;
   static const double _fullRotation = 2 * math.pi;
   static const int _globalRotationDurationMs = 4666;
   static const double _quarterRotation = _fullRotation / 4;
