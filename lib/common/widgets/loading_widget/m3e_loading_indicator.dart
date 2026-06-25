@@ -32,11 +32,13 @@ class M3ELoadingIndicator extends StatefulWidget {
     this.morphs,
     this.color,
     this.size = const Size.square(40),
+    this.onMorphCompleted,
   });
   final List<Morph>? morphs;
 
   final Color? color;
   final Size size;
+  final VoidCallback? onMorphCompleted;
   // final Key? childKey;
 
   @override
@@ -69,6 +71,7 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
   void _statusListener(AnimationStatus status) {
     if (_morphs.length <= 1) return;
     if (status == AnimationStatus.completed) {
+      widget.onMorphCompleted?.call();
       _startAnimation();
     }
   }

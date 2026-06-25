@@ -29,9 +29,8 @@ class PgcController
   late final showPgcTimeline =
       !isDrama && tabType == HomeTabType.bangumi && Pref.showPgcTimeline;
 
-  /// 初始加载最短显示时间（4550ms），避免转圈一闪而过
-  final _initTime = DateTime.now();
-  late final RxBool initialLoadingMinTime = true.obs;
+  /// 初始加载至少播放 3 个形态变换，避免转圈一闪而过
+  late final RxInt initialMorphCount = 0.obs;
 
   @override
   final accountService = Get.find<AccountService>();
@@ -39,14 +38,6 @@ class PgcController
   @override
   void onInit() {
     super.onInit();
-
-    final elapsed = DateTime.now().difference(_initTime);
-    final remaining = const Duration(milliseconds: 4550) - elapsed;
-    if (remaining > Duration.zero) {
-      Future.delayed(remaining, () => initialLoadingMinTime.value = false);
-    } else {
-      initialLoadingMinTime.value = false;
-    }
 
     if (!isDrama) {
       queryData();

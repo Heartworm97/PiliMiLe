@@ -59,28 +59,38 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
     super.build(context);
     if (controller.isDrama) {
       return Obx(() {
+        final morphsDone = controller.initialMorphCount.value >= 3;
         final isInitialLoading =
-            controller.initialLoadingMinTime.value ||
+            !morphsDone ||
             (controller.dramaMovieState.value is Loading &&
                 controller.dramaTvState.value is Loading &&
                 controller.dramaAnimationState.value is Loading &&
                 controller.dramaShowState.value is Loading);
         if (isInitialLoading) {
-          return const Center(
-            child: M3ELoadingIndicator(size: Size.square(72)),
+          return Center(
+            child: M3ELoadingIndicator(
+              size: const Size.square(72),
+              onMorphCompleted: () => controller.initialMorphCount.value++,
+            ),
           );
         }
         return _buildDramaContent(context);
       });
     }
     return Obx(() {
+      final morphsDone = controller.initialMorphCount.value >= 3;
       final isInitialLoading =
-          controller.initialLoadingMinTime.value ||
+          !morphsDone ||
           (controller.followState.value is Loading &&
            controller.loadingState.value is Loading &&
            (!controller.showPgcTimeline || controller.timelineState.value is Loading));
       if (isInitialLoading) {
-        return const Center(child: M3ELoadingIndicator(size: Size.square(72)));
+        return Center(
+          child: M3ELoadingIndicator(
+            size: const Size.square(72),
+            onMorphCompleted: () => controller.initialMorphCount.value++,
+          ),
+        );
       }
       return _buildContent(context);
     });

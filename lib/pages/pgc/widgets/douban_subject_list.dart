@@ -33,25 +33,14 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
   bool _loading = false;
   final _scrollController = ScrollController();
 
-  /// 初始加载最短显示时间（4550ms），避免转圈一闪而过
-  final DateTime _initTime = DateTime.now();
-  bool _initialLoadingMinTime = true;
+  /// 初始加载至少播放 3 个形态变换，避免转圈一闪而过
+  int _morphCount = 0;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
     _loadData();
-
-    final elapsed = DateTime.now().difference(_initTime);
-    final remaining = const Duration(milliseconds: 4550) - elapsed;
-    if (remaining > Duration.zero) {
-      Future.delayed(remaining, () {
-        if (mounted) setState(() => _initialLoadingMinTime = false);
-      });
-    } else {
-      _initialLoadingMinTime = false;
-    }
   }
 
   @override
@@ -120,12 +109,18 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
       mainAxisExtent: MediaQuery.textScalerOf(context).scale(50),
     );
 
-    if (_initialLoadingMinTime || _state is Loading) {
+    if (_morphCount < 3 || _state is Loading) {
       return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(title: Text(widget.title)),
-        body: const Center(
-          child: M3ELoadingIndicator(size: Size.square(72)),
+        body: Center(
+          child: M3ELoadingIndicator(
+            size: const Size.square(72),
+            onMorphCompleted: () {
+              _morphCount++;
+              if (mounted) setState(() {});
+            },
+          ),
         ),
       );
     }
