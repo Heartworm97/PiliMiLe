@@ -118,7 +118,7 @@ class DoubanCard extends StatelessWidget {
                         ),
                       PBadge(
                         text: '★ $ratingText',
-                        type: PBadgeType.gray,
+                        type: PBadgeType.star,
                         bottom: 6,
                         left: 6,
                       ),
