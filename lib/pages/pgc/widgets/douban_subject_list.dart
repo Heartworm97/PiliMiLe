@@ -1,6 +1,6 @@
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/loading_widget/http_error.dart';
-import 'package:PiliMiLe/common/widgets/loading_widget/loading_widget.dart';
+import 'package:PiliMiLe/common/widgets/loading_widget/m3e_loading_indicator.dart';
 import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/http/loading_state.dart';
 import 'package:PiliMiLe/models_new/douban/subject.dart';
@@ -33,11 +33,25 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
   bool _loading = false;
   final _scrollController = ScrollController();
 
+  /// 初始加载最短显示时间（1300ms），避免转圈一闪而过
+  final DateTime _initTime = DateTime.now();
+  bool _initialLoadingMinTime = true;
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
     _loadData();
+
+    final elapsed = DateTime.now().difference(_initTime);
+    final remaining = const Duration(milliseconds: 1300) - elapsed;
+    if (remaining > Duration.zero) {
+      Future.delayed(remaining, () {
+        if (mounted) setState(() => _initialLoadingMinTime = false);
+      });
+    } else {
+      _initialLoadingMinTime = false;
+    }
   }
 
   @override
@@ -106,13 +120,21 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
       mainAxisExtent: MediaQuery.textScalerOf(context).scale(50),
     );
 
+    if (_initialLoadingMinTime || _state is Loading) {
+      return Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(title: Text(widget.title)),
+        body: const Center(
+          child: M3ELoadingIndicator(size: Size.square(72)),
+        ),
+      );
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(title: Text(widget.title)),
       body: switch (_state) {
-        Loading() => m3eLoading,
-        Success() when _items.isEmpty =>
-          HttpError(onReload: _loadData),
+        Success() when _items.isEmpty => HttpError(onReload: _loadData),
         Success() => CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -141,6 +163,7 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
             errMsg: errMsg,
             onReload: _loadData,
           ),
+        _ => const SizedBox.shrink(),
       },
     );
   }
