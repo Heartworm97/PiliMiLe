@@ -68,8 +68,10 @@ $diff_log"
 
             # 切除 AI 输出中 ## [ 之前的废话（如"根据分析…以下是…"）
             if [[ "$new_section" == *'## ['* ]]; then
-                new_section="${new_section#*$'\n'## [}"
-                new_section="## [${new_section}"
+                if [[ "$new_section" != '## ['* ]]; then
+                    new_section="${new_section#*$'\n'## [}"
+                    new_section="## [${new_section}"
+                fi
             fi
 
             # 校验：AI 输出为空或没有实际条目则生成待填写模板
