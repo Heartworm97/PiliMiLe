@@ -118,7 +118,7 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
         body: Center(
           child: M3ELoadingIndicator(
             morphs: _randomMorphs,
-            morphDuration: 2000,
+            size: const Size.square(72),
             onMorphCompleted: () {
               _morphCount++;
               if (mounted) setState(() {});
