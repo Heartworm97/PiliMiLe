@@ -59,7 +59,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
     super.build(context);
     if (controller.isDrama) {
       return Obx(() {
-        final morphsDone = controller.initialMorphCount.value >= 3;
+        final morphsDone = controller.initialMorphCount.value >= 7;
         final isInitialLoading =
             !morphsDone ||
             (controller.dramaMovieState.value is Loading &&

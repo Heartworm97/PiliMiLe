@@ -29,7 +29,7 @@ class PgcController
   late final showPgcTimeline =
       !isDrama && tabType == HomeTabType.bangumi && Pref.showPgcTimeline;
 
-  /// 初始加载至少播放 3 个形态变换，避免转圈一闪而过
+  /// 初始加载至少播放一整轮（7 个形态变换），避免转圈一闪而过
   late final RxInt initialMorphCount = 0.obs;
 
   @override

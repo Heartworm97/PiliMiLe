@@ -33,7 +33,7 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
   bool _loading = false;
   final _scrollController = ScrollController();
 
-  /// 初始加载至少播放 3 个形态变换，避免转圈一闪而过
+  /// 初始加载至少播放一整轮（7 个形态变换），避免转圈一闪而过
   int _morphCount = 0;
 
   @override
@@ -109,7 +109,7 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
       mainAxisExtent: MediaQuery.textScalerOf(context).scale(50),
     );
 
-    if (_morphCount < 3 || _state is Loading) {
+    if (_morphCount < 7 || _state is Loading) {
       return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(title: Text(widget.title)),
