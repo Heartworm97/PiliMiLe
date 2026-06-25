@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:material_new_shapes/material_new_shapes.dart';
 
 abstract final class Morphs {
@@ -13,6 +15,19 @@ abstract final class Morphs {
     ];
   }
 
+  static final _sourceShapes = [
+    MaterialShapes.softBurst,
+    MaterialShapes.cookie9Sided,
+    MaterialShapes.pentagon,
+    MaterialShapes.pill,
+    MaterialShapes.sunny,
+    MaterialShapes.cookie4Sided,
+    MaterialShapes.oval,
+    MaterialShapes.gem,
+    MaterialShapes.flower,
+    MaterialShapes.cookie12Sided,
+  ];
+
   static final loadingMorphs = buildMorph([
     MaterialShapes.softBurst,
     MaterialShapes.cookie9Sided,
@@ -23,19 +38,9 @@ abstract final class Morphs {
     MaterialShapes.oval,
   ]);
 
-  // static final refreshMorphs = buildMorph([
-  //   MaterialShapes.softBurst,
-  //   MaterialShapes.cookie9Sided,
-  //   MaterialShapes.gem,
-  //   MaterialShapes.flower,
-  //   MaterialShapes.sunny,
-  //   MaterialShapes.cookie4Sided,
-  //   MaterialShapes.oval,
-  //   MaterialShapes.cookie12Sided,
-  // ]);
-
-  // static final manualMorph = Morph(
-  //   MaterialShapes.circle,
-  //   MaterialShapes.softBurst,
-  // );
+  /// 每次调用返回随机打乱顺序的 morph 列表，数量固定 7 个
+  static List<Morph> randomMorphs() {
+    final shuffled = List<RoundedPolygon>.of(_sourceShapes)..shuffle(Random());
+    return buildMorph(shuffled.take(7).toList());
+  }
 }

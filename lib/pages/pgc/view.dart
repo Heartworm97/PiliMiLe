@@ -5,6 +5,7 @@ import 'package:PiliMiLe/common/widgets/button/more_btn.dart';
 import 'package:PiliMiLe/common/widgets/flutter/refresh_indicator.dart';
 import 'package:PiliMiLe/common/widgets/loading_widget/http_error.dart';
 import 'package:PiliMiLe/common/widgets/loading_widget/m3e_loading_indicator.dart';
+import 'package:PiliMiLe/common/widgets/loading_widget/morphs.dart';
 import 'package:PiliMiLe/common/widgets/scroll_physics.dart';
 import 'package:PiliMiLe/common/widgets/view_safe_area.dart';
 import 'package:PiliMiLe/http/loading_state.dart';
@@ -41,6 +42,7 @@ class PgcPage extends StatefulWidget {
 
 class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
   late final PgcController controller;
+  late final _randomMorphs = Morphs.randomMorphs();
 
   @override
   void initState() {
@@ -69,6 +71,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
         if (isInitialLoading) {
           return Center(
             child: M3ELoadingIndicator(
+              morphs: _randomMorphs,
               size: const Size.square(72),
               onMorphCompleted: () => controller.initialMorphCount.value++,
             ),
@@ -78,7 +81,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
       });
     }
     return Obx(() {
-      final morphsDone = controller.initialMorphCount.value >= 3;
+      final morphsDone = controller.initialMorphCount.value >= 7;
       final isInitialLoading =
           !morphsDone ||
           (controller.followState.value is Loading &&
@@ -87,6 +90,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
       if (isInitialLoading) {
         return Center(
           child: M3ELoadingIndicator(
+            morphs: _randomMorphs,
             size: const Size.square(72),
             onMorphCompleted: () => controller.initialMorphCount.value++,
           ),

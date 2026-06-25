@@ -1,6 +1,7 @@
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/loading_widget/http_error.dart';
 import 'package:PiliMiLe/common/widgets/loading_widget/m3e_loading_indicator.dart';
+import 'package:PiliMiLe/common/widgets/loading_widget/morphs.dart';
 import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/http/loading_state.dart';
 import 'package:PiliMiLe/models_new/douban/subject.dart';
@@ -35,6 +36,7 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
 
   /// 初始加载至少播放一整轮（7 个形态变换），避免转圈一闪而过
   int _morphCount = 0;
+  late final _randomMorphs = Morphs.randomMorphs();
 
   @override
   void initState() {
@@ -115,6 +117,7 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
         appBar: AppBar(title: Text(widget.title)),
         body: Center(
           child: M3ELoadingIndicator(
+            morphs: _randomMorphs,
             size: const Size.square(72),
             onMorphCompleted: () {
               _morphCount++;
