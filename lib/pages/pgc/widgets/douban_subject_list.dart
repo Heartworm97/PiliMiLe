@@ -33,7 +33,7 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
   bool _loading = false;
   final _scrollController = ScrollController();
 
-  /// 初始加载最短显示时间（2000ms），避免转圈一闪而过
+  /// 初始加载最短显示时间（4550ms），避免转圈一闪而过
   final DateTime _initTime = DateTime.now();
   bool _initialLoadingMinTime = true;
 
@@ -44,7 +44,7 @@ class _DoubanSubjectListPageState extends State<DoubanSubjectListPage> {
     _loadData();
 
     final elapsed = DateTime.now().difference(_initTime);
-    final remaining = const Duration(milliseconds: 2000) - elapsed;
+    final remaining = const Duration(milliseconds: 4550) - elapsed;
     if (remaining > Duration.zero) {
       Future.delayed(remaining, () {
         if (mounted) setState(() => _initialLoadingMinTime = false);

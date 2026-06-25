@@ -29,7 +29,7 @@ class PgcController
   late final showPgcTimeline =
       !isDrama && tabType == HomeTabType.bangumi && Pref.showPgcTimeline;
 
-  /// 初始加载最短显示时间（2000ms），避免转圈一闪而过
+  /// 初始加载最短显示时间（4550ms），避免转圈一闪而过
   final _initTime = DateTime.now();
   late final RxBool initialLoadingMinTime = true.obs;
 
@@ -41,7 +41,7 @@ class PgcController
     super.onInit();
 
     final elapsed = DateTime.now().difference(_initTime);
-    final remaining = const Duration(milliseconds: 2000) - elapsed;
+    final remaining = const Duration(milliseconds: 4550) - elapsed;
     if (remaining > Duration.zero) {
       Future.delayed(remaining, () => initialLoadingMinTime.value = false);
     } else {
