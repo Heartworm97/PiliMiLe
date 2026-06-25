@@ -65,7 +65,7 @@ class _FavTopicPageState extends State<FavTopicPage>
     LoadingState<List<FavTopicItem>?> loadingState,
   ) {
     return switch (loadingState) {
-      Loading() => const SliverToBoxAdapter(
+      Loading() => SliverToBoxAdapter(
         child: SizedBox(
           height: 125,
           child: m3eLoading,

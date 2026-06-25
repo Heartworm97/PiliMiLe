@@ -180,7 +180,7 @@ class _UpowerRankPageState extends State<UpowerRankPage>
   ) {
     late final width = MediaQuery.textScalerOf(context).scale(32);
     return switch (loadingState) {
-      Loading() => const SliverFillRemaining(child: m3eLoading),
+      Loading() => SliverFillRemaining(child: m3eLoading),
       Success<List<UpowerRankInfo>?>(:final response) =>
         response != null && response.isNotEmpty
             ? SliverList.builder(

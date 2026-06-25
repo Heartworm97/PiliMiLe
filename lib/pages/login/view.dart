@@ -96,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
           key: globalKey,
           child: Obx(
             () => switch (_loginPageCtr.codeInfo.value) {
-              Loading() => const SizedBox(
+              Loading() => SizedBox(
                 height: 200,
                 width: 200,
                 child: m3eLoading,

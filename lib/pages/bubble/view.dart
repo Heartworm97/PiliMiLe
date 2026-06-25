@@ -190,7 +190,7 @@ class _BubblePageState extends State<BubblePage>
   Widget _buildBody(LoadingState<List<DynList>?> loadingState) {
     switch (loadingState) {
       case Loading():
-        return const SliverFillRemaining(child: m3eLoading);
+        return SliverFillRemaining(child: m3eLoading);
       case Success(:final response):
         if (response != null && response.isNotEmpty) {
           return SliverGrid.builder(
