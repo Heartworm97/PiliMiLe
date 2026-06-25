@@ -1660,6 +1660,8 @@ class HeaderControlState extends State<HeaderControl>
             final String title;
             if (isFileSource || videoDetail.videos == 1) {
               title = videoDetail.title!;
+            } else if (!videoDetailCtr.isUgc) {
+              title = videoDetail.title!;
             } else {
               title =
                   videoDetail.pages
