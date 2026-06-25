@@ -38,9 +38,9 @@ abstract final class Morphs {
     MaterialShapes.oval,
   ]);
 
-  /// 每次调用返回随机打乱顺序的 morph 列表，数量固定 7 个
+  /// 每次调用返回随机打乱顺序的 morph 列表，数量固定 4 个
   static List<Morph> randomMorphs() {
     final shuffled = List<RoundedPolygon>.of(_sourceShapes)..shuffle(Random());
-    return buildMorph(shuffled.take(7).toList());
+    return buildMorph(shuffled.take(4).toList());
   }
 }
