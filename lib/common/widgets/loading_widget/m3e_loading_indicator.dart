@@ -30,11 +30,13 @@ class M3ELoadingIndicator extends StatefulWidget {
     super.key,
     // this.childKey,
     this.morphs,
+    this.morphDuration = 4550,
     this.color,
     this.size = const Size.square(40),
     this.onMorphCompleted,
   });
   final List<Morph>? morphs;
+  final int morphDuration;
 
   final Color? color;
   final Size size;
@@ -47,10 +49,11 @@ class M3ELoadingIndicator extends StatefulWidget {
 
 class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
     with SingleTickerProviderStateMixin {
-  static const int _morphIntervalMs = 4550;
   static const double _fullRotation = 2 * math.pi;
   static const int _globalRotationDurationMs = 4666;
   static const double _quarterRotation = _fullRotation / 4;
+
+  int get _morphIntervalMs => widget.morphDuration;
 
   late final List<Morph> _morphs;
   late final AnimationController _controller;
@@ -95,7 +98,7 @@ class _M3ELoadingIndicatorState extends State<M3ELoadingIndicator>
     _morphs = widget.morphs ?? Morphs.loadingMorphs;
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: _morphIntervalMs),
+      duration: Duration(milliseconds: _morphIntervalMs),
     )..addStatusListener(_statusListener);
     if (_morphs.length <= 1) {
       _controller
