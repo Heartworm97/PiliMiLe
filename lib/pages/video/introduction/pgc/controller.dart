@@ -474,7 +474,8 @@ class PgcIntroController extends CommonIntroController {
   void queryVideoIntro([EpisodeItem? episode]) {
     episode ??= pgcItem.episodes!.firstWhere((e) => e.cid == cid.value);
     videoDetail
-      ..value.title = episode.showTitle
+      ..value.title =
+          '${pgcItem.title} ${episode.showTitle ?? episode.title ?? ''}'
       ..refresh();
     videoPlayerServiceHandler?.onVideoDetailChange(
       episode,
