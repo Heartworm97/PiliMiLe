@@ -8,6 +8,8 @@ import 'package:PiliMiLe/models/common/badge_type.dart';
 import 'package:PiliMiLe/models/common/search/search_type.dart';
 import 'package:PiliMiLe/models_new/douban/subject.dart';
 import 'package:PiliMiLe/utils/platform_utils.dart';
+import 'package:PiliMiLe/utils/storage.dart';
+import 'package:PiliMiLe/utils/storage_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -64,6 +66,14 @@ class DoubanCard extends StatelessWidget {
       child: InkWell(
         borderRadius: Style.mdRadius,
         onTap: () {
+          if (Pref.recordSearchHistory) {
+            final historyList = List<String>.from(
+              GStorage.historyWord.get('cacheList') ?? const <String>[],
+            )
+              ..remove(item.title)
+              ..insert(0, item.title);
+            GStorage.historyWord.put('cacheList', historyList);
+          }
           Get.toNamed('/searchResult',
             parameters: {'keyword': item.title},
             arguments: {'initIndex': SearchType.drama.index});
