@@ -7,17 +7,16 @@ import 'package:PiliMiLe/models_new/fav/fav_pgc/list.dart';
 import 'package:PiliMiLe/utils/page_utils.dart';
 import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 // 视频卡片 - 垂直布局
 class PgcCardV extends StatelessWidget {
   const PgcCardV({
     super.key,
     required this.item,
-    this.onTap,
   });
 
   final FavPgcItemModel item;
-  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +30,9 @@ class PgcCardV extends StatelessWidget {
         borderRadius: Style.mdRadius,
         onLongPress: onLongPress,
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
-        onTap: onTap ?? (() => PageUtils.viewPgc(seasonId: item.seasonId)),
+        onTap: item.vodId != null
+            ? () => Get.toNamed('/doubanVideo', arguments: {'vodId': item.vodId})
+            : () => PageUtils.viewPgc(seasonId: item.seasonId),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

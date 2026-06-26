@@ -10,6 +10,7 @@ class FavPgcItemModel with MultiSelectData {
   NewEp? newEp;
   String? renewalTime;
   String? progress;
+  dynamic vodId;
 
   FavPgcItemModel({
     this.seasonId,
@@ -20,6 +21,7 @@ class FavPgcItemModel with MultiSelectData {
     this.newEp,
     this.renewalTime,
     this.progress,
+    this.vodId,
   });
 
   factory FavPgcItemModel.fromJson(

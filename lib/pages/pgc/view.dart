@@ -277,17 +277,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                               ? Style.safeSpace
                               : 0,
                         ),
-                        child: PgcCardV(
-                          item: response[index],
-                          onTap: controller.dramaRecordVodIds.isEmpty
-                              ? null
-                              : () => Get.toNamed('/doubanVideo', arguments: {
-                                    'vodId':
-                                        controller.dramaRecordVodIds[index],
-                                    'vodName': response[index].title,
-                                    'vodPic': response[index].cover,
-                                  }),
-                        ),
+                        child: PgcCardV(item: response[index]),
                       );
                     },
                   ),
