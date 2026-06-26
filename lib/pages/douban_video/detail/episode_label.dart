@@ -1,4 +1,5 @@
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
+import 'package:PiliMiLe/services/logger.dart';
 
 /// 集数显示文本：标准剧集/综艺统一显示「第X集」，电影等显示原始标题
 String episodeLabel(DoubanEpisodeModel ep) {
@@ -19,6 +20,8 @@ String episodeLabel(DoubanEpisodeModel ep) {
   if (RegExp(r'^EP\.?\s*\d+$', caseSensitive: false).hasMatch(ep.title)) {
     return '第${ep.nid}集';
   }
+  // ⬇️ 未匹配到任何已知格式，打印日志便于排查
+  logger.d('[episodeLabel] 未格式化标题: nid=${ep.nid}, title="${ep.title}"');
   // 电影等非标准剧集 → 显示原始标题（如「正片」「HD中字」）
   return ep.title;
 }
