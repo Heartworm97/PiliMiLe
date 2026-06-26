@@ -199,12 +199,16 @@ main() {
     fi
 
     echo ""
-    read -rp "新版本名 (回车使用建议 $suggested_version, 或输入 m=M/major p=patch): " new_version
+    read -rp "新版本名 (回车使用建议 $suggested_version, 或输入 m=major n=minor p=patch): " new_version
 
     # 解析快捷输入
     case "$(echo "$new_version" | tr '[:upper:]' '[:lower:]')" in
         m|major)
             suggested_version="$((major + 1)).0.0"
+            new_version="$suggested_version"
+            ;;
+        n|minor)
+            suggested_version="$major.$((minor + 1)).0"
             new_version="$suggested_version"
             ;;
         p|patch)
