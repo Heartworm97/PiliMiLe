@@ -274,13 +274,20 @@ class PgcController
       if (resp['status'] == true && resp['data'] != null) {
         final detail = resp['data'] as DoubanVodDetailModel;
 
-        // 匹配记录的线路
+        // 匹配记录的线路（优先匹配且可用，否则回退到首个可用线路）
         int sourceIndex = 0;
         if (item.badge != null) {
-          final idx = detail.sources.indexWhere(
-            (s) => s.name == item.badge,
+          final matchIdx = detail.sources.indexWhere(
+            (s) => s.name == item.badge && s.decodeStatus == '1',
           );
-          if (idx >= 0) sourceIndex = idx;
+          if (matchIdx >= 0) {
+            sourceIndex = matchIdx;
+          } else {
+            final fallback = detail.sources.indexWhere(
+              (s) => s.decodeStatus == '1',
+            );
+            if (fallback >= 0) sourceIndex = fallback;
+          }
         }
 
         // 匹配记录的集数
