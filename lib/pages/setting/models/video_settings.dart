@@ -63,10 +63,16 @@ List<SettingsModel> get videoSettings => [
     onTap: _showCDNDialog,
   ),
   NormalModel(
-    title: '追剧 CDN 设置',
+    title: '豆瓣数据 CDN',
     leading: const Icon(MdiIcons.cloudPlusOutline),
-    getSubtitle: () => '当前使用：${Pref.dramaCdnType}，用于加速豆瓣热门榜单请求',
-    onTap: _showDramaCdnDialog,
+    getSubtitle: () => '当前使用：${Pref.dramaDataCdnType}，加速豆瓣热门榜单请求',
+    onTap: _showDramaDataCdnDialog,
+  ),
+  NormalModel(
+    title: '豆瓣图片 CDN',
+    leading: const Icon(MdiIcons.cloudPlusOutline),
+    getSubtitle: () => '当前使用：${Pref.dramaImageCdnType}，加速豆瓣海报/剧照加载',
+    onTap: _showDramaImageCdnDialog,
   ),
   NormalModel(
     title: '直播 CDN 设置',
@@ -197,26 +203,49 @@ Future<void> _showCDNDialog(BuildContext context, VoidCallback setState) async {
   }
 }
 
-const _dramaCdnOptions = [
+const _dramaDataCdnOptions = [
   ('直连', '直连 m.douban.com，国内用户最佳'),
   ('cmliussss (腾讯)', '经腾讯云 CDN 代理，全国加速'),
   ('cmliussss (阿里)', '经阿里云 CDN 代理，全国加速'),
 ];
 
-Future<void> _showDramaCdnDialog(
+Future<void> _showDramaDataCdnDialog(
   BuildContext context,
   VoidCallback setState,
 ) async {
   final res = await showDialog<String>(
     context: context,
     builder: (context) => SelectDialog<String>(
-      title: '追剧 CDN 设置',
-      value: Pref.dramaCdnType,
-      values: _dramaCdnOptions.map((e) => (e.$1, e.$2)).toList(),
+      title: '豆瓣数据 CDN',
+      value: Pref.dramaDataCdnType,
+      values: _dramaDataCdnOptions.map((e) => (e.$1, e.$2)).toList(),
     ),
   );
   if (res != null) {
-    await GStorage.setting.put(SettingBoxKey.dramaCdnType, res);
+    await GStorage.setting.put(SettingBoxKey.dramaDataCdnType, res);
+    setState();
+  }
+}
+
+const _dramaImageCdnOptions = [
+  ('直连', '直连 img.doubanio.com，国内用户可用'),
+  ('cmliussss', '经社区 CDN 代理，绕过防盗链，海内外加速'),
+];
+
+Future<void> _showDramaImageCdnDialog(
+  BuildContext context,
+  VoidCallback setState,
+) async {
+  final res = await showDialog<String>(
+    context: context,
+    builder: (context) => SelectDialog<String>(
+      title: '豆瓣图片 CDN',
+      value: Pref.dramaImageCdnType,
+      values: _dramaImageCdnOptions.map((e) => (e.$1, e.$2)).toList(),
+    ),
+  );
+  if (res != null) {
+    await GStorage.setting.put(SettingBoxKey.dramaImageCdnType, res);
     setState();
   }
 }

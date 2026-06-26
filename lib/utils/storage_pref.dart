@@ -276,9 +276,13 @@ abstract final class Pref {
     return CDNService.backupUrl;
   }
 
-  /// 追剧 CDN 类型：直连 / cmliussss腾讯 / cmliussss阿里
-  static String get dramaCdnType =>
-      _setting.get(SettingBoxKey.dramaCdnType, defaultValue: '直连');
+  /// 追剧数据 CDN 类型：直连 / cmliussss (腾讯) / cmliussss (阿里)
+  static String get dramaDataCdnType =>
+      _setting.get(SettingBoxKey.dramaDataCdnType, defaultValue: '直连');
+
+  /// 追剧图片 CDN 类型：直连 / cmliussss
+  static String get dramaImageCdnType =>
+      _setting.get(SettingBoxKey.dramaImageCdnType, defaultValue: 'cmliussss');
 
   static String get banWordForRecommend =>
       _setting.get(SettingBoxKey.banWordForRecommend, defaultValue: '');
