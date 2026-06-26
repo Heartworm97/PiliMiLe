@@ -189,6 +189,8 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text.rich(
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             TextSpan(
                               children: [
                                 if (isSelected)
@@ -457,6 +459,8 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
                     child: Center(
                       child: Text(
                         _episodeLabel(ep),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: isCurrent ? FontWeight.bold : null,
