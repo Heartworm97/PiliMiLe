@@ -177,6 +177,10 @@ class PgcController
   late final Rx<LoadingState<List<FavPgcItemModel>>> dramaRecordState =
       LoadingState<List<FavPgcItemModel>>.loading().obs;
 
+  /// 与 [dramaRecordState] 中列表下标对齐的 vodId 列表，
+  /// 用于卡片点击跳转豆瓣追剧详情页
+  final List<String> dramaRecordVodIds = [];
+
   // 追剧 - 豆瓣 4 个板块
   final dramaMovieState =
       Rx<LoadingState<List<DoubanSubject>>>(LoadingState.loading());
@@ -245,9 +249,14 @@ class PgcController
     List<FavPgcItemModel> list;
     if (box.isEmpty) {
       list = _dramaRecordEmptyHint;
+      dramaRecordVodIds.clear();
     } else {
       final records = box.values.toList()
         ..sort((a, b) => (b['playedAt'] as int).compareTo(a['playedAt'] as int));
+      // 同步维护 vodId 列表，供卡片点击跳转使用
+      dramaRecordVodIds
+        ..clear()
+        ..addAll(records.map((r) => r['vodId'].toString()));
       list = records.map<FavPgcItemModel>((r) {
         return FavPgcItemModel(
           seasonId: 0,
