@@ -1,6 +1,7 @@
 import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/models/common/home_tab_type.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
+import 'package:PiliMiLe/pages/douban_video/detail/episode_label.dart';
 import 'package:PiliMiLe/pages/pgc/controller.dart';
 import 'package:PiliMiLe/plugin/pl_player/controller.dart';
 import 'package:PiliMiLe/plugin/pl_player/models/data_source.dart';
@@ -172,8 +173,9 @@ class DoubanVideoDetailController extends GetxController {
     final badge = selectedSource?.name ?? '追剧中';
     // 判断是否完结
     final isFinish = RegExp(r'完结|全\d+集').hasMatch(remarks) ? 1 : 0;
-    // 当前剧集标题
-    final epTitle = selectedEpisode?.title;
+    // 当前剧集标题（格式化后）
+    final ep = selectedEpisode;
+    final epTitle = ep != null ? episodeLabel(ep) : null;
 
     final record = <String, dynamic>{
       'vodId': vodId.toString(),

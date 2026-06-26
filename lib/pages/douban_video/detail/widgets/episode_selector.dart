@@ -2,26 +2,9 @@ import 'package:PiliMiLe/common/assets.dart';
 import 'package:PiliMiLe/common/style.dart';
 import 'package:PiliMiLe/common/widgets/button/icon_button.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
+import 'package:PiliMiLe/pages/douban_video/detail/episode_label.dart';
 import 'package:PiliMiLe/utils/extension/num_ext.dart';
 import 'package:flutter/material.dart';
-
-/// 集数显示文本：标准剧集/综艺统一显示「第X集」，电影等显示原始标题
-String _episodeLabel(DoubanEpisodeModel ep) {
-  // 标准剧集格式「第X集」→ 使用 nid 统一显示
-  if (RegExp(r'^第\d+集$').hasMatch(ep.title)) {
-    return '第${ep.nid}集';
-  }
-  // 综艺格式「第X期」（含「第X期上/下」等后缀）→ 使用 nid 统一显示
-  if (RegExp(r'^第\d+期').hasMatch(ep.title)) {
-    return '第${ep.nid}集';
-  }
-  // 纯数字标题（如 "1", "01", "001"）→ 视为标准剧集
-  if (RegExp(r'^\d+$').hasMatch(ep.title)) {
-    return '第${ep.nid}集';
-  }
-  // 电影等非标准剧集 → 显示原始标题（如「正片」「HD中字」）
-  return ep.title;
-}
 
 class EpisodeSelector extends StatefulWidget {
   const EpisodeSelector({
@@ -123,7 +106,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                   ),
                   Expanded(
                     child: Text(
-                      '正在播放：${_episodeLabel(widget.episodes[widget.selectedIndex])}',
+                      '正在播放：${episodeLabel(widget.episodes[widget.selectedIndex])}',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12,
@@ -213,7 +196,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                                     ),
                                   ),
                                 TextSpan(
-                                  text: _episodeLabel(ep),
+                                  text: episodeLabel(ep),
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: isSelected
@@ -462,7 +445,7 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
                     ),
                     child: Center(
                       child: Text(
-                        _episodeLabel(ep),
+                        episodeLabel(ep),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
