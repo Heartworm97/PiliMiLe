@@ -7,9 +7,15 @@ import 'package:flutter/material.dart';
 
 /// 集数显示文本：电影等非标准剧集显示原始标题，标准剧集显示「第X集」
 String _episodeLabel(DoubanEpisodeModel ep) {
+  // 标准剧集格式「第X集」→ 使用 nid 统一显示
   if (RegExp(r'^第\d+集$').hasMatch(ep.title)) {
     return '第${ep.nid}集';
   }
+  // 纯数字标题（如 "1", "01", "001"）→ 视为标准剧集
+  if (RegExp(r'^\d+$').hasMatch(ep.title)) {
+    return '第${ep.nid}集';
+  }
+  // 电影等非标准剧集 → 显示原始标题（如「正片」「HD中字」）
   return ep.title;
 }
 
