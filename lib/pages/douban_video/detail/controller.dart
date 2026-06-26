@@ -142,8 +142,8 @@ class DoubanVideoDetailController extends GetxController {
     if (d == null) return;
 
     final remarks = d.vodRemarks;
-    // 统一处理空值 / "未知"
-    final badge = remarks.isNotEmpty && remarks != '未知' ? remarks : '追剧中';
+    // 显示当前线路名称
+    final badge = selectedSource?.name ?? '追剧中';
     // 判断是否完结
     final isFinish = RegExp(r'完结|全\d+集').hasMatch(remarks) ? 1 : 0;
     // 当前剧集标题
