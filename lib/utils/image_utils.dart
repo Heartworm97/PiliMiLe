@@ -229,6 +229,14 @@ abstract final class ImageUtils {
     r'(@(\d+[a-z]_?)*)(\..*)?$',
     caseSensitive: false,
   );
+
+  /// 匹配 B站图片 CDN 域名（hdslb.com / bilibili.com），
+  /// 避免对豆瓣等第三方图片 URL 追加 B站专有的 @ 后缀。
+  static final _bilibiliCdnRegex = RegExp(
+    r'https?://[^/]*\.(hdslb|bilibili)\.com/',
+    caseSensitive: false,
+  );
+
   static String thumbnailUrl(String? src, [int maxQuality = 1]) {
     if (src != null && maxQuality != 100) {
       maxQuality = math.max(maxQuality, GlobalData().imgQuality);
@@ -244,7 +252,7 @@ abstract final class ImageUtils {
           return str;
         },
       );
-      if (!hasMatch) {
+      if (!hasMatch && _bilibiliCdnRegex.hasMatch(src)) {
         src += '@${maxQuality}q.webp';
       }
     }
