@@ -5,12 +5,12 @@ import 'package:PiliMiLe/http/pgc.dart';
 import 'package:PiliMiLe/models/common/home_tab_type.dart';
 import 'package:PiliMiLe/models_new/douban/subject.dart';
 import 'package:PiliMiLe/models_new/fav/fav_pgc/list.dart';
-import 'package:PiliMiLe/models_new/fav/fav_pgc/new_ep.dart';
 import 'package:PiliMiLe/models_new/pgc/pgc_index_result/list.dart';
 import 'package:PiliMiLe/models_new/pgc/pgc_timeline/result.dart';
 import 'package:PiliMiLe/pages/common/common_list_controller.dart';
 import 'package:PiliMiLe/services/account_service.dart';
 import 'package:PiliMiLe/utils/extension/scroll_controller_ext.dart';
+import 'package:PiliMiLe/utils/storage.dart';
 import 'package:PiliMiLe/utils/storage_pref.dart';
 import 'package:flutter/widgets.dart' show ScrollController;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -49,6 +49,7 @@ class PgcController
     } else {
       loadingState.value = const Success(null);
       followState.value = const Success(null);
+      _loadDramaRecords();
       queryDramaSections();
     }
   }
@@ -56,6 +57,7 @@ class PgcController
   @override
   Future<void> onRefresh() {
     if (isDrama) {
+      _loadDramaRecords();
       return queryDramaSections();
     }
     if (accountService.isLogin.value) {
@@ -172,8 +174,7 @@ class PgcController
   }
 
   // 追剧 - 追剧记录
-  late final dramaRecordState =
-      Rx<LoadingState<List<FavPgcItemModel>>>(Success(_dramaRecordMockData));
+  late final Rx<LoadingState<List<FavPgcItemModel>>> dramaRecordState;
 
   // 追剧 - 豆瓣 4 个板块
   final dramaMovieState =
@@ -236,30 +237,38 @@ class PgcController
       return const Error('连接错误，请检查网络重试');
     }
   }
-}
 
-/// 追剧记录板块 mock 数据，后续接入真实数据源后替换
-final List<FavPgcItemModel> _dramaRecordMockData = [
-  FavPgcItemModel(
-    seasonId: 0,
-    title: '追剧记录功能开发中',
-    cover: '',
-    badge: '即将上线',
-    progress: '敬请期待',
-  ),
-  FavPgcItemModel(
-    seasonId: 0,
-    title: '这里将展示你的追剧进度',
-    cover: '',
-    badge: '追剧中',
-    progress: '第1话',
-  ),
-  FavPgcItemModel(
-    seasonId: 0,
-    title: '更多精彩内容即将到来',
-    cover: '',
-    badge: '预约',
-    isFinish: 1,
-    newEp: NewEp(indexShow: '即将开播'),
-  ),
-];
+  /// 从本地 Box 加载追剧记录
+  void _loadDramaRecords() {
+    final box = GStorage.dramaRecord;
+    List<FavPgcItemModel> list;
+    if (box.isEmpty) {
+      list = _dramaRecordEmptyHint;
+    } else {
+      final records = box.values.toList()
+        ..sort((a, b) => (b['playedAt'] as int).compareTo(a['playedAt'] as int));
+      list = records.map<FavPgcItemModel>((r) {
+        return FavPgcItemModel(
+          seasonId: 0,
+          title: r['title'] as String?,
+          cover: r['cover'] as String?,
+          badge: r['badge'] as String?,
+          progress: r['progress'] as String?,
+          isFinish: r['isFinish'] as int?,
+        );
+      }).toList();
+    }
+    dramaRecordState.value = Success(list);
+  }
+
+  /// 追剧记录空状态占位
+  static final List<FavPgcItemModel> _dramaRecordEmptyHint = [
+    FavPgcItemModel(
+      seasonId: 0,
+      title: '暂无追剧记录',
+      cover: '',
+      badge: '提示',
+      progress: '播放追剧后将自动记录',
+    ),
+  ];
+}

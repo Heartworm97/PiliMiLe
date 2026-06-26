@@ -2,6 +2,7 @@ import 'package:PiliMiLe/http/douban.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/plugin/pl_player/controller.dart';
 import 'package:PiliMiLe/plugin/pl_player/models/data_source.dart';
+import 'package:PiliMiLe/utils/storage.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:get/get.dart';
@@ -132,6 +133,33 @@ class DoubanVideoDetailController extends GetxController {
     playerReady.value = true;
     // 显式调用 play 确保不须二次点击
     await plPlayerController.play();
+    _saveDramaRecord();
+  }
+
+  /// 视频开始播放后写入追剧记录
+  void _saveDramaRecord() {
+    final d = detail.value;
+    if (d == null) return;
+
+    final remarks = d.vodRemarks;
+    // 统一处理空值 / "未知"
+    final badge = remarks.isNotEmpty && remarks != '未知' ? remarks : '追剧中';
+    // 判断是否完结
+    final isFinish = RegExp(r'完结|全\d+集').hasMatch(remarks) ? 1 : 0;
+    // 当前剧集标题
+    final epTitle = selectedEpisode?.title;
+
+    final record = <String, dynamic>{
+      'vodId': vodId.toString(),
+      'title': vodName.value,
+      'cover': vodPic.value,
+      'badge': badge,
+      'progress': epTitle,
+      'isFinish': isFinish,
+      'playedAt': DateTime.now().millisecondsSinceEpoch,
+    };
+
+    GStorage.dramaRecord.put(vodId.toString(), record);
   }
 
   void onSelectSource(int index) {
