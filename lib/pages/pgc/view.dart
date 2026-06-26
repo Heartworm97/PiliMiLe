@@ -309,7 +309,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                     },
                   ),
                 _ => const Center(
-                  child: Text('还没有追剧历史'),
+                  child: Text('还没有追剧记录'),
                 ),
               };
             }),
