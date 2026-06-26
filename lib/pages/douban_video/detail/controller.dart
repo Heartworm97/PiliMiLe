@@ -59,6 +59,8 @@ class DoubanVideoDetailController extends GetxController {
       if (args?['preloadedM3u8'] case final String url) {
         m3u8Url.value = url;
       }
+    } else {
+      _fetchDetail();
     }
   }
 
@@ -66,6 +68,28 @@ class DoubanVideoDetailController extends GetxController {
   void onClose() {
     plPlayerController.dispose();
     super.onClose();
+  }
+
+  /// 请求上游 API 获取影片详情（无预加载数据时使用）
+  Future<void> _fetchDetail() async {
+    isLoading.value = true;
+    errorMsg.value = null;
+    try {
+      final resp = await DoubanHttp.getVodDetail(vodId);
+      if (resp['status'] == true && resp['data'] != null) {
+        final d = resp['data'] as DoubanVodDetailModel;
+        detail.value = d;
+        vodName.value = d.vodName;
+        vodPic.value = d.vodPic;
+      } else {
+        errorMsg.value = resp['msg'] ?? '获取详情失败';
+      }
+    } catch (e) {
+      debugPrint('[追剧详情] 请求详情异常: $e');
+      errorMsg.value = '网络错误: $e';
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   /// 手动播放
