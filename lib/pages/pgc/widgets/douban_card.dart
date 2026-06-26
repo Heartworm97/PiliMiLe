@@ -21,9 +21,10 @@ class DoubanCard extends StatelessWidget {
 
   final DoubanSubject item;
 
-  /// 将豆瓣图片 URL 替换为社区 CDN 代理
+  /// 若启用图片 CDN 则替换为社区代理域名，否则保持原地址
   static String proxyImg(String url) {
     if (url.isEmpty) return url;
+    if (Pref.dramaImageCdnType != 'cmliussss') return url;
     final uri = Uri.tryParse(url);
     if (uri == null) return url;
     final pathSegments = uri.pathSegments;

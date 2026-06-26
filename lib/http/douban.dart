@@ -4,6 +4,7 @@ import 'package:PiliMiLe/models/search/result.dart';
 import 'package:PiliMiLe/services/logger.dart';
 import 'package:PiliMiLe/services/upstream_decoder.dart';
 import 'package:PiliMiLe/utils/storage.dart';
+import 'package:PiliMiLe/utils/storage_pref.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:hive_ce/hive.dart';
@@ -22,6 +23,43 @@ class DoubanHttp {
         'referer': 'https://movie.douban.com/',
         'user-agent': BrowserUa.mob,
         'accept': 'application/json, text/plain, */*',
+      },
+    ));
+
+    // 豆瓣数据 CDN 代理拦截器
+    d.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) {
+        final cdnType = Pref.dramaDataCdnType;
+        if (cdnType == '直连') {
+          return handler.next(options);
+        }
+
+        // 构建原始豆瓣 URL（供 Cors 代理使用）
+        final originalUri = Uri.https(
+          'm.douban.com',
+          options.path,
+          options.queryParameters.isNotEmpty ? Map.fromEntries(
+            options.queryParameters.entries.map(
+              (e) => MapEntry(e.key, e.value.toString()),
+            ),
+          ) : null,
+        );
+
+        switch (cdnType) {
+          case 'Cors Proxy By Zwei':
+            // CORS 代理：完整 URL 作为路径
+            options.baseUrl = '';
+            options.path = 'https://ciao-cors.is-an.org/${originalUri.toString()}';
+            options.queryParameters.clear();
+          case 'cmliussss (腾讯云)':
+            options.baseUrl = 'https://m.douban.cmliussss.net';
+          case 'cmliussss (阿里云)':
+            options.baseUrl = 'https://m.douban.cmliussss.com';
+          case 'cmliussss (统一域名)':
+            options.baseUrl = 'https://img.doubanio.cmliussss.net';
+        }
+
+        handler.next(options);
       },
     ));
 
@@ -256,7 +294,8 @@ class DoubanHttp {
 
   // ============ 图片URL清洗 ============
 
-  /// 上游返回的海报地址可能是代理 URL，提取真实豆瓣地址并替换为社区CDN
+  /// 上游返回的海报地址可能是代理 URL，提取真实豆瓣地址；
+  /// 若启用图片 CDN 则替换为社区代理域名。
   static String cleanVodPic(String rawUrl) {
     if (rawUrl.isEmpty) return rawUrl;
 
@@ -269,6 +308,11 @@ class DoubanHttp {
       if (innerUrl != null && innerUrl.isNotEmpty) {
         url = innerUrl;
       }
+    }
+
+    // 仅当启用图片CDN时才替换域名
+    if (Pref.dramaImageCdnType != 'cmliussss') {
+      return url;
     }
 
     // 将豆瓣图片CDN替换为社区CDN代理
