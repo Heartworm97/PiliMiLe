@@ -280,13 +280,9 @@ abstract final class Pref {
   static String get dramaDataCdnType =>
       _setting.get(SettingBoxKey.dramaDataCdnType, defaultValue: '直连');
 
-  /// 追剧图片 CDN 类型：直连 / img3 官方CDN / cmliussss (腾讯云) / cmliussss (阿里云) / 自定义
+  /// 追剧图片 CDN 类型：直连 / cmliussss (腾讯云) / cmliussss (阿里云)
   static String get dramaImageCdnType =>
       _setting.get(SettingBoxKey.dramaImageCdnType, defaultValue: '直连');
-
-  /// 追剧图片自定义代理域名（仅 dramaImageCdnType == '自定义' 时生效）
-  static String get dramaImageCdnCustomUrl =>
-      _setting.get(SettingBoxKey.dramaImageCdnCustomUrl, defaultValue: '');
 
   static String get banWordForRecommend =>
       _setting.get(SettingBoxKey.banWordForRecommend, defaultValue: '');

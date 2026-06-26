@@ -207,17 +207,15 @@ const _dramaDataCdnOptions = [
 
 const _dramaImageCdnOptions = [
   ('直连', '直连 img.doubanio.com，国内用户可用'),
-  ('img3 官方CDN', '豆瓣官方阿里云 CDN，国内加速'),
   ('cmliussss (腾讯云)', '经腾讯云 CDN 代理，绕过防盗链'),
   ('cmliussss (阿里云)', '经阿里云 CDN 代理，绕过防盗链'),
-  ('自定义', '自行填写图片代理域名'),
 ];
 
 Future<void> _showDramaCdnDialog(
   BuildContext context,
   VoidCallback setState,
 ) async {
-  final res = await showDialog<({String dataType, String imageType, String imageCustomUrl})>(
+  final res = await showDialog<({String dataType, String imageType})>(
     context: context,
     builder: (context) => const _DramaCdnDialog(),
   );
@@ -225,7 +223,6 @@ Future<void> _showDramaCdnDialog(
     await Future.wait([
       GStorage.setting.put(SettingBoxKey.dramaDataCdnType, res.dataType),
       GStorage.setting.put(SettingBoxKey.dramaImageCdnType, res.imageType),
-      GStorage.setting.put(SettingBoxKey.dramaImageCdnCustomUrl, res.imageCustomUrl),
     ]);
     setState();
   }
@@ -241,16 +238,6 @@ class _DramaCdnDialog extends StatefulWidget {
 class _DramaCdnDialogState extends State<_DramaCdnDialog> {
   late String _dataType = Pref.dramaDataCdnType;
   late String _imageType = Pref.dramaImageCdnType;
-  late String _imageCustomUrl = Pref.dramaImageCdnCustomUrl;
-
-  late final _imageCustomCtrl =
-      TextEditingController(text: _imageCustomUrl);
-
-  @override
-  void dispose() {
-    _imageCustomCtrl.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -303,19 +290,6 @@ class _DramaCdnDialogState extends State<_DramaCdnDialog> {
                     .toList(),
               ),
             ),
-            if (_imageType == '自定义') ...[
-              const SizedBox(height: 8),
-              TextField(
-                controller: _imageCustomCtrl,
-                decoration: const InputDecoration(
-                  labelText: '图片代理域名',
-                  hintText: 'img.doubanio.cmliussss.net',
-                  border: OutlineInputBorder(),
-                  isDense: true,
-                ),
-                onChanged: (v) => _imageCustomUrl = v,
-              ),
-            ],
           ],
         ),
       ),
@@ -330,7 +304,6 @@ class _DramaCdnDialogState extends State<_DramaCdnDialog> {
             (
               dataType: _dataType,
               imageType: _imageType,
-              imageCustomUrl: _imageCustomCtrl.text.trim(),
             ),
           ),
           child: const Text('确定'),

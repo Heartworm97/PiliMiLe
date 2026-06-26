@@ -35,10 +35,8 @@ class DoubanCard extends StatelessWidget {
     final filename = pathSegments.last;
 
     final proxyHost = switch (imgType) {
-      'img3 官方CDN' => 'img3.doubanio.com',
       'cmliussss (腾讯云)' => 'img.doubanio.cmliussss.net',
       'cmliussss (阿里云)' => 'img.doubanio.cmliussss.com',
-      '自定义' => Pref.dramaImageCdnCustomUrl,
       _ => null,
     };
     if (proxyHost != null && proxyHost.isNotEmpty) {
