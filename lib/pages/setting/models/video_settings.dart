@@ -63,6 +63,12 @@ List<SettingsModel> get videoSettings => [
     onTap: _showCDNDialog,
   ),
   NormalModel(
+    title: '追剧 CDN 设置',
+    leading: const Icon(MdiIcons.cloudPlusOutline),
+    getSubtitle: () => '当前使用：${Pref.dramaCdnType}，用于加速豆瓣热门榜单请求',
+    onTap: _showDramaCdnDialog,
+  ),
+  NormalModel(
     title: '直播 CDN 设置',
     leading: const Icon(MdiIcons.cloudPlusOutline),
     getSubtitle: () => '当前使用：${Pref.liveCdnUrl ?? "默认"}',
@@ -187,6 +193,30 @@ Future<void> _showCDNDialog(BuildContext context, VoidCallback setState) async {
   if (res != null) {
     VideoUtils.cdnService = res;
     await GStorage.setting.put(SettingBoxKey.CDNService, res.name);
+    setState();
+  }
+}
+
+const _dramaCdnOptions = [
+  ('直连', '直连 m.douban.com，国内用户最佳'),
+  ('cmliussss (腾讯)', '经腾讯云 CDN 代理，全国加速'),
+  ('cmliussss (阿里)', '经阿里云 CDN 代理，全国加速'),
+];
+
+Future<void> _showDramaCdnDialog(
+  BuildContext context,
+  VoidCallback setState,
+) async {
+  final res = await showDialog<String>(
+    context: context,
+    builder: (context) => SelectDialog<String>(
+      title: '追剧 CDN 设置',
+      value: Pref.dramaCdnType,
+      values: _dramaCdnOptions.map((e) => (e.$1, e.$2)).toList(),
+    ),
+  );
+  if (res != null) {
+    await GStorage.setting.put(SettingBoxKey.dramaCdnType, res);
     setState();
   }
 }
