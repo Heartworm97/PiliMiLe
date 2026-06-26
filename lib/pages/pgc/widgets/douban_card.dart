@@ -21,16 +21,31 @@ class DoubanCard extends StatelessWidget {
 
   final DoubanSubject item;
 
-  /// 若启用图片 CDN 则替换为社区代理域名，否则保持原地址
+  /// 根据图片 CDN 设置替换域名，否则保持原地址
   static String proxyImg(String url) {
     if (url.isEmpty) return url;
-    if (Pref.dramaImageCdnType != 'cmliussss') return url;
+
+    final imgType = Pref.dramaImageCdnType;
+    if (imgType == '直连') return url;
+
     final uri = Uri.tryParse(url);
     if (uri == null) return url;
     final pathSegments = uri.pathSegments;
     if (pathSegments.length < 2) return url;
     final filename = pathSegments.last;
-    return 'https://img.doubanio.cmliussss.net/view/photo/m_ratio_poster/public/$filename';
+
+    final proxyHost = switch (imgType) {
+      'img3 官方CDN' => 'img3.doubanio.com',
+      'cmliussss (腾讯云)' => 'img.doubanio.cmliussss.net',
+      'cmliussss (阿里云)' => 'img.doubanio.cmliussss.com',
+      '自定义' => Pref.dramaImageCdnCustomUrl,
+      _ => null,
+    };
+    if (proxyHost != null && proxyHost.isNotEmpty) {
+      return 'https://$proxyHost/view/photo/m_ratio_poster/public/$filename';
+    }
+
+    return url;
   }
 
   /// 基于 ID 确定性模拟评分，Box-Muller 正态分布（中心 7.5，σ=0.8，范围 5.5~9.5）

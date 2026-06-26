@@ -204,18 +204,23 @@ const _dramaDataCdnOptions = [
   ('cmliussss (腾讯云)', '经腾讯云 CDN 代理，全国加速'),
   ('cmliussss (阿里云)', '经阿里云 CDN 代理，全国加速'),
   ('cmliussss (统一域名)', '经统一 CDN 代理，数据走 img 域名'),
+  ('CORS Anywhere', 'CORS 代理，通用跨域方案'),
+  ('自定义', '自行填写代理 URL 前缀'),
 ];
 
 const _dramaImageCdnOptions = [
   ('直连', '直连 img.doubanio.com，国内用户可用'),
-  ('cmliussss', '经社区 CDN 代理，绕过防盗链，海内外加速'),
+  ('img3 官方CDN', '豆瓣官方阿里云 CDN，国内加速'),
+  ('cmliussss (腾讯云)', '经腾讯云 CDN 代理，绕过防盗链'),
+  ('cmliussss (阿里云)', '经阿里云 CDN 代理，绕过防盗链'),
+  ('自定义', '自行填写图片代理域名'),
 ];
 
 Future<void> _showDramaCdnDialog(
   BuildContext context,
   VoidCallback setState,
 ) async {
-  final res = await showDialog<({String dataType, String imageType})>(
+  final res = await showDialog<({String dataType, String imageType, String dataCustomUrl, String imageCustomUrl})>(
     context: context,
     builder: (context) => const _DramaCdnDialog(),
   );
@@ -223,6 +228,8 @@ Future<void> _showDramaCdnDialog(
     await Future.wait([
       GStorage.setting.put(SettingBoxKey.dramaDataCdnType, res.dataType),
       GStorage.setting.put(SettingBoxKey.dramaImageCdnType, res.imageType),
+      GStorage.setting.put(SettingBoxKey.dramaDataCdnCustomUrl, res.dataCustomUrl),
+      GStorage.setting.put(SettingBoxKey.dramaImageCdnCustomUrl, res.imageCustomUrl),
     ]);
     setState();
   }
@@ -238,6 +245,20 @@ class _DramaCdnDialog extends StatefulWidget {
 class _DramaCdnDialogState extends State<_DramaCdnDialog> {
   late String _dataType = Pref.dramaDataCdnType;
   late String _imageType = Pref.dramaImageCdnType;
+  late String _dataCustomUrl = Pref.dramaDataCdnCustomUrl;
+  late String _imageCustomUrl = Pref.dramaImageCdnCustomUrl;
+
+  late final _dataCustomCtrl =
+      TextEditingController(text: _dataCustomUrl);
+  late final _imageCustomCtrl =
+      TextEditingController(text: _imageCustomUrl);
+
+  @override
+  void dispose() {
+    _dataCustomCtrl.dispose();
+    _imageCustomCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -270,6 +291,19 @@ class _DramaCdnDialogState extends State<_DramaCdnDialog> {
                     .toList(),
               ),
             ),
+            if (_dataType == '自定义') ...[
+              const SizedBox(height: 8),
+              TextField(
+                controller: _dataCustomCtrl,
+                decoration: const InputDecoration(
+                  labelText: '数据代理 URL 前缀',
+                  hintText: 'https://your-proxy.com/',
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+                onChanged: (v) => _dataCustomUrl = v,
+              ),
+            ],
             const Divider(),
             Text('图片代理', style: titleSmall),
             const SizedBox(height: 4),
@@ -290,6 +324,19 @@ class _DramaCdnDialogState extends State<_DramaCdnDialog> {
                     .toList(),
               ),
             ),
+            if (_imageType == '自定义') ...[
+              const SizedBox(height: 8),
+              TextField(
+                controller: _imageCustomCtrl,
+                decoration: const InputDecoration(
+                  labelText: '图片代理域名',
+                  hintText: 'img.doubanio.cmliussss.net',
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+                onChanged: (v) => _imageCustomUrl = v,
+              ),
+            ],
           ],
         ),
       ),
@@ -301,7 +348,12 @@ class _DramaCdnDialogState extends State<_DramaCdnDialog> {
         TextButton(
           onPressed: () => Navigator.pop(
             context,
-            (dataType: _dataType, imageType: _imageType),
+            (
+              dataType: _dataType,
+              imageType: _imageType,
+              dataCustomUrl: _dataCustomCtrl.text.trim(),
+              imageCustomUrl: _imageCustomCtrl.text.trim(),
+            ),
           ),
           child: const Text('确定'),
         ),

@@ -34,7 +34,7 @@ class DoubanHttp {
           return handler.next(options);
         }
 
-        // 构建原始豆瓣 URL（供 Cors 代理使用）
+        // 构建原始豆瓣 URL（供 CORS 代理使用）
         final originalUri = Uri.https(
           'm.douban.com',
           options.path,
@@ -57,6 +57,18 @@ class DoubanHttp {
             options.baseUrl = 'https://m.douban.cmliussss.com';
           case 'cmliussss (统一域名)':
             options.baseUrl = 'https://img.doubanio.cmliussss.net';
+          case 'CORS Anywhere':
+            // CORS 代理：完整 URL 作为路径
+            options.baseUrl = '';
+            options.path = 'https://cors-anywhere.com/${originalUri.toString()}';
+            options.queryParameters.clear();
+          case '自定义':
+            final customUrl = Pref.dramaDataCdnCustomUrl;
+            if (customUrl.isNotEmpty) {
+              options.baseUrl = '';
+              options.path = '$customUrl${originalUri.toString()}';
+              options.queryParameters.clear();
+            }
         }
 
         handler.next(options);
@@ -310,18 +322,27 @@ class DoubanHttp {
       }
     }
 
-    // 仅当启用图片CDN时才替换域名
-    if (Pref.dramaImageCdnType != 'cmliussss') {
+    // 根据图片 CDN 设置替换域名
+    final imgType = Pref.dramaImageCdnType;
+    if (imgType == '直连') {
       return url;
     }
 
-    // 将豆瓣图片CDN替换为社区CDN代理
     final doubanUri = Uri.tryParse(url);
     if (doubanUri != null && doubanUri.host.contains('doubanio.com')) {
       final pathSegments = doubanUri.pathSegments;
       if (pathSegments.length >= 2) {
         final filename = pathSegments.last;
-        return 'https://img.doubanio.cmliussss.net/view/photo/m_ratio_poster/public/$filename';
+        final proxyHost = switch (imgType) {
+          'img3 官方CDN' => 'img3.doubanio.com',
+          'cmliussss (腾讯云)' => 'img.doubanio.cmliussss.net',
+          'cmliussss (阿里云)' => 'img.doubanio.cmliussss.com',
+          '自定义' => Pref.dramaImageCdnCustomUrl,
+          _ => null,
+        };
+        if (proxyHost != null && proxyHost.isNotEmpty) {
+          return 'https://$proxyHost/view/photo/m_ratio_poster/public/$filename';
+        }
       }
     }
 
