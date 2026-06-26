@@ -237,10 +237,17 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
             padding: const EdgeInsets.only(left: 16),
             child: Row(
               children: [
-                Text(
-                  '追剧记录',
-                  style: theme.textTheme.titleMedium,
-                ),
+                Obx(() {
+                  final count = switch (controller.dramaRecordState.value) {
+                    Success(:final response) =>
+                      response.where((e) => e.vodId != null).length,
+                    _ => 0,
+                  };
+                  return Text(
+                    '追剧记录 $count',
+                    style: theme.textTheme.titleMedium,
+                  );
+                }),
                 const Spacer(),
                 IconButton(
                   tooltip: '刷新',
