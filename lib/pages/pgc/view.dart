@@ -277,7 +277,10 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                               ? Style.safeSpace
                               : 0,
                         ),
-                        child: PgcCardV(item: response[index]),
+                        child: PgcCardV(
+                          item: response[index],
+                          onTap: () => controller.onDramaCardTap(response[index]),
+                        ),
                       );
                     },
                   ),

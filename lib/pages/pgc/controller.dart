@@ -263,6 +263,29 @@ class PgcController
     dramaRecordState.value = Success(list);
   }
 
+  /// 点击追剧记录卡片：先请求详情再跳转
+  Future<void> onDramaCardTap(FavPgcItemModel item) async {
+    if (item.vodId == null) return;
+    SmartDialog.showLoading(msg: '资源加载中...');
+    try {
+      final resp = await DoubanHttp.getVodDetail(item.vodId);
+      SmartDialog.dismiss();
+      if (resp['status'] == true && resp['data'] != null) {
+        Get.toNamed('/doubanVideo', arguments: {
+          'vodId': item.vodId,
+          'preloadedDetail': resp['data'],
+          'vodName': item.title,
+          'vodPic': item.cover,
+        });
+      } else {
+        SmartDialog.showToast(resp['msg'] ?? '获取详情失败');
+      }
+    } catch (e) {
+      SmartDialog.dismiss();
+      SmartDialog.showToast('网络错误，请稍后重试');
+    }
+  }
+
   /// 追剧记录空状态占位
   static final List<FavPgcItemModel> _dramaRecordEmptyHint = [
     FavPgcItemModel(

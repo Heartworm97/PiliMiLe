@@ -14,9 +14,11 @@ class PgcCardV extends StatelessWidget {
   const PgcCardV({
     super.key,
     required this.item,
+    this.onTap,
   });
 
   final FavPgcItemModel item;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +32,10 @@ class PgcCardV extends StatelessWidget {
         borderRadius: Style.mdRadius,
         onLongPress: onLongPress,
         onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
-        onTap: item.vodId != null
-            ? () => Get.toNamed('/doubanVideo', arguments: {'vodId': item.vodId})
-            : () => PageUtils.viewPgc(seasonId: item.seasonId),
+        onTap: onTap ??
+            (item.vodId != null
+                ? () => Get.toNamed('/doubanVideo', arguments: {'vodId': item.vodId})
+                : () => PageUtils.viewPgc(seasonId: item.seasonId)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
