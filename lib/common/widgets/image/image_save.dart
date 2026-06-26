@@ -13,6 +13,7 @@ void imageSaveDialog({
   required String? cover,
   dynamic aid,
   String? bvid,
+  List<Widget>? extraActions,
 }) {
   final double imgWidth = MediaQuery.sizeOf(Get.context!).shortestSide - 16;
   SmartDialog.show(
@@ -110,6 +111,7 @@ void imageSaveDialog({
                       icon: const Icon(Icons.download),
                     ),
                   ],
+                  ...?extraActions,
                 ],
               ),
             ),

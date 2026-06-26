@@ -15,14 +15,16 @@ class PgcCardV extends StatelessWidget {
     super.key,
     required this.item,
     this.onTap,
+    this.onLongPress,
   });
 
   final FavPgcItemModel item;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
-    void onLongPress() => imageSaveDialog(
+    void defaultLongPress() => imageSaveDialog(
       title: item.title,
       cover: item.cover,
     );
@@ -30,8 +32,8 @@ class PgcCardV extends StatelessWidget {
       shape: const RoundedRectangleBorder(borderRadius: Style.mdRadius),
       child: InkWell(
         borderRadius: Style.mdRadius,
-        onLongPress: onLongPress,
-        onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
+        onLongPress: onLongPress ?? defaultLongPress,
+        onSecondaryTap: PlatformUtils.isMobile ? null : (onLongPress ?? defaultLongPress),
         onTap: onTap ??
             (item.vodId != null
                 ? () => Get.toNamed('/doubanVideo', arguments: {'vodId': item.vodId})

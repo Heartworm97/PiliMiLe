@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:PiliMiLe/common/style.dart';
+import 'package:PiliMiLe/common/widgets/button/icon_button.dart';
 import 'package:PiliMiLe/common/widgets/button/more_btn.dart';
+import 'package:PiliMiLe/common/widgets/image/image_save.dart';
 import 'package:PiliMiLe/common/widgets/flutter/refresh_indicator.dart';
 import 'package:PiliMiLe/common/widgets/loading_widget/http_error.dart';
 import 'package:PiliMiLe/common/widgets/loading_widget/m3e_loading_indicator.dart';
@@ -25,6 +27,7 @@ import 'package:PiliMiLe/pages/pgc_index/view.dart';
 import 'package:PiliMiLe/pages/pgc_index/widgets/pgc_card_v_pgc_index.dart';
 import 'package:PiliMiLe/utils/extension/iterable_ext.dart';
 import 'package:PiliMiLe/utils/grid.dart';
+import 'package:PiliMiLe/utils/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -280,6 +283,27 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                         child: PgcCardV(
                           item: response[index],
                           onTap: () => controller.onDramaCardTap(response[index]),
+                          onLongPress: () => imageSaveDialog(
+                            title: response[index].title,
+                            cover: response[index].cover,
+                            extraActions: [
+                              iconButton(
+                                iconSize: 20,
+                                tooltip: '删除记录',
+                                onPressed: () {
+                                  SmartDialog.dismiss();
+                                  GStorage.dramaRecord.delete(
+                                    response[index].vodId.toString(),
+                                  );
+                                  controller.loadDramaRecords();
+                                },
+                                icon: Icon(
+                                  Icons.delete_outline,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
