@@ -486,17 +486,22 @@ class SearchDramaItemModel {
     required this.vodArea,
   });
 
+  static String _orNull(dynamic v) {
+    final s = v as String?;
+    return s != null && s.isNotEmpty ? s : 'null';
+  }
+
   factory SearchDramaItemModel.fromJson(Map<String, dynamic> json) {
-    final typeName = json['type_name'] ?? 'null';
+    final typeNameRaw = _orNull(json['type_name']);
     return SearchDramaItemModel(
       vodId: json['vod_id'],
       vodName: json['vod_name'] ?? '',
-      typeName: typeName == '剧集' ? '电视剧' : typeName,
+      typeName: typeNameRaw == '剧集' ? '电视剧' : typeNameRaw,
       vodPic: json['vod_pic'] ?? '',
-      vodRemarks: json['vod_remarks'] ?? 'null',
+      vodRemarks: _orNull(json['vod_remarks']),
       vodYear: json['vod_year']?.toString() ?? '',
-      vodActor: json['vod_actor'] ?? 'null',
-      vodArea: json['vod_area'] ?? 'null',
+      vodActor: _orNull(json['vod_actor']),
+      vodArea: _orNull(json['vod_area']),
     );
   }
 }

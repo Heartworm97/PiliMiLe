@@ -332,16 +332,27 @@ class DoubanHttp {
         }
         final rawList = (data['data'] as List<dynamic>?)
                 ?.map((item) {
-                  final typeName = item['type_name'] ?? 'null';
+                  final typeNameRaw = item['type_name'] as String?;
+                  final typeName = typeNameRaw != null && typeNameRaw.isNotEmpty
+                      ? typeNameRaw
+                      : 'null';
                   return SearchDramaItemModel(
                     vodId: item['vod_id'],
                     vodName: item['vod_name'] ?? '',
                     typeName: typeName == '剧集' ? '电视剧' : typeName,
                     vodPic: cleanVodPic(item['vod_pic'] ?? ''),
-                    vodRemarks: item['vod_remarks'] ?? 'null',
+                    vodRemarks: (item['vod_remarks'] as String?)
+                                ?.isNotEmpty ==
+                            true
+                        ? item['vod_remarks']
+                        : 'null',
                     vodYear: item['vod_year']?.toString() ?? '',
-                    vodActor: item['vod_actor'] ?? 'null',
-                    vodArea: item['vod_area'] ?? 'null',
+                    vodActor: (item['vod_actor'] as String?)?.isNotEmpty == true
+                        ? item['vod_actor']
+                        : 'null',
+                    vodArea: (item['vod_area'] as String?)?.isNotEmpty == true
+                        ? item['vod_area']
+                        : 'null',
                   );
                 })
                 .toList() ??
