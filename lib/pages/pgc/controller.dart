@@ -263,7 +263,6 @@ class PgcController
       }).toList();
     }
     dramaRecordState.value = Success(list);
-    SmartDialog.showToast('刷新成功');
   }
 
   /// 点击追剧记录卡片：先请求详情再跳转，并定位到记录的线路和集数

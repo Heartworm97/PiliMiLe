@@ -251,7 +251,10 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                 const Spacer(),
                 IconButton(
                   tooltip: '刷新',
-                  onPressed: controller.loadDramaRecords,
+                  onPressed: () {
+                    controller.loadDramaRecords();
+                    SmartDialog.showToast('刷新成功');
+                  },
                   icon: const Icon(Icons.refresh, size: 20),
                 ),
               ],
