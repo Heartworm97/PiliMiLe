@@ -63,16 +63,11 @@ List<SettingsModel> get videoSettings => [
     onTap: _showCDNDialog,
   ),
   NormalModel(
-    title: '豆瓣数据 CDN',
+    title: '豆瓣 CDN 设置',
     leading: const Icon(MdiIcons.cloudPlusOutline),
-    getSubtitle: () => '当前使用：${Pref.dramaDataCdnType}，加速豆瓣热门榜单请求',
-    onTap: _showDramaDataCdnDialog,
-  ),
-  NormalModel(
-    title: '豆瓣图片 CDN',
-    leading: const Icon(MdiIcons.cloudPlusOutline),
-    getSubtitle: () => '当前使用：${Pref.dramaImageCdnType}，加速豆瓣海报/剧照加载',
-    onTap: _showDramaImageCdnDialog,
+    getSubtitle: () =>
+        '数据：${Pref.dramaDataCdnType} | 图片：${Pref.dramaImageCdnType}',
+    onTap: _showDramaCdnDialog,
   ),
   NormalModel(
     title: '直播 CDN 设置',
@@ -209,44 +204,107 @@ const _dramaDataCdnOptions = [
   ('cmliussss (阿里)', '经阿里云 CDN 代理，全国加速'),
 ];
 
-Future<void> _showDramaDataCdnDialog(
-  BuildContext context,
-  VoidCallback setState,
-) async {
-  final res = await showDialog<String>(
-    context: context,
-    builder: (context) => SelectDialog<String>(
-      title: '豆瓣数据 CDN',
-      value: Pref.dramaDataCdnType,
-      values: _dramaDataCdnOptions.map((e) => (e.$1, e.$2)).toList(),
-    ),
-  );
-  if (res != null) {
-    await GStorage.setting.put(SettingBoxKey.dramaDataCdnType, res);
-    setState();
-  }
-}
-
 const _dramaImageCdnOptions = [
   ('直连', '直连 img.doubanio.com，国内用户可用'),
   ('cmliussss', '经社区 CDN 代理，绕过防盗链，海内外加速'),
 ];
 
-Future<void> _showDramaImageCdnDialog(
+Future<void> _showDramaCdnDialog(
   BuildContext context,
   VoidCallback setState,
 ) async {
-  final res = await showDialog<String>(
+  final res = await showDialog<({String dataType, String imageType})>(
     context: context,
-    builder: (context) => SelectDialog<String>(
-      title: '豆瓣图片 CDN',
-      value: Pref.dramaImageCdnType,
-      values: _dramaImageCdnOptions.map((e) => (e.$1, e.$2)).toList(),
-    ),
+    builder: (context) => const _DramaCdnDialog(),
   );
   if (res != null) {
-    await GStorage.setting.put(SettingBoxKey.dramaImageCdnType, res);
+    await Future.wait([
+      GStorage.setting.put(SettingBoxKey.dramaDataCdnType, res.dataType),
+      GStorage.setting.put(SettingBoxKey.dramaImageCdnType, res.imageType),
+    ]);
     setState();
+  }
+}
+
+class _DramaCdnDialog extends StatefulWidget {
+  const _DramaCdnDialog();
+
+  @override
+  State<_DramaCdnDialog> createState() => _DramaCdnDialogState();
+}
+
+class _DramaCdnDialogState extends State<_DramaCdnDialog> {
+  late String _dataType = Pref.dramaDataCdnType;
+  late String _imageType = Pref.dramaImageCdnType;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final titleSmall = theme.textTheme.titleSmall;
+    final bodySmall = theme.textTheme.bodySmall;
+    return AlertDialog(
+      title: const Text('豆瓣 CDN 设置'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('数据代理', style: titleSmall),
+            const SizedBox(height: 4),
+            RadioGroup<String>(
+              groupValue: _dataType,
+              onChanged: (v) => setState(() => _dataType = v ?? _dataType),
+              child: Column(
+                children: _dramaDataCdnOptions
+                    .map(
+                      (e) => RadioListTile<String>(
+                        dense: true,
+                        value: e.$1,
+                        title: Text(e.$1),
+                        subtitle: Text(e.$2, style: bodySmall),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+            const Divider(),
+            Text('图片代理', style: titleSmall),
+            const SizedBox(height: 4),
+            RadioGroup<String>(
+              groupValue: _imageType,
+              onChanged: (v) => setState(() => _imageType = v ?? _imageType),
+              child: Column(
+                children: _dramaImageCdnOptions
+                    .map(
+                      (e) => RadioListTile<String>(
+                        dense: true,
+                        value: e.$1,
+                        title: Text(e.$1),
+                        subtitle: Text(e.$2, style: bodySmall),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('取消', style: TextStyle(color: theme.colorScheme.outline)),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(
+            context,
+            (dataType: _dataType, imageType: _imageType),
+          ),
+          child: const Text('确定'),
+        ),
+      ],
+    );
   }
 }
 
