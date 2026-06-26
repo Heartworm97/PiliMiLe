@@ -227,9 +227,6 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
   }
 
   Widget _buildDramaRecord(ThemeData theme) {
-    final cardWidth = Grid.smallCardWidth / 2;
-    final cardHeight = cardWidth / 0.75;
-    const textHeight = 50.0;
     return SliverToBoxAdapter(
       child: Column(
         children: [
@@ -265,20 +262,20 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
               ],
             ),
           ),
-          Obx(() {
-            return switch (controller.dramaRecordState.value) {
-              Success(:final response) when response.isNotEmpty =>
-                SizedBox(
-                  height: cardHeight +
-                      MediaQuery.textScalerOf(context).scale(textHeight),
-                  child: ListView.builder(
+          SizedBox(
+            height: Grid.smallCardWidth / 2 / 0.75 +
+                MediaQuery.textScalerOf(context).scale(50),
+            child: Obx(() {
+              return switch (controller.dramaRecordState.value) {
+                Success(:final response) when response.isNotEmpty =>
+                  ListView.builder(
                     scrollDirection: Axis.horizontal,
                     physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: response.length,
                     padding: EdgeInsets.zero,
                     itemBuilder: (context, index) {
                       return Container(
-                        width: cardWidth,
+                        width: Grid.smallCardWidth / 2,
                         margin: EdgeInsets.only(
                           left: Style.safeSpace,
                           right: index == response.length - 1
@@ -289,10 +286,10 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                       );
                     },
                   ),
-                ),
-              _ => const SizedBox.shrink(),
-            };
-          }),
+                _ => const SizedBox.shrink(),
+              };
+            }),
+          ),
         ],
       ),
     );
