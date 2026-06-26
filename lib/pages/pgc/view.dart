@@ -254,16 +254,6 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                   onPressed: controller.loadDramaRecords,
                   icon: const Icon(Icons.refresh, size: 20),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: moreTextButton(
-                    text: '查看全部',
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    color: theme.colorScheme.secondary,
-                    onTap: () =>
-                        SmartDialog.showToast('功能开发中，敬请期待'),
-                  ),
-                ),
               ],
             ),
           ),
