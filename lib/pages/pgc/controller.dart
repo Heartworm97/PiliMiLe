@@ -49,7 +49,7 @@ class PgcController
     } else {
       loadingState.value = const Success(null);
       followState.value = const Success(null);
-      _loadDramaRecords();
+      loadDramaRecords();
       queryDramaSections();
     }
   }
@@ -57,7 +57,7 @@ class PgcController
   @override
   Future<void> onRefresh() {
     if (isDrama) {
-      _loadDramaRecords();
+      loadDramaRecords();
       return queryDramaSections();
     }
     if (accountService.isLogin.value) {
@@ -240,7 +240,7 @@ class PgcController
   }
 
   /// 从本地 Box 加载追剧记录
-  void _loadDramaRecords() {
+  void loadDramaRecords() {
     final box = GStorage.dramaRecord;
     List<FavPgcItemModel> list;
     if (box.isEmpty) {
