@@ -7,9 +7,9 @@ String episodeLabel(DoubanEpisodeModel ep) {
   if (RegExp(r'^\d+$').hasMatch(ep.title)) {
     return '第${ep.nid}集';
   }
-  // 包含「第X集」或「第X期」→ 使用 nid 统一显示
+  // 包含「第X集」「第X期」「第X话」→ 使用 nid 统一显示
   // 不限行首，兼容 "2025-01-01 第1期"、"第1期：嘉宾XXX"、"第1期上" 等变体
-  if (RegExp(r'第\d+[集期]').hasMatch(ep.title)) {
+  if (RegExp(r'第\d+[集期话]').hasMatch(ep.title)) {
     return '第${ep.nid}集';
   }
   // 紧凑日期格式（如 "20260501"、"20260501(往季回顾)"）→ 视为综艺单期
