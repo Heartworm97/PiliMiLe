@@ -9,6 +9,7 @@ import 'package:PiliMiLe/models_new/fav/fav_pgc/list.dart';
 import 'package:PiliMiLe/models_new/pgc/pgc_index_result/list.dart';
 import 'package:PiliMiLe/models_new/pgc/pgc_timeline/result.dart';
 import 'package:PiliMiLe/pages/common/common_list_controller.dart';
+import 'package:PiliMiLe/pages/douban_video/detail/episode_label.dart';
 import 'package:PiliMiLe/services/account_service.dart';
 import 'package:PiliMiLe/utils/extension/scroll_controller_ext.dart';
 import 'package:PiliMiLe/utils/storage.dart';
@@ -295,7 +296,7 @@ class PgcController
         if (item.progress != null && detail.sources.isNotEmpty) {
           final episodes = detail.sources[sourceIndex].episodes;
           final idx = episodes.indexWhere(
-            (e) => e.title == item.progress,
+            (e) => episodeLabel(e) == item.progress,
           );
           if (idx >= 0) episodeIndex = idx;
         }
