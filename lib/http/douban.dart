@@ -332,16 +332,16 @@ class DoubanHttp {
         }
         final rawList = (data['data'] as List<dynamic>?)
                 ?.map((item) {
-                  final typeName = item['type_name'] ?? '';
+                  final typeName = item['type_name'] ?? 'null';
                   return SearchDramaItemModel(
                     vodId: item['vod_id'],
                     vodName: item['vod_name'] ?? '',
                     typeName: typeName == '剧集' ? '电视剧' : typeName,
                     vodPic: cleanVodPic(item['vod_pic'] ?? ''),
-                    vodRemarks: item['vod_remarks'] ?? '',
+                    vodRemarks: item['vod_remarks'] ?? 'null',
                     vodYear: item['vod_year']?.toString() ?? '',
-                    vodActor: item['vod_actor'] ?? '',
-                    vodArea: item['vod_area'] ?? '',
+                    vodActor: item['vod_actor'] ?? 'null',
+                    vodArea: item['vod_area'] ?? 'null',
                   );
                 })
                 .toList() ??

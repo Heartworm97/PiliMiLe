@@ -487,16 +487,16 @@ class SearchDramaItemModel {
   });
 
   factory SearchDramaItemModel.fromJson(Map<String, dynamic> json) {
-    final typeName = json['type_name'] ?? '';
+    final typeName = json['type_name'] ?? 'null';
     return SearchDramaItemModel(
       vodId: json['vod_id'],
       vodName: json['vod_name'] ?? '',
       typeName: typeName == '剧集' ? '电视剧' : typeName,
       vodPic: json['vod_pic'] ?? '',
-      vodRemarks: json['vod_remarks'] ?? '',
+      vodRemarks: json['vod_remarks'] ?? 'null',
       vodYear: json['vod_year']?.toString() ?? '',
-      vodActor: json['vod_actor'] ?? '',
-      vodArea: json['vod_area'] ?? '',
+      vodActor: json['vod_actor'] ?? 'null',
+      vodArea: json['vod_area'] ?? 'null',
     );
   }
 }
