@@ -5,6 +5,7 @@ import 'package:PiliMiLe/http/pgc.dart';
 import 'package:PiliMiLe/models/common/home_tab_type.dart';
 import 'package:PiliMiLe/models_new/douban/subject.dart';
 import 'package:PiliMiLe/models_new/fav/fav_pgc/list.dart';
+import 'package:PiliMiLe/models_new/fav/fav_pgc/new_ep.dart';
 import 'package:PiliMiLe/models_new/pgc/pgc_index_result/list.dart';
 import 'package:PiliMiLe/models_new/pgc/pgc_timeline/result.dart';
 import 'package:PiliMiLe/pages/common/common_list_controller.dart';
@@ -170,6 +171,10 @@ class PgcController
     }
   }
 
+  // 追剧 - 追剧记录
+  late final dramaRecordState =
+      Rx<LoadingState<List<FavPgcItemModel>>>(Success(_dramaRecordMockData));
+
   // 追剧 - 豆瓣 4 个板块
   final dramaMovieState =
       Rx<LoadingState<List<DoubanSubject>>>(LoadingState.loading());
@@ -232,3 +237,29 @@ class PgcController
     }
   }
 }
+
+/// 追剧记录板块 mock 数据，后续接入真实数据源后替换
+final List<FavPgcItemModel> _dramaRecordMockData = [
+  FavPgcItemModel(
+    seasonId: 0,
+    title: '追剧记录功能开发中',
+    cover: '',
+    badge: '即将上线',
+    progress: '敬请期待',
+  ),
+  FavPgcItemModel(
+    seasonId: 0,
+    title: '这里将展示你的追剧进度',
+    cover: '',
+    badge: '追剧中',
+    progress: '第1话',
+  ),
+  FavPgcItemModel(
+    seasonId: 0,
+    title: '更多精彩内容即将到来',
+    cover: '',
+    badge: '预约',
+    isFinish: 1,
+    newEp: NewEp(indexShow: '即将开播'),
+  ),
+];

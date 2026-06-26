@@ -108,6 +108,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
         controller: controller.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
+        _buildDramaRecord(theme),
         _buildDramaSection(
           theme: theme,
           title: '热门电影',
@@ -220,6 +221,62 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
         ),
         const SliverPadding(padding: EdgeInsets.only(bottom: 16)),
       ],
+      ),
+    );
+  }
+
+  Widget _buildDramaRecord(ThemeData theme) {
+    final cardWidth = Grid.smallCardWidth / 2;
+    final cardHeight = cardWidth / 0.75;
+    const textHeight = 50.0;
+    return SliverToBoxAdapter(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 10,
+              bottom: 10,
+              left: 16,
+              right: 10,
+            ),
+            child: Row(
+              children: [
+                Text(
+                  '追剧记录',
+                  style: theme.textTheme.titleMedium,
+                ),
+              ],
+            ),
+          ),
+          Obx(() {
+            return switch (controller.dramaRecordState.value) {
+              Success(:final response) when response.isNotEmpty =>
+                SizedBox(
+                  height: cardHeight +
+                      MediaQuery.textScalerOf(context).scale(textHeight),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: response.length,
+                    padding: EdgeInsets.zero,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: cardWidth,
+                        margin: EdgeInsets.only(
+                          left: Style.safeSpace,
+                          right: index == response.length - 1
+                              ? Style.safeSpace
+                              : 0,
+                        ),
+                        child: PgcCardV(item: response[index]),
+                      );
+                    },
+                  ),
+                ),
+              _ => const SizedBox.shrink(),
+            };
+          }),
+        ],
       ),
     );
   }
