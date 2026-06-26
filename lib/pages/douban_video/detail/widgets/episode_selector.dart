@@ -5,6 +5,14 @@ import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/utils/extension/num_ext.dart';
 import 'package:flutter/material.dart';
 
+/// 集数显示文本：电影等非标准剧集显示原始标题，标准剧集显示「第X集」
+String _episodeLabel(DoubanEpisodeModel ep) {
+  if (RegExp(r'^第\d+集$').hasMatch(ep.title)) {
+    return '第${ep.nid}集';
+  }
+  return ep.title;
+}
+
 class EpisodeSelector extends StatefulWidget {
   const EpisodeSelector({
     super.key,
@@ -105,7 +113,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                   ),
                   Expanded(
                     child: Text(
-                      '正在播放：第${widget.episodes[widget.selectedIndex].nid}集',
+                      '正在播放：${_episodeLabel(widget.episodes[widget.selectedIndex])}',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12,
@@ -193,7 +201,7 @@ class _EpisodeSelectorState extends State<EpisodeSelector> {
                                     ),
                                   ),
                                 TextSpan(
-                                  text: '第${ep.nid}集',
+                                  text: _episodeLabel(ep),
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: isSelected
@@ -442,7 +450,7 @@ class _DoubanEpisodePanelState extends State<_DoubanEpisodePanel>
                     ),
                     child: Center(
                       child: Text(
-                        '第${ep.nid}集',
+                        _episodeLabel(ep),
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: isCurrent ? FontWeight.bold : null,
