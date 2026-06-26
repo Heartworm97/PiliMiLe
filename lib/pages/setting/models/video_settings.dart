@@ -198,17 +198,17 @@ Future<void> _showCDNDialog(BuildContext context, VoidCallback setState) async {
   }
 }
 
-const _dramaDataCdnOptions = [
-  ('直连', '直连 m.douban.com，国内用户最佳'),
-  ('cmliussss (腾讯云)', '经腾讯云 CDN 代理，全国加速'),
-  ('cmliussss (阿里云)', '经阿里云 CDN 代理，全国加速'),
-  ('cmliussss (统一域名)', '经统一 CDN 代理，数据走 img 域名'),
+const _dataSegments = <ButtonSegment<String>>[
+  ButtonSegment(value: '直连', label: Text('直连')),
+  ButtonSegment(value: 'cmliussss (腾讯云)', label: Text('腾讯云')),
+  ButtonSegment(value: 'cmliussss (阿里云)', label: Text('阿里云')),
+  ButtonSegment(value: 'cmliussss (统一域名)', label: Text('统一')),
 ];
 
-const _dramaImageCdnOptions = [
-  ('直连', '直连 img.doubanio.com，国内用户可用'),
-  ('cmliussss (腾讯云)', '经腾讯云 CDN 代理，绕过防盗链'),
-  ('cmliussss (阿里云)', '经阿里云 CDN 代理，绕过防盗链'),
+const _imageSegments = <ButtonSegment<String>>[
+  ButtonSegment(value: '直连', label: Text('直连')),
+  ButtonSegment(value: 'cmliussss (腾讯云)', label: Text('腾讯云')),
+  ButtonSegment(value: 'cmliussss (阿里云)', label: Text('阿里云')),
 ];
 
 Future<void> _showDramaCdnDialog(
@@ -243,55 +243,28 @@ class _DramaCdnDialogState extends State<_DramaCdnDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final titleSmall = theme.textTheme.titleSmall;
-    final bodySmall = theme.textTheme.bodySmall;
     return AlertDialog(
       title: const Text('豆瓣 CDN 设置'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('数据代理', style: titleSmall),
-            const SizedBox(height: 4),
-            RadioGroup<String>(
-              groupValue: _dataType,
-              onChanged: (v) => setState(() => _dataType = v ?? _dataType),
-              child: Column(
-                children: _dramaDataCdnOptions
-                    .map(
-                      (e) => RadioListTile<String>(
-                        dense: true,
-                        value: e.$1,
-                        title: Text(e.$1),
-                        subtitle: Text(e.$2, style: bodySmall),
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-            const Divider(),
-            Text('图片代理', style: titleSmall),
-            const SizedBox(height: 4),
-            RadioGroup<String>(
-              groupValue: _imageType,
-              onChanged: (v) => setState(() => _imageType = v ?? _imageType),
-              child: Column(
-                children: _dramaImageCdnOptions
-                    .map(
-                      (e) => RadioListTile<String>(
-                        dense: true,
-                        value: e.$1,
-                        title: Text(e.$1),
-                        subtitle: Text(e.$2, style: bodySmall),
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ],
-        ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('数据代理', style: titleSmall),
+          const SizedBox(height: 8),
+          SegmentedButton<String>(
+            segments: _dataSegments,
+            selected: {_dataType},
+            onSelectionChanged: (v) => setState(() => _dataType = v.first),
+          ),
+          const SizedBox(height: 20),
+          Text('图片代理', style: titleSmall),
+          const SizedBox(height: 8),
+          SegmentedButton<String>(
+            segments: _imageSegments,
+            selected: {_imageType},
+            onSelectionChanged: (v) => setState(() => _imageType = v.first),
+          ),
+        ],
       ),
       actions: [
         TextButton(
