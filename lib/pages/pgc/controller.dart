@@ -1,4 +1,5 @@
 import 'package:PiliMiLe/http/douban.dart';
+import 'package:PiliMiLe/models/douban/douban_detail.dart';
 import 'package:PiliMiLe/http/fav.dart';
 import 'package:PiliMiLe/http/loading_state.dart';
 import 'package:PiliMiLe/http/pgc.dart';
@@ -263,7 +264,7 @@ class PgcController
     dramaRecordState.value = Success(list);
   }
 
-  /// 点击追剧记录卡片：先请求详情再跳转
+  /// 点击追剧记录卡片：先请求详情再跳转，并定位到记录的线路和集数
   Future<void> onDramaCardTap(FavPgcItemModel item) async {
     if (item.vodId == null) return;
     SmartDialog.showLoading(msg: '资源加载中...');
@@ -271,9 +272,32 @@ class PgcController
       final resp = await DoubanHttp.getVodDetail(item.vodId);
       SmartDialog.dismiss();
       if (resp['status'] == true && resp['data'] != null) {
+        final detail = resp['data'] as DoubanVodDetailModel;
+
+        // 匹配记录的线路
+        int sourceIndex = 0;
+        if (item.badge != null) {
+          final idx = detail.sources.indexWhere(
+            (s) => s.name == item.badge,
+          );
+          if (idx >= 0) sourceIndex = idx;
+        }
+
+        // 匹配记录的集数
+        int episodeIndex = 0;
+        if (item.progress != null && detail.sources.isNotEmpty) {
+          final episodes = detail.sources[sourceIndex].episodes;
+          final idx = episodes.indexWhere(
+            (e) => e.title == item.progress,
+          );
+          if (idx >= 0) episodeIndex = idx;
+        }
+
         Get.toNamed('/doubanVideo', arguments: {
           'vodId': item.vodId,
-          'preloadedDetail': resp['data'],
+          'preloadedDetail': detail,
+          'preloadedSourceIndex': sourceIndex,
+          'preloadedEpisodeIndex': episodeIndex,
           'vodName': item.title,
           'vodPic': item.cover,
         });
