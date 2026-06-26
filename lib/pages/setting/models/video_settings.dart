@@ -200,8 +200,10 @@ Future<void> _showCDNDialog(BuildContext context, VoidCallback setState) async {
 
 const _dramaDataCdnOptions = [
   ('直连', '直连 m.douban.com，国内用户最佳'),
-  ('cmliussss (腾讯)', '经腾讯云 CDN 代理，全国加速'),
-  ('cmliussss (阿里)', '经阿里云 CDN 代理，全国加速'),
+  ('Cors Proxy By Zwei', 'CORS 代理，绕过跨域限制'),
+  ('cmliussss (腾讯云)', '经腾讯云 CDN 代理，全国加速'),
+  ('cmliussss (阿里云)', '经阿里云 CDN 代理，全国加速'),
+  ('cmliussss (统一域名)', '经统一 CDN 代理，数据走 img 域名'),
 ];
 
 const _dramaImageCdnOptions = [
