@@ -278,11 +278,11 @@ abstract final class Pref {
 
   /// 追剧数据 CDN 类型：直连 / cmliussss (腾讯云) / cmliussss (阿里云) / cmliussss (统一域名)
   static String get dramaDataCdnType =>
-      _setting.get(SettingBoxKey.dramaDataCdnType, defaultValue: '直连');
+      _setting.get(SettingBoxKey.dramaDataCdnType, defaultValue: 'cmliussss (腾讯云)');
 
   /// 追剧图片 CDN 类型：直连 / cmliussss (腾讯云) / cmliussss (阿里云)
   static String get dramaImageCdnType =>
-      _setting.get(SettingBoxKey.dramaImageCdnType, defaultValue: '直连');
+      _setting.get(SettingBoxKey.dramaImageCdnType, defaultValue: 'cmliussss (腾讯云)');
 
   static String get banWordForRecommend =>
       _setting.get(SettingBoxKey.banWordForRecommend, defaultValue: '');
