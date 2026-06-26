@@ -174,7 +174,8 @@ class PgcController
   }
 
   // 追剧 - 追剧记录
-  late final Rx<LoadingState<List<FavPgcItemModel>>> dramaRecordState;
+  late final Rx<LoadingState<List<FavPgcItemModel>>> dramaRecordState =
+      LoadingState<List<FavPgcItemModel>>.loading().obs;
 
   // 追剧 - 豆瓣 4 个板块
   final dramaMovieState =
