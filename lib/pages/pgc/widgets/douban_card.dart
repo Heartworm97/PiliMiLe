@@ -105,10 +105,6 @@ class DoubanCard extends StatelessWidget {
                         height: maxHeight,
                         src: proxyImg(item.picLarge),
                         skipThumbnail: true,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Style.imgRadius,
-                          topRight: Style.imgRadius,
-                        ),
                       ),
                       if (item.year.isNotEmpty)
                         PBadge(
