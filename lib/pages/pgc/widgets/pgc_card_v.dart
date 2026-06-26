@@ -110,7 +110,9 @@ class PgcCardV extends StatelessWidget {
             const SizedBox(height: 1),
             if (item.progress != null)
               Text(
-                '看到${item.progress!}',
+                item.progress!.startsWith('看到')
+                    ? item.progress!
+                    : '看到${item.progress!}',
                 maxLines: 1,
                 style: style,
               )
