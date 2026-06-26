@@ -488,7 +488,7 @@ class SearchDramaItemModel {
 
   static String _orNull(dynamic v) {
     final s = v as String?;
-    return s != null && s.isNotEmpty ? s : 'null';
+    return s != null && s.isNotEmpty && s != '未知' ? s : 'null';
   }
 
   factory SearchDramaItemModel.fromJson(Map<String, dynamic> json) {
