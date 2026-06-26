@@ -34,41 +34,13 @@ class DoubanHttp {
           return handler.next(options);
         }
 
-        // 构建原始豆瓣 URL（供 CORS 代理使用）
-        final originalUri = Uri.https(
-          'm.douban.com',
-          options.path,
-          options.queryParameters.isNotEmpty ? Map.fromEntries(
-            options.queryParameters.entries.map(
-              (e) => MapEntry(e.key, e.value.toString()),
-            ),
-          ) : null,
-        );
-
         switch (cdnType) {
-          case 'Cors Proxy By Zwei':
-            // CORS 代理：完整 URL 作为路径
-            options.baseUrl = '';
-            options.path = 'https://ciao-cors.is-an.org/${originalUri.toString()}';
-            options.queryParameters.clear();
           case 'cmliussss (腾讯云)':
             options.baseUrl = 'https://m.douban.cmliussss.net';
           case 'cmliussss (阿里云)':
             options.baseUrl = 'https://m.douban.cmliussss.com';
           case 'cmliussss (统一域名)':
             options.baseUrl = 'https://img.doubanio.cmliussss.net';
-          case 'CORS Anywhere':
-            // CORS 代理：完整 URL 作为路径
-            options.baseUrl = '';
-            options.path = 'https://cors-anywhere.com/${originalUri.toString()}';
-            options.queryParameters.clear();
-          case '自定义':
-            final customUrl = Pref.dramaDataCdnCustomUrl;
-            if (customUrl.isNotEmpty) {
-              options.baseUrl = '';
-              options.path = '$customUrl${originalUri.toString()}';
-              options.queryParameters.clear();
-            }
         }
 
         handler.next(options);

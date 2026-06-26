@@ -41,7 +41,6 @@ abstract final class SettingBoxKey {
       disableAudioCDN = 'disableAudioCDN',
       dramaDataCdnType = 'dramaDataCdnType',
       dramaImageCdnType = 'dramaImageCdnType',
-      dramaDataCdnCustomUrl = 'dramaDataCdnCustomUrl',
       dramaImageCdnCustomUrl = 'dramaImageCdnCustomUrl',
       autoPiP = 'autoPiP',
       enableAutoLongPressSpeed = 'enableAutoLongPressSpeed',

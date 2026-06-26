@@ -276,17 +276,13 @@ abstract final class Pref {
     return CDNService.backupUrl;
   }
 
-  /// 追剧数据 CDN 类型：直连 / Cors Proxy By Zwei / cmliussss / CORS Anywhere / 自定义
+  /// 追剧数据 CDN 类型：直连 / cmliussss (腾讯云) / cmliussss (阿里云) / cmliussss (统一域名)
   static String get dramaDataCdnType =>
       _setting.get(SettingBoxKey.dramaDataCdnType, defaultValue: '直连');
 
   /// 追剧图片 CDN 类型：直连 / img3 官方CDN / cmliussss (腾讯云) / cmliussss (阿里云) / 自定义
   static String get dramaImageCdnType =>
       _setting.get(SettingBoxKey.dramaImageCdnType, defaultValue: '直连');
-
-  /// 追剧数据自定义代理 URL（仅 dramaDataCdnType == '自定义' 时生效）
-  static String get dramaDataCdnCustomUrl =>
-      _setting.get(SettingBoxKey.dramaDataCdnCustomUrl, defaultValue: '');
 
   /// 追剧图片自定义代理域名（仅 dramaImageCdnType == '自定义' 时生效）
   static String get dramaImageCdnCustomUrl =>
