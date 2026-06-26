@@ -12,8 +12,12 @@ String episodeLabel(DoubanEpisodeModel ep) {
   if (RegExp(r'第\d+[集期]').hasMatch(ep.title)) {
     return '第${ep.nid}集';
   }
-  // 日期格式标题（如 "2025-01-01"、"2025/01/01"）→ 视为综艺单期
-  if (RegExp(r'^\d{4}[-/]\d{1,2}[-/]\d{1,2}$').hasMatch(ep.title)) {
+  // 紧凑日期格式（如 "20260501"、"20260501(往季回顾)"）→ 视为综艺单期
+  if (RegExp(r'^\d{8}').hasMatch(ep.title)) {
+    return '第${ep.nid}集';
+  }
+  // 带分隔符日期格式（如 "2025-01-01"、"2025/01/01"）→ 视为综艺单期
+  if (RegExp(r'^\d{4}[-/]\d{1,2}[-/]\d{1,2}').hasMatch(ep.title)) {
     return '第${ep.nid}集';
   }
   // 英文集数格式（如 "EP01", "EP.01", "ep1"）
