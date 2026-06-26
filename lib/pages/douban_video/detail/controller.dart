@@ -1,5 +1,7 @@
 import 'package:PiliMiLe/http/douban.dart';
+import 'package:PiliMiLe/models/common/home_tab_type.dart';
 import 'package:PiliMiLe/models/douban/douban_detail.dart';
+import 'package:PiliMiLe/pages/pgc/controller.dart';
 import 'package:PiliMiLe/plugin/pl_player/controller.dart';
 import 'package:PiliMiLe/plugin/pl_player/models/data_source.dart';
 import 'package:PiliMiLe/utils/storage.dart';
@@ -184,6 +186,11 @@ class DoubanVideoDetailController extends GetxController {
     };
 
     GStorage.dramaRecord.put(vodId.toString(), record);
+
+    // 通知追剧 Tab 刷新卡片，无需手动下拉
+    try {
+      Get.find<PgcController>(tag: HomeTabType.drama.name).loadDramaRecords();
+    } catch (_) {}
   }
 
   void onSelectSource(int index) {
