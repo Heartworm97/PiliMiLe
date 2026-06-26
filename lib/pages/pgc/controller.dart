@@ -246,7 +246,7 @@ class PgcController
     final box = GStorage.dramaRecord;
     List<FavPgcItemModel> list;
     if (box.isEmpty) {
-      list = _dramaRecordEmptyHint;
+      list = [];
     } else {
       final records = box.values.toList()
         ..sort((a, b) => (b['playedAt'] as int).compareTo(a['playedAt'] as int));
@@ -318,14 +318,4 @@ class PgcController
     }
   }
 
-  /// 追剧记录空状态占位
-  static final List<FavPgcItemModel> _dramaRecordEmptyHint = [
-    FavPgcItemModel(
-      seasonId: 0,
-      title: '暂无追剧记录',
-      cover: '',
-      badge: '提示',
-      progress: '播放追剧后将自动记录',
-    ),
-  ];
 }

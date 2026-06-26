@@ -308,7 +308,9 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                       );
                     },
                   ),
-                _ => const SizedBox.shrink(),
+                _ => const Center(
+                  child: Text('还没有追剧历史'),
+                ),
               };
             }),
           ),
