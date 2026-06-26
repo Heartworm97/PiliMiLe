@@ -26,6 +26,7 @@ import 'package:PiliMiLe/pages/pgc_index/widgets/pgc_card_v_pgc_index.dart';
 import 'package:PiliMiLe/utils/extension/iterable_ext.dart';
 import 'package:PiliMiLe/utils/grid.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 
 class PgcPage extends StatefulWidget {
@@ -244,6 +245,23 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                 Text(
                   '追剧记录',
                   style: theme.textTheme.titleMedium,
+                ),
+                const Spacer(),
+                IconButton(
+                  tooltip: '刷新',
+                  onPressed: () =>
+                      SmartDialog.showToast('功能开发中，敬请期待'),
+                  icon: const Icon(Icons.refresh, size: 20),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: moreTextButton(
+                    text: '查看全部',
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    color: theme.colorScheme.secondary,
+                    onTap: () =>
+                        SmartDialog.showToast('功能开发中，敬请期待'),
+                  ),
                 ),
               ],
             ),
