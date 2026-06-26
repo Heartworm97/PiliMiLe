@@ -231,11 +231,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-              bottom: 10,
-              left: 16,
-              right: 10,
-            ),
+            padding: const EdgeInsets.only(left: 16),
             child: Row(
               children: [
                 Text(
