@@ -233,6 +233,15 @@ class DoubanVideoDetailController extends GetxController {
 
     GStorage.dramaRecord.put(vodId.toString(), record);
 
+    // 最多保留最近 25 条，超限删除最旧记录
+    final box = GStorage.dramaRecord;
+    if (box.length > 25) {
+      final oldest = box.values.reduce(
+        (a, b) => (a['playedAt'] as int) < (b['playedAt'] as int) ? a : b,
+      );
+      box.delete(oldest['vodId'].toString());
+    }
+
     // 通知追剧 Tab 刷新卡片，无需手动下拉
     try {
       Get.find<PgcController>(tag: HomeTabType.drama.name).loadDramaRecords();
