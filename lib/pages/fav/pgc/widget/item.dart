@@ -119,7 +119,15 @@ class FavPgcItem extends StatelessWidget {
                             height: item.newEp?.indexShow != null ? 2 : 6,
                           ),
                           Text(
-                            item.progress!,
+                            item.progress!
+                                .replaceAllMapped(
+                                  RegExp(r'\b(\d+):(\d{2}):(\d{2})\b'),
+                                  (m) => '${m[1]!.padLeft(2, '0')}:${m[2]}:${m[3]}',
+                                )
+                                .replaceAllMapped(
+                                  RegExp(r'\b(\d+):(\d{2})\b(?!:\d)'),
+                                  (m) => '${m[1]!.padLeft(2, '0')}:${m[2]}',
+                                ),
                             style: TextStyle(
                               fontSize: 13,
                               color: colorScheme.onSurfaceVariant,
