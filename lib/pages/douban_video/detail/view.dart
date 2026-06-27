@@ -13,6 +13,7 @@ import 'package:PiliMiLe/pages/douban_video/detail/widgets/header_control.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/widgets/source_selector.dart';
 import 'package:PiliMiLe/plugin/pl_player/view/view.dart';
 import 'package:PiliMiLe/utils/page_utils.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -63,7 +64,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
         // 全屏 / 横屏时播放器撑满，移除 SafeArea + 隐藏详情区域
-        if (isFullScreen || !isPortrait) {
+        if (isFullScreen || (!PlatformUtils.isDesktop && !isPortrait)) {
           return _buildPlayerArea(size.width, size.height);
         }
 
