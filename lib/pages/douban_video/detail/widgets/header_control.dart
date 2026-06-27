@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:PiliMiLe/common/widgets/custom_icon.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/controller.dart';
+import 'package:PiliMiLe/pages/douban_video/detail/episode_label.dart';
 import 'package:PiliMiLe/pages/setting/models/play_settings.dart'
     show showPlayerVolumeDialog;
 import 'package:PiliMiLe/pages/setting/widgets/popup_item.dart'
@@ -11,14 +14,15 @@ import 'package:PiliMiLe/plugin/pl_player/controller.dart';
 import 'package:PiliMiLe/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliMiLe/services/shutdown_timer_service.dart'
     show shutdownTimerService;
-import 'package:PiliMiLe/pages/douban_video/detail/episode_label.dart';
 import 'package:PiliMiLe/utils/image_utils.dart';
 import 'package:PiliMiLe/utils/page_utils.dart';
 import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:PiliMiLe/utils/storage_pref.dart';
+import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class DoubanVideoHeaderControl extends StatelessWidget {
   const DoubanVideoHeaderControl({
@@ -287,6 +291,13 @@ class DoubanVideoHeaderControl extends StatelessWidget {
             return const SizedBox.shrink();
           }),
           _buildTitle(context),
+          // 时间 + 电量（横屏/全屏时显示）
+          Obx(() {
+            if (MediaQuery.of(context).orientation == Orientation.portrait) {
+              return const SizedBox.shrink();
+            }
+            return const _TimeBatteryWidget();
+          }),
           // 右侧操作按钮
           if (PlatformUtils.isDesktop)
             Obx(() {
@@ -349,5 +360,82 @@ class DoubanVideoHeaderControl extends StatelessWidget {
       }
       return const Spacer();
     });
+  }
+}
+
+class _TimeBatteryWidget extends StatefulWidget {
+  const _TimeBatteryWidget();
+
+  @override
+  State<_TimeBatteryWidget> createState() => _TimeBatteryWidgetState();
+}
+
+class _TimeBatteryWidgetState extends State<_TimeBatteryWidget> {
+  Timer? _clock;
+  final _now = ''.obs;
+  final _batteryLevel = RxnInt();
+  late final _battery = Battery();
+
+  static final _timeFormat = DateFormat('HH:mm');
+
+  bool get _showBattery => Pref.showBatteryLevel;
+
+  @override
+  void initState() {
+    super.initState();
+    _startClock();
+    if (_showBattery) _fetchBattery();
+  }
+
+  @override
+  void dispose() {
+    _stopClock();
+    super.dispose();
+  }
+
+  void _startClock() {
+    _now.value = _timeFormat.format(DateTime.now());
+    _clock = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      _now.value = _timeFormat.format(DateTime.now());
+    });
+  }
+
+  void _stopClock() {
+    _clock?.cancel();
+    _clock = null;
+  }
+
+  Future<void> _fetchBattery() async {
+    try {
+      final level = await _battery.batteryLevel;
+      if (mounted) _batteryLevel.value = level;
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (_showBattery)
+          Obx(() {
+            final level = _batteryLevel.value;
+            if (level == null) return const SizedBox.shrink();
+            return Text(
+              '$level%',
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+            );
+          }),
+        if (_showBattery && _batteryLevel.value != null)
+          const SizedBox(width: 10),
+        Obx(
+          () => Text(
+            _now.value,
+            style: const TextStyle(color: Colors.white, fontSize: 13),
+          ),
+        ),
+      ],
+    );
   }
 }
