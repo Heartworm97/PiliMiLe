@@ -128,7 +128,7 @@ class _SourceSelectorState extends State<SourceSelector> {
                 final indicatorColor = !isAvailable
                     ? Colors.red
                     : isBBBlueRay
-                        ? Colors.amber
+                        ? Colors.purpleAccent
                         : isBuiltin
                             ? Colors.green
                             : Colors.orange;
@@ -195,7 +195,7 @@ class _SourceSelectorState extends State<SourceSelector> {
                                   boxShadow: isBBBlueRay && isAvailable
                                       ? [
                                           BoxShadow(
-                                            color: Colors.amber.withValues(alpha: 0.7),
+                                            color: Colors.purpleAccent.withValues(alpha: 0.5),
                                             blurRadius: 4,
                                             spreadRadius: 1,
                                           ),
