@@ -271,6 +271,8 @@ class DoubanVideoHeaderControl extends StatelessWidget {
             },
           ),
           Obx(() {
+            // 读取 isFullScreen.value 确保 Obx 能感知播放器状态变化
+            plPlayerController.isFullScreen.value;
             if (!plPlayerController.isDesktopPip) {
               return _buildBtn(
                 tooltip: '返回主页',
