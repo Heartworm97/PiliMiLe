@@ -223,6 +223,11 @@ class DoubanVideoDetailController extends GetxController {
     existing['progressTime'] = _formatPosition(plPlayerController.position);
     existing['playedAt'] = DateTime.now().millisecondsSinceEpoch;
     GStorage.dramaRecord.put(vodId.toString(), existing);
+
+    // 通知追剧 Tab 刷新卡片
+    try {
+      Get.find<PgcController>(tag: HomeTabType.drama.name).loadDramaRecords();
+    } catch (_) {}
   }
 
   void onSelectSource(int index) {
