@@ -31,10 +31,10 @@ class PgcController
   bool get isDrama => tabType == HomeTabType.drama;
 
   late final showPgcTimeline =
-      !isDrama && tabType == HomeTabType.bangumi && Pref.showPgcTimeline;
+      tabType == HomeTabType.bangumi && Pref.showPgcTimeline;
 
   /// 初始加载至少播放一整轮（4 个形态变换），避免转圈一闪而过
-  late final RxInt initialMorphCount = 0.obs;
+  final RxInt initialMorphCount = 0.obs;
 
   @override
   final accountService = Get.find<AccountService>();

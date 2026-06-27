@@ -61,6 +61,9 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
+  double get _cardWidth => Grid.smallCardWidth / 2;
+  double get _cardImageHeight => _cardWidth / 0.75;
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -231,10 +234,8 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
   }
 
   Widget _buildDramaRecord(ThemeData theme) {
-    final cardWidth = Grid.smallCardWidth / 2;
-    final cardImageHeight = cardWidth / 0.75;
-    final textHeight = MediaQuery.textScalerOf(context).scale(50);
-    final cardTotalHeight = cardImageHeight + textHeight;
+    final scaledTextHeight = MediaQuery.textScalerOf(context).scale(50);
+    final cardTotalHeight = _cardImageHeight + scaledTextHeight;
     return SliverToBoxAdapter(
       child: Column(
         children: [
@@ -287,7 +288,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                     padding: EdgeInsets.zero,
                     itemBuilder: (context, index) {
                       return Container(
-                        width: cardWidth,
+                        width: _cardWidth,
                         margin: EdgeInsets.only(
                           left: Style.safeSpace,
                           right: index == response.length - 1
@@ -358,10 +359,8 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
     required String kind,
     required Map<String, dynamic> params,
   }) {
-    final cardWidth = Grid.smallCardWidth / 2;
-    final cardHeight = cardWidth / 0.75;
-    const textHeight = 50.0;
-    final scaledTextHeight = MediaQuery.textScalerOf(context).scale(textHeight);
+    const unscaledTextHeight = 50.0;
+    final scaledTextHeight = MediaQuery.textScalerOf(context).scale(unscaledTextHeight);
     return [
       SliverToBoxAdapter(
         child: Padding(
@@ -406,7 +405,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                   gridDelegate: SliverGridDelegateWithExtentAndRatio(
                     mainAxisSpacing: Style.cardSpace,
                     crossAxisSpacing: Style.cardSpace,
-                    maxCrossAxisExtent: cardWidth,
+                    maxCrossAxisExtent: _cardWidth,
                     childAspectRatio: 0.75,
                     mainAxisExtent: scaledTextHeight,
                   ),
@@ -427,7 +426,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
       else
         SliverToBoxAdapter(
           child: SizedBox(
-            height: cardHeight + scaledTextHeight,
+            height: _cardImageHeight + scaledTextHeight,
             child: Obx(() {
               return switch (state.value) {
                 Success(:final response) when response.isNotEmpty =>
@@ -438,7 +437,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                     padding: EdgeInsets.zero,
                     itemBuilder: (context, index) {
                       return Container(
-                        width: cardWidth,
+                        width: _cardWidth,
                         margin: EdgeInsets.only(
                           left: Style.safeSpace,
                           right: index == response.length - 1
