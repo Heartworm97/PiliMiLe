@@ -262,13 +262,16 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                   },
                   icon: const Icon(Icons.refresh, size: 20),
                 ),
-                moreTextButton(
-                  text: '查看全部',
-                  onTap: () {
-                    SmartDialog.showToast('等待开发...');
-                  },
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  color: theme.colorScheme.secondary,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: moreTextButton(
+                    text: '查看全部',
+                    onTap: () {
+                      SmartDialog.showToast('等待开发...');
+                    },
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    color: theme.colorScheme.secondary,
+                  ),
                 ),
               ],
             ),
