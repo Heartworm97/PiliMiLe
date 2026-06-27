@@ -327,6 +327,36 @@ Platform.isMacOS
 
 大量核心依赖使用自定义 Git fork（GetX、media-kit、audio_service、window_manager 等），执行 `flutter pub get` 前确保能访问对应 GitHub 仓库。不要用 pub.dev 上的官方版本替换。
 
+### Git 依赖备份仓库
+
+以下 19 个上游 Git 依赖已在 `Heartworm97` 账户下有 fork 备份，存放在 https://github.com/Heartworm97 。**当上游仓库出现分支被删除、force push 破坏、仓库归档/删除等异常时**，可将 `pubspec.yaml` 中对应条目的 `url` 从原地址改为 `https://github.com/Heartworm97/<仓库名>.git`，其余 `path`/`ref` 不变。
+
+| 原仓库 | 备份仓库 |
+|--------|----------|
+| `bggRGjQaUbCoE/audio_service` | `Heartworm97/audio_service` |
+| `bggRGjQaUbCoE/flutter_cached_network_image_ce` | `Heartworm97/flutter_cached_network_image_ce` |
+| `bggRGjQaUbCoE/canvas_danmaku` | `Heartworm97/canvas_danmaku` |
+| `My-Responsitories/catcher_2` | `Heartworm97/catcher_2` |
+| `bggRGjQaUbCoE/flutter_chat_packages` | `Heartworm97/flutter_chat_packages` |
+| `bggRGjQaUbCoE/extended_nested_scroll_view` | `Heartworm97/extended_nested_scroll_view` |
+| `bggRGjQaUbCoE/flutter_file_picker` | `Heartworm97/flutter_file_picker` |
+| `bggRGjQaUbCoE/flutter_smart_dialog` | `Heartworm97/flutter_smart_dialog` |
+| `bggRGjQaUbCoE/flutter_sortable_wrap` | `Heartworm97/flutter_sortable_wrap` |
+| `bggRGjQaUbCoE/font_awesome_flutter` | `Heartworm97/font_awesome_flutter` |
+| `bggRGjQaUbCoE/getx` | `Heartworm97/getx` |
+| `bggRGjQaUbCoE/material_design_icons_flutter` | `Heartworm97/material_design_icons_flutter` |
+| `bggRGjQaUbCoE/flutter_native_device_orientation` | `Heartworm97/flutter_native_device_orientation` |
+| `bggRGjQaUbCoE/super_sliver_list` | `Heartworm97/super_sliver_list` |
+| `bggRGjQaUbCoE/window_manager` | `Heartworm97/window_manager` |
+| `wgh136/webdav_client` | `Heartworm97/webdav_client` |
+| `bggRGjQaUbCoE/flutter_inappwebview` | `Heartworm97/flutter_inappwebview` |
+| `My-Responsitories/media-kit` | `Heartworm97/media-kit` |
+| `bggRGjQaUbCoE/screen_brightness` | `Heartworm97/screen_brightness` |
+
+> **注意**：不要一次性把所有 `url` 都改成 `Heartworm97`，避免触发传递依赖冲突（多个依赖之间互相引用，不同源的同一包会冲突）。按需切换，改完一个就跑 `flutter pub get` 验证。
+
+`screen_brightness_android` 因上游删除了 `main` 分支已于 2025-06-28 切换到 `Heartworm97/screen_brightness`，当前 `pubspec.yaml` 中该项已指向备份仓库。
+
 ### 代码生成后编译
 
 修改任何带 `@HiveType` 注解的 model 后，必须运行：
