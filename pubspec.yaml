@@ -217,7 +217,7 @@ dependency_overrides:
       ref: version_1.2.5
   screen_brightness_android:
     git:
-      url: https://github.com/bggRGjQaUbCoE/screen_brightness.git
+      url: https://github.com/Heartworm97/screen_brightness.git
       path: screen_brightness_android
       ref: develop
 

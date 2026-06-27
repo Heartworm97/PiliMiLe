@@ -1474,10 +1474,10 @@ packages:
     description:
       path: screen_brightness_android
       ref: develop
-      resolved-ref: "239b9e4595f257184c8afcaf21167f8667ba367d"
-      url: "https://github.com/bggRGjQaUbCoE/screen_brightness.git"
+      resolved-ref: "1904a306e1e973b196a30ef3ce9e4eb777c6c7d8"
+      url: "https://github.com/Heartworm97/screen_brightness.git"
     source: git
-    version: "2.1.5"
+    version: "2.1.6"
   screen_brightness_ios:
     dependency: transitive
     description:
@@ -1490,10 +1490,10 @@ packages:
     dependency: "direct main"
     description:
       name: screen_brightness_platform_interface
-      sha256: "59d50850d6735d677780fc7359c8e997d0ff6df91c8465161c9e617a7b0a11d8"
+      sha256: "2de60c0ba569b898950029cc1f7e9dd72bda44a22beb5054aac331cb6fce2ff2"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   screen_retriever:
     dependency: "direct main"
     description:
