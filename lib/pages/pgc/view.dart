@@ -266,7 +266,7 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                   child: moreTextButton(
                     text: '查看全部',
                     onTap: () {
-                      SmartDialog.showToast('等待开发...');
+                      SmartDialog.showToast('都在这里呢，不用查看全部了');
                     },
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     color: theme.colorScheme.secondary,
