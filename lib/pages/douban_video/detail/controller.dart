@@ -233,9 +233,9 @@ class DoubanVideoDetailController extends GetxController {
 
     GStorage.dramaRecord.put(vodId.toString(), record);
 
-    // 最多保留最近 25 条，超限删除最旧记录
+    // 最多保留最近 30 条，超限删除最旧记录
     final box = GStorage.dramaRecord;
-    if (box.length > 25) {
+    if (box.length > 30) {
       final oldest = box.values.reduce(
         (a, b) => (a['playedAt'] as int) < (b['playedAt'] as int) ? a : b,
       );
