@@ -124,11 +124,14 @@ class _SourceSelectorState extends State<SourceSelector> {
                 final isSelected = originalIndex == widget.selectedIndex;
                 final isAvailable = src.decodeStatus != '2' && src.key != 'JD4K' && src.key != 'NBY';
                 final isBuiltin = !src.key.startsWith('site_');
+                final isBBBlueRay = src.name == 'BB蓝光';
                 final indicatorColor = !isAvailable
                     ? Colors.red
-                    : isBuiltin
-                        ? Colors.green
-                        : Colors.orange;
+                    : isBBBlueRay
+                        ? Colors.blue
+                        : isBuiltin
+                            ? Colors.green
+                            : Colors.orange;
 
                 final textColor = !isAvailable
                     ? theme.colorScheme.onSurface.withValues(alpha: 0.38)
