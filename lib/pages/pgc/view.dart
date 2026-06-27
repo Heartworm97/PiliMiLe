@@ -323,8 +323,25 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                       );
                     },
                   ),
-                _ => const Center(
+                Success _ => const Center(
                   child: Text('还没有记录'),
+                ),
+                Error(:final errMsg) => Center(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: controller.loadDramaRecords,
+                    child: Text(
+                      errMsg ?? '加载失败',
+                      style: TextStyle(color: theme.colorScheme.error),
+                    ),
+                  ),
+                ),
+                Loading() => const Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
                 ),
               };
             }),

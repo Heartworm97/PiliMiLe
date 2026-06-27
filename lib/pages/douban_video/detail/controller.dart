@@ -172,7 +172,7 @@ class DoubanVideoDetailController extends GetxController {
     playerReady.value = true;
     // 显式调用 play 确保不须二次点击
     await plPlayerController.play();
-    _saveDramaRecord();
+    await _saveDramaRecord();
   }
 
   /// 解析时间字符串为 Duration（"mm:ss" / "H:mm:ss"）
@@ -203,7 +203,7 @@ class DoubanVideoDetailController extends GetxController {
   }
 
   /// 视频开始播放后写入追剧记录
-  void _saveDramaRecord() {
+  Future<void> _saveDramaRecord() async {
     if (vodId == null) return;
     final d = detail.value;
     if (d == null) return;
@@ -232,7 +232,7 @@ class DoubanVideoDetailController extends GetxController {
       'playedAt': DateTime.now().millisecondsSinceEpoch,
     };
 
-    GStorage.dramaRecord.put(vodId.toString(), record);
+    await GStorage.dramaRecord.put(vodId.toString(), record);
 
     // 最多保留最近 30 条，超限删除最旧记录
     final box = GStorage.dramaRecord;
@@ -257,7 +257,8 @@ class DoubanVideoDetailController extends GetxController {
   }
 
   /// 更新当前追剧记录的播放进度时间（页面关闭时调用）
-  void _updateDramaProgress() {
+  Future<void> _updateDramaProgress() async {
+    if (vodId == null) return;
     if (plPlayerController.position.inSeconds <= 0) return;
     if (selectedEpisode == null) return;
 
@@ -266,7 +267,7 @@ class DoubanVideoDetailController extends GetxController {
 
     existing['progressTime'] = _formatPosition(plPlayerController.position);
     existing['playedAt'] = DateTime.now().millisecondsSinceEpoch;
-    GStorage.dramaRecord.put(vodId.toString(), existing);
+    await GStorage.dramaRecord.put(vodId.toString(), existing);
 
     // 通知追剧 Tab 刷新卡片
     try {

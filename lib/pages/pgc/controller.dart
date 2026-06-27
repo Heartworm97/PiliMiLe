@@ -190,7 +190,6 @@ class PgcController
       Rx<LoadingState<List<DoubanSubject>>>(LoadingState.loading());
 
   Future<void> queryDramaSections() async {
-    final enableSaveLastData = Pref.enableSaveLastData;
     try {
       final results = await Future.wait([
         _queryDramaHot(kind: 'movie', category: '热门', type: '全部'),
@@ -203,13 +202,11 @@ class PgcController
       dramaAnimationState.value = results[2];
       dramaShowState.value = results[3];
     } catch (_) {
-      if (!enableSaveLastData) {
-        dramaMovieState.value = const Error('连接错误，请检查网络重试');
-        dramaTvState.value = const Error('连接错误，请检查网络重试');
-        dramaAnimationState.value = const Error('连接错误，请检查网络重试');
-        dramaShowState.value = const Error('连接错误，请检查网络重试');
-        SmartDialog.showToast('网络连接错误，请检查网络重试');
-      }
+      dramaMovieState.value = const Error('连接错误，请检查网络重试');
+      dramaTvState.value = const Error('连接错误，请检查网络重试');
+      dramaAnimationState.value = const Error('连接错误，请检查网络重试');
+      dramaShowState.value = const Error('连接错误，请检查网络重试');
+      SmartDialog.showToast('网络连接错误，请检查网络重试');
     }
   }
 
