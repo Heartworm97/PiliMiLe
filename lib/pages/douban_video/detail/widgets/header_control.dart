@@ -293,6 +293,8 @@ class DoubanVideoHeaderControl extends StatelessWidget {
           _buildTitle(context),
           // 时间 + 电量（横屏/全屏时显示）
           Obx(() {
+            // 读取 isFullScreen 确保 Obx 能感知播放器状态变化
+            plPlayerController.isFullScreen.value;
             if (MediaQuery.of(context).orientation == Orientation.portrait) {
               return const SizedBox.shrink();
             }
