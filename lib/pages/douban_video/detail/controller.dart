@@ -204,6 +204,7 @@ class DoubanVideoDetailController extends GetxController {
 
   /// 视频开始播放后写入追剧记录
   void _saveDramaRecord() {
+    if (vodId == null) return;
     final d = detail.value;
     if (d == null) return;
 
@@ -236,10 +237,17 @@ class DoubanVideoDetailController extends GetxController {
     // 最多保留最近 30 条，超限删除最旧记录
     final box = GStorage.dramaRecord;
     if (box.length > 30) {
-      final oldest = box.values.reduce(
-        (a, b) => (a['playedAt'] as int) < (b['playedAt'] as int) ? a : b,
-      );
-      box.delete(oldest['vodId'].toString());
+      final oldest = box.values.reduce((a, b) {
+        final pa = a['playedAt'];
+        final pb = b['playedAt'];
+        final va = pa is int ? pa : 0;
+        final vb = pb is int ? pb : 0;
+        return va < vb ? a : b;
+      });
+      final oldestId = oldest['vodId'];
+      if (oldestId != null) {
+        box.delete(oldestId.toString());
+      }
     }
 
     // 通知追剧 Tab 刷新卡片，无需手动下拉

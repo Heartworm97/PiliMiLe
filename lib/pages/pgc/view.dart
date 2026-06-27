@@ -306,10 +306,11 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
                                 tooltip: '删除记录',
                                 onPressed: () {
                                   SmartDialog.dismiss();
-                                  GStorage.dramaRecord.delete(
-                                    response[index].vodId.toString(),
-                                  );
-                                  controller.loadDramaRecords();
+                                  final vid = response[index].vodId;
+                                  if (vid != null) {
+                                    GStorage.dramaRecord.delete(vid.toString());
+                                    controller.loadDramaRecords();
+                                  }
                                 },
                                 icon: Icon(
                                   Icons.delete_outline,

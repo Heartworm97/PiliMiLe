@@ -250,7 +250,13 @@ class PgcController
       list = [];
     } else {
       final records = box.values.toList()
-        ..sort((a, b) => (b['playedAt'] as int).compareTo(a['playedAt'] as int));
+        ..sort((a, b) {
+          final pa = a['playedAt'];
+          final pb = b['playedAt'];
+          final va = pa is int ? pa : 0;
+          final vb = pb is int ? pb : 0;
+          return vb.compareTo(va);
+        });
       list = records.take(30).map<FavPgcItemModel>((r) {
         return FavPgcItemModel(
           seasonId: 0,

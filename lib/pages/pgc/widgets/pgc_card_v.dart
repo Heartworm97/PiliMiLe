@@ -99,7 +99,7 @@ class PgcCardV extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              item.title!,
+              item.title ?? '',
               textAlign: TextAlign.start,
               style: const TextStyle(
                 letterSpacing: 0.3,
@@ -108,18 +108,19 @@ class PgcCardV extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 1),
-            if (item.progress != null)
-              Text(
-                [
-                  item.progress!.startsWith('看到')
-                      ? item.formattedProgress!
-                      : '看到${item.formattedProgress!}',
-                  if (item.progressTime != null) item.progressTime!,
-                ].join(' '),
-                maxLines: 1,
-                style: style,
-              )
-            else if (item.newEp?.indexShow != null)
+            if (item.progress != null) ...[
+              Builder(builder: (_) {
+                final fp = item.formattedProgress ?? item.progress!;
+                return Text(
+                  [
+                    item.progress!.startsWith('看到') ? fp : '看到$fp',
+                    if (item.progressTime != null) item.progressTime!,
+                  ].join(' '),
+                  maxLines: 1,
+                  style: style,
+                );
+              }),
+            ] else if (item.newEp?.indexShow != null)
               Text(
                 item.newEp!.indexShow!,
                 maxLines: 1,
