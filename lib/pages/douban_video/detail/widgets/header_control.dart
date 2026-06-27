@@ -53,7 +53,7 @@ class DoubanVideoHeaderControl extends StatelessWidget {
       tooltip: '更多设置',
       icon: const Icon(
         Icons.more_vert_outlined,
-        size: 15,
+        size: 19,
         color: Colors.white,
       ),
       onPressed: () => _showMoreMenu(context),
