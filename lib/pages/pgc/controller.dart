@@ -257,6 +257,7 @@ class PgcController
           cover: r['cover'] as String?,
           badge: r['badge'] as String?,
           progress: r['progress'] as String?,
+          progressTime: r['progressTime'] as String?,
           isFinish: r['isFinish'] as int?,
           vodId: r['vodId'],
         );

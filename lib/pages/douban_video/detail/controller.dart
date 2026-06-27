@@ -69,6 +69,7 @@ class DoubanVideoDetailController extends GetxController {
 
   @override
   void onClose() {
+    _updateDramaProgress();
     plPlayerController.dispose();
     super.onClose();
   }
@@ -163,6 +164,17 @@ class DoubanVideoDetailController extends GetxController {
     _saveDramaRecord();
   }
 
+  /// 格式化 Duration 为时间字符串（<1h: "mm:ss", >=1h: "H:mm:ss"）
+  String _formatPosition(Duration d) {
+    final h = d.inHours;
+    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    if (h > 0) {
+      return '$h:$m:$s';
+    }
+    return '$m:$s';
+  }
+
   /// 视频开始播放后写入追剧记录
   void _saveDramaRecord() {
     final d = detail.value;
@@ -176,6 +188,10 @@ class DoubanVideoDetailController extends GetxController {
     // 当前剧集标题（格式化后）
     final ep = selectedEpisode;
     final epTitle = ep != null ? episodeLabel(ep) : null;
+    // 当前播放进度时间
+    final pos = plPlayerController.position.inSeconds > 0
+        ? _formatPosition(plPlayerController.position)
+        : null;
 
     final record = <String, dynamic>{
       'vodId': vodId.toString(),
@@ -183,6 +199,7 @@ class DoubanVideoDetailController extends GetxController {
       'cover': vodPic.value,
       'badge': badge,
       'progress': epTitle,
+      'progressTime': pos,
       'isFinish': isFinish,
       'playedAt': DateTime.now().millisecondsSinceEpoch,
     };
@@ -193,6 +210,19 @@ class DoubanVideoDetailController extends GetxController {
     try {
       Get.find<PgcController>(tag: HomeTabType.drama.name).loadDramaRecords();
     } catch (_) {}
+  }
+
+  /// 更新当前追剧记录的播放进度时间（页面关闭时调用）
+  void _updateDramaProgress() {
+    if (plPlayerController.position.inSeconds <= 0) return;
+    if (selectedEpisode == null) return;
+
+    final existing = GStorage.dramaRecord.get(vodId.toString());
+    if (existing == null) return;
+
+    existing['progressTime'] = _formatPosition(plPlayerController.position);
+    existing['playedAt'] = DateTime.now().millisecondsSinceEpoch;
+    GStorage.dramaRecord.put(vodId.toString(), existing);
   }
 
   void onSelectSource(int index) {
