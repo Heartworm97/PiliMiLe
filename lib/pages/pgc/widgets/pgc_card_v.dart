@@ -9,20 +9,6 @@ import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-/// 将进度文本中的时间补零为两位数（"5:16" → "05:16", "1:05:16" → "01:05:16"）
-String _padProgressTime(String text) {
-  // 先处理 H:MM:SS 三段格式
-  text = text.replaceAllMapped(
-    RegExp(r'\b(\d+):(\d{2}):(\d{2})\b'),
-    (m) => '${m[1]!.padLeft(2, '0')}:${m[2]}:${m[3]}',
-  );
-  // 再处理 M:SS 两段格式（排除三段中的 M:SS 部分）
-  return text.replaceAllMapped(
-    RegExp(r'\b(\d+):(\d{2})\b(?!:\d)'),
-    (m) => '${m[1]!.padLeft(2, '0')}:${m[2]}',
-  );
-}
-
 // 视频卡片 - 垂直布局
 class PgcCardV extends StatelessWidget {
   const PgcCardV({
@@ -124,14 +110,12 @@ class PgcCardV extends StatelessWidget {
             const SizedBox(height: 1),
             if (item.progress != null)
               Text(
-                _padProgressTime(
-                  [
-                    item.progress!.startsWith('看到')
-                        ? item.progress!
-                        : '看到${item.progress!}',
-                    if (item.progressTime != null) item.progressTime!,
-                  ].join(' '),
-                ),
+                [
+                  item.progress!.startsWith('看到')
+                      ? item.formattedProgress!
+                      : '看到${item.formattedProgress!}',
+                  if (item.progressTime != null) item.progressTime!,
+                ].join(' '),
                 maxLines: 1,
                 style: style,
               )

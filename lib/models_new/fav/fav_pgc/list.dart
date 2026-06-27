@@ -40,4 +40,18 @@ class FavPgcItemModel with MultiSelectData {
     renewalTime: json['renewal_time'] as String?,
     progress: json['progress'] == '' ? null : json['progress'],
   );
+
+  /// 进度文本中时间补零（"第5集 5:16" → "第5集 05:16"）
+  String? get formattedProgress {
+    if (progress == null) return null;
+    return progress!
+        .replaceAllMapped(
+          RegExp(r'\b(\d+):(\d{2}):(\d{2})\b'),
+          (m) => '${m[1]!.padLeft(2, '0')}:${m[2]}:${m[3]}',
+        )
+        .replaceAllMapped(
+          RegExp(r'\b(\d+):(\d{2})\b(?!:\d)'),
+          (m) => '${m[1]!.padLeft(2, '0')}:${m[2]}',
+        );
+  }
 }
