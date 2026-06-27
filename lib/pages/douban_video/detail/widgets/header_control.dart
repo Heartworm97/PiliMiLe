@@ -270,11 +270,7 @@ class DoubanVideoHeaderControl extends StatelessWidget {
             },
           ),
           Obx(() {
-            final isPortrait =
-                MediaQuery.of(context).orientation == Orientation.portrait;
-            final isFullScreen = plPlayerController.isFullScreen.value;
-            if (!plPlayerController.isDesktopPip &&
-                (!isFullScreen || !isPortrait)) {
+            if (!plPlayerController.isDesktopPip) {
               return _buildBtn(
                 tooltip: '返回主页',
                 icon: const Icon(
