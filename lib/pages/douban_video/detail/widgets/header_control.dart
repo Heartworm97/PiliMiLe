@@ -380,13 +380,11 @@ class _TimeBatteryWidgetState extends State<_TimeBatteryWidget> {
 
   static final _timeFormat = DateFormat('HH:mm');
 
-  bool get _showBattery => Pref.showBatteryLevel;
-
   @override
   void initState() {
     super.initState();
     _startClock();
-    if (_showBattery) _fetchBattery();
+    _fetchBattery();
   }
 
   @override
@@ -420,17 +418,20 @@ class _TimeBatteryWidgetState extends State<_TimeBatteryWidget> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_showBattery)
-          Obx(() {
-            final level = _batteryLevel.value;
-            if (level == null) return const SizedBox.shrink();
-            return Text(
-              '$level%',
-              style: const TextStyle(color: Colors.white, fontSize: 13),
-            );
-          }),
-        if (_showBattery && _batteryLevel.value != null)
-          const SizedBox(width: 10),
+        Obx(() {
+          final level = _batteryLevel.value;
+          if (level == null) return const SizedBox.shrink();
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '$level%',
+                style: const TextStyle(color: Colors.white, fontSize: 13),
+              ),
+              const SizedBox(width: 10),
+            ],
+          );
+        }),
         Obx(
           () => Text(
             _now.value,
