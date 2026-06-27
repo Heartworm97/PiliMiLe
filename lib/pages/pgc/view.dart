@@ -114,28 +114,28 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
         _buildDramaRecord(theme),
-        _buildDramaSection(
+        ..._buildDramaSection(
           theme: theme,
           title: '热门电影',
           state: controller.dramaMovieState,
           kind: 'movie',
           params: {'category': '热门', 'type': '全部'},
         ),
-        _buildDramaSection(
+        ..._buildDramaSection(
           theme: theme,
           title: '热门剧集',
           state: controller.dramaTvState,
           kind: 'tv',
           params: {'category': 'tv', 'type': 'tv'},
         ),
-        _buildDramaSection(
+        ..._buildDramaSection(
           theme: theme,
           title: '热门动漫',
           state: controller.dramaAnimationState,
           kind: 'tv',
           params: {'category': 'tv', 'type': 'tv_animation'},
         ),
-        _buildDramaSection(
+        ..._buildDramaSection(
           theme: theme,
           title: '热门综艺',
           state: controller.dramaShowState,
@@ -265,113 +265,65 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
               ],
             ),
           ),
-          if (PlatformUtils.isDesktop)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Style.safeSpace),
-              child: Obx(() {
-                return switch (controller.dramaRecordState.value) {
-                  Success(:final response) when response.isNotEmpty =>
-                    Wrap(
-                      spacing: Style.cardSpace,
-                      runSpacing: Style.cardSpace,
-                      children: response.map((item) {
-                        return SizedBox(
-                          width: cardWidth,
-                          height: cardTotalHeight,
-                          child: PgcCardV(
-                            item: item,
-                            onTap: () => controller.onDramaCardTap(item),
-                            onLongPress: () => imageSaveDialog(
-                              title: item.title,
-                              cover: item.cover,
-                              extraActions: [
-                                iconButton(
-                                  iconSize: 20,
-                                  tooltip: '删除记录',
-                                  onPressed: () {
-                                    SmartDialog.dismiss();
-                                    GStorage.dramaRecord.delete(
-                                      item.vodId.toString(),
-                                    );
-                                    controller.loadDramaRecords();
-                                  },
-                                  icon: Icon(
-                                    Icons.delete_outline,
-                                    color: Theme.of(context).colorScheme.error,
-                                  ),
+          SizedBox(
+            height: cardTotalHeight,
+            child: Obx(() {
+              return switch (controller.dramaRecordState.value) {
+                Success(:final response) when response.isNotEmpty =>
+                  ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: response.length,
+                    padding: EdgeInsets.zero,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: cardWidth,
+                        margin: EdgeInsets.only(
+                          left: Style.safeSpace,
+                          right: index == response.length - 1
+                              ? Style.safeSpace
+                              : 0,
+                        ),
+                        child: PgcCardV(
+                          item: response[index],
+                          onTap: () => controller.onDramaCardTap(response[index]),
+                          onLongPress: () => imageSaveDialog(
+                            title: response[index].title,
+                            cover: response[index].cover,
+                            extraActions: [
+                              iconButton(
+                                iconSize: 20,
+                                tooltip: '删除记录',
+                                onPressed: () {
+                                  SmartDialog.dismiss();
+                                  GStorage.dramaRecord.delete(
+                                    response[index].vodId.toString(),
+                                  );
+                                  controller.loadDramaRecords();
+                                },
+                                icon: Icon(
+                                  Icons.delete_outline,
+                                  color: Theme.of(context).colorScheme.error,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        );
-                      }).toList(),
-                    ),
-                  _ => const Center(
-                    child: Text('还没有记录'),
+                        ),
+                      );
+                    },
                   ),
-                };
-              }),
-            )
-          else
-            SizedBox(
-              height: cardTotalHeight,
-              child: Obx(() {
-                return switch (controller.dramaRecordState.value) {
-                  Success(:final response) when response.isNotEmpty =>
-                    ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      itemCount: response.length,
-                      padding: EdgeInsets.zero,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          width: cardWidth,
-                          margin: EdgeInsets.only(
-                            left: Style.safeSpace,
-                            right: index == response.length - 1
-                                ? Style.safeSpace
-                                : 0,
-                          ),
-                          child: PgcCardV(
-                            item: response[index],
-                            onTap: () => controller.onDramaCardTap(response[index]),
-                            onLongPress: () => imageSaveDialog(
-                              title: response[index].title,
-                              cover: response[index].cover,
-                              extraActions: [
-                                iconButton(
-                                  iconSize: 20,
-                                  tooltip: '删除记录',
-                                  onPressed: () {
-                                    SmartDialog.dismiss();
-                                    GStorage.dramaRecord.delete(
-                                      response[index].vodId.toString(),
-                                    );
-                                    controller.loadDramaRecords();
-                                  },
-                                  icon: Icon(
-                                    Icons.delete_outline,
-                                    color: Theme.of(context).colorScheme.error,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  _ => const Center(
-                    child: Text('还没有记录'),
-                  ),
-                };
-              }),
-            ),
+                _ => const Center(
+                  child: Text('还没有记录'),
+                ),
+              };
+            }),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildDramaSection({
+  List<Widget> _buildDramaSection({
     required ThemeData theme,
     required String title,
     required Rx<LoadingState<List<DoubanSubject>>> state,
@@ -381,92 +333,105 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
     final cardWidth = Grid.smallCardWidth / 2;
     final cardHeight = cardWidth / 0.75;
     const textHeight = 50.0;
-    return SliverToBoxAdapter(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 10,
-              bottom: 10,
-              left: 16,
-              right: 10,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleMedium,
-                ),
-                moreTextButton(
-                  text: '查看全部',
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  color: theme.colorScheme.secondary,
-                  onTap: () {
-                    Get.to(
-                      DoubanSubjectListPage(
-                        title: title,
-                        kind: kind,
-                        params: params,
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
+    final scaledTextHeight = MediaQuery.textScalerOf(context).scale(textHeight);
+    return [
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(
+            top: 10,
+            bottom: 10,
+            left: 16,
+            right: 10,
           ),
-          Obx(() {
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.titleMedium,
+              ),
+              moreTextButton(
+                text: '查看全部',
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                color: theme.colorScheme.secondary,
+                onTap: () {
+                  Get.to(
+                    DoubanSubjectListPage(
+                      title: title,
+                      kind: kind,
+                      params: params,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      if (PlatformUtils.isDesktop)
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: Style.safeSpace),
+          sliver: Obx(() {
             return switch (state.value) {
               Success(:final response) when response.isNotEmpty =>
-                PlatformUtils.isDesktop
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: Style.safeSpace,
-                        ),
-                        child: Wrap(
-                          spacing: Style.cardSpace,
-                          runSpacing: Style.cardSpace,
-                          children: response.map((item) {
-                            return SizedBox(
-                              width: cardWidth,
-                              height: cardHeight +
-                                  MediaQuery.textScalerOf(context)
-                                      .scale(textHeight),
-                              child: DoubanCard(item: item),
-                            );
-                          }).toList(),
-                        ),
-                      )
-                    : SizedBox(
-                        height: cardHeight +
-                            MediaQuery.textScalerOf(context).scale(textHeight),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          itemCount: response.length,
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              width: cardWidth,
-                              margin: EdgeInsets.only(
-                                left: Style.safeSpace,
-                                right: index == response.length - 1
-                                    ? Style.safeSpace
-                                    : 0,
-                              ),
-                              child: DoubanCard(item: response[index]),
-                            );
-                          },
-                        ),
-                      ),
-              Error(:final errMsg) =>
-                HttpError(isSliver: false, errMsg: errMsg, onReload: controller.onRefresh),
-              _ => const SizedBox.shrink(),
+                SliverGrid.builder(
+                  gridDelegate: SliverGridDelegateWithExtentAndRatio(
+                    mainAxisSpacing: Style.cardSpace,
+                    crossAxisSpacing: Style.cardSpace,
+                    maxCrossAxisExtent: cardWidth,
+                    childAspectRatio: 0.75,
+                    mainAxisExtent: scaledTextHeight,
+                  ),
+                  itemCount: response.length,
+                  itemBuilder: (context, index) => DoubanCard(item: response[index]),
+                ),
+              Error(:final errMsg) => SliverToBoxAdapter(
+                child: HttpError(
+                  isSliver: false,
+                  errMsg: errMsg,
+                  onReload: controller.onRefresh,
+                ),
+              ),
+              _ => const SliverToBoxAdapter(child: SizedBox.shrink()),
             };
           }),
-        ],
-      ),
-    );
+        )
+      else
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: cardHeight + scaledTextHeight,
+            child: Obx(() {
+              return switch (state.value) {
+                Success(:final response) when response.isNotEmpty =>
+                  ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: response.length,
+                    padding: EdgeInsets.zero,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: cardWidth,
+                        margin: EdgeInsets.only(
+                          left: Style.safeSpace,
+                          right: index == response.length - 1
+                              ? Style.safeSpace
+                              : 0,
+                        ),
+                        child: DoubanCard(item: response[index]),
+                      );
+                    },
+                  ),
+                Error(:final errMsg) => HttpError(
+                  isSliver: false,
+                  errMsg: errMsg,
+                  onReload: controller.onRefresh,
+                ),
+                _ => const SizedBox.shrink(),
+              };
+            }),
+          ),
+        ),
+    ];
   }
 
   Widget _buildContent(BuildContext context) {
