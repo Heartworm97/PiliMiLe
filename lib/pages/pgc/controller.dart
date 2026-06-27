@@ -251,7 +251,7 @@ class PgcController
     } else {
       final records = box.values.toList()
         ..sort((a, b) => (b['playedAt'] as int).compareTo(a['playedAt'] as int));
-      list = records.map<FavPgcItemModel>((r) {
+      list = records.take(25).map<FavPgcItemModel>((r) {
         return FavPgcItemModel(
           seasonId: 0,
           title: r['title'] as String?,
