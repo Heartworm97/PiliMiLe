@@ -424,7 +424,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                     labelStyle:
                         TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 14) ??
                         const TextStyle(fontSize: 14),
-                    labelPadding: const EdgeInsets.symmetric(horizontal: 18),
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 24),
                     dividerColor: Colors.transparent,
                     dividerHeight: 0,
                     tabs: const [
