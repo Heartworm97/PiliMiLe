@@ -417,21 +417,22 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
               height: 40,
               child: Row(
                 children: [
-                  Expanded(
-                    child: TabBar(
-                      padding: EdgeInsets.zero,
-                      labelStyle:
-                          TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 12) ??
-                          const TextStyle(fontSize: 12),
-                      labelPadding: const EdgeInsets.symmetric(horizontal: 6),
-                      dividerColor: Colors.transparent,
-                      dividerHeight: 0,
-                      tabs: const [
-                        Tab(text: '简介'),
-                        Tab(text: '待规划'),
-                      ],
-                    ),
+                  TabBar(
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    padding: EdgeInsets.zero,
+                    labelStyle:
+                        TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 12) ??
+                        const TextStyle(fontSize: 12),
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 6),
+                    dividerColor: Colors.transparent,
+                    dividerHeight: 0,
+                    tabs: const [
+                      Tab(text: '简介'),
+                      Tab(text: '待规划'),
+                    ],
                   ),
+                  const Spacer(),
                   // 控制按钮
                   SizedBox(
                     width: 30,
