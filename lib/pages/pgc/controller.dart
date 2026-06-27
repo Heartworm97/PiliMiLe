@@ -258,13 +258,26 @@ class PgcController
           cover: r['cover'] as String?,
           badge: r['badge'] as String?,
           progress: r['progress'] as String?,
-          progressTime: r['progressTime'] as String?,
+          progressTime: _normalizeProgressTime(r['progressTime'] as String?),
           isFinish: r['isFinish'] as int?,
           vodId: r['vodId'],
         );
       }).toList();
     }
     dramaRecordState.value = Success(list);
+  }
+
+  /// 规范化进度时间，确保分钟/秒始终两位数（兼容旧数据如 "5:16" → "05:16"）
+  String? _normalizeProgressTime(String? time) {
+    if (time == null || time.isEmpty) return time;
+    final parts = time.split(':');
+    if (parts.length == 2) {
+      return '${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}';
+    }
+    if (parts.length == 3) {
+      return '${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}:${parts[2].padLeft(2, '0')}';
+    }
+    return time;
   }
 
   /// 点击追剧记录卡片：先请求详情再跳转，并定位到记录的线路和集数
