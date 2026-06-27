@@ -191,12 +191,12 @@ class DoubanVideoDetailController extends GetxController {
     return null;
   }
 
-  /// 格式化 Duration 为时间字符串（<1h: "mm:ss", >=1h: "HH:mm:ss"）
+  /// 格式化 Duration 为时间字符串（<1h: "mm:ss", >=1h: "H:mm:ss"）
   String _formatPosition(Duration d) {
-    final h = d.inHours.toString().padLeft(2, '0');
+    final h = d.inHours;
     final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-    if (d.inHours > 0) {
+    if (h > 0) {
       return '$h:$m:$s';
     }
     return '$m:$s';
