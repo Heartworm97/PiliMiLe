@@ -29,6 +29,9 @@ class DoubanVideoDetailController extends GetxController {
   final isDecoding = false.obs;
   final m3u8Url = Rxn<String>();
 
+  // 续播进度（从追剧记录卡片传入）
+  Duration? resumePosition;
+
   // 播放器
   final plPlayerController = PlPlayerController.getInstance(isLive: false);
   final playerReady = false.obs;
@@ -61,6 +64,10 @@ class DoubanVideoDetailController extends GetxController {
           (args?['preloadedEpisodeIndex'] as int?) ?? 0;
       if (args?['preloadedM3u8'] case final String url) {
         m3u8Url.value = url;
+      }
+      // 解析续播进度
+      if (args?['progressTime'] case final String time) {
+        resumePosition = _parseProgressTime(time);
       }
     } else {
       _fetchDetail();
@@ -153,15 +160,35 @@ class DoubanVideoDetailController extends GetxController {
   }
 
   Future<void> _playM3u8(String url) async {
+    // 有续播进度时传入 seekTo，初始化到对应位置
+    final seekTo = resumePosition;
+    resumePosition = null;
     await plPlayerController.setDataSource(
       NetworkSource(videoSource: url, audioSource: null),
       isLive: false,
       autoplay: false,
+      seekTo: seekTo,
     );
     playerReady.value = true;
     // 显式调用 play 确保不须二次点击
     await plPlayerController.play();
     _saveDramaRecord();
+  }
+
+  /// 解析时间字符串为 Duration（"mm:ss" / "H:mm:ss"）
+  Duration? _parseProgressTime(String time) {
+    final parts = time.split(':');
+    if (parts.length == 2) {
+      final m = int.tryParse(parts[0]);
+      final s = int.tryParse(parts[1]);
+      if (m != null && s != null) return Duration(minutes: m, seconds: s);
+    } else if (parts.length == 3) {
+      final h = int.tryParse(parts[0]);
+      final m = int.tryParse(parts[1]);
+      final s = int.tryParse(parts[2]);
+      if (h != null && m != null && s != null) return Duration(hours: h, minutes: m, seconds: s);
+    }
+    return null;
   }
 
   /// 格式化 Duration 为时间字符串（<1h: "mm:ss", >=1h: "H:mm:ss"）

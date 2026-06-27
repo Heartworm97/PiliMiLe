@@ -309,6 +309,7 @@ class PgcController
           'preloadedEpisodeIndex': episodeIndex,
           'vodName': item.title,
           'vodPic': item.cover,
+          'progressTime': item.progressTime,
         });
       } else {
         SmartDialog.showToast(resp['msg'] ?? '获取详情失败');
