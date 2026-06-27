@@ -355,6 +355,24 @@ class VideoDetailController extends GetxController
     }
   }
 
+  /// 保存PGC追番/影视观看进度到本地，供首页卡片展示
+  void _cachePgcProgress() {
+    final isPgc = videoType == VideoType.pgc || _actualVideoType == VideoType.pgc;
+    if (!isPgc || seasonId == null) return;
+    final pos = plPlayerController.position;
+    if (pos.inSeconds <= 0) return;
+
+    final h = pos.inHours;
+    final m = pos.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final s = pos.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final progressTime = h > 0 ? '$h:$m:$s' : '$m:$s';
+
+    GStorage.pgcProgress.put(seasonId.toString(), {
+      'progressTime': progressTime,
+      'playedAt': DateTime.now().millisecondsSinceEpoch,
+    });
+  }
+
   void initFileSource(BiliDownloadEntryInfo entry, {bool isInit = true}) {
     this.entry = entry;
     firstVideo = VideoItem(
@@ -1246,6 +1264,7 @@ class VideoDetailController extends GetxController
     if (isFileSource) {
       cacheLocalProgress();
     }
+    _cachePgcProgress();
     introScrollCtr?.dispose();
     introScrollCtr = null;
     tabCtr.dispose();

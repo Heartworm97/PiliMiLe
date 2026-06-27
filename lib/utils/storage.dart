@@ -23,6 +23,7 @@ abstract final class GStorage {
   static late final Box<dynamic> video;
   static late final Box<int> watchProgress;
   static late final Box<dynamic> dramaRecord;
+  static late final Box<dynamic> pgcProgress;
   static late final Box<Uint8List>? reply;
 
   static Future<void> init() async {
@@ -65,6 +66,8 @@ abstract final class GStorage {
       ).then((res) => watchProgress = res),
       // 追剧记录
       Hive.openBox<dynamic>('dramaRecord').then((res) => dramaRecord = res),
+      // PGC追番/影视观看进度
+      Hive.openBox<dynamic>('pgcProgress').then((res) => pgcProgress = res),
     ]);
 
     if (Pref.saveReply) {
@@ -121,6 +124,7 @@ abstract final class GStorage {
       Accounts.account.compact(),
       watchProgress.compact(),
       dramaRecord.compact(),
+      pgcProgress.compact(),
       ?reply?.compact(),
     ]);
   }
@@ -135,6 +139,7 @@ abstract final class GStorage {
       Accounts.account.close(),
       watchProgress.close(),
       dramaRecord.close(),
+      pgcProgress.close(),
       ?reply?.close(),
     ]);
   }
@@ -149,6 +154,7 @@ abstract final class GStorage {
       Accounts.clear(),
       watchProgress.clear(),
       dramaRecord.clear(),
+      pgcProgress.clear(),
       ?reply?.clear(),
     ]);
   }
