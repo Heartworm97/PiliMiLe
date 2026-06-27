@@ -149,31 +149,10 @@ class PgcController
         followState.refresh();
       }
       followPage++;
-      _mergeLocalPgcProgress();
+    } else if (isRefresh) {
       followState.value = res as Error;
     }
     followLoading = false;
-  }
-
-  /// 合并本地PGC观看进度到追番/影视列表，让首页卡片即时显示观看时间
-  void _mergeLocalPgcProgress() {
-    if (followState.value case Success(:final response) when response != null) {
-      var changed = false;
-      for (final item in response) {
-        if (item.seasonId == null) continue;
-        final local = GStorage.pgcProgress.get(item.seasonId.toString());
-        if (local != null && local['progressTime'] is String) {
-          item.progressTime = local['progressTime'];
-          changed = true;
-        }
-      }
-      if (changed) followState.refresh();
-    }
-  }
-
-  /// 页面变为可见时调用，合并本地进度到卡片展示
-  void onPageShow() {
-    _mergeLocalPgcProgress();
   }
 
   @override

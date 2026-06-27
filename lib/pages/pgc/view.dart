@@ -64,9 +64,6 @@ class _PgcPageState extends State<PgcPage> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) controller.onPageShow();
-    });
     if (controller.isDrama) {
       return Obx(() {
         final morphsDone = controller.initialMorphCount.value >= 4;
