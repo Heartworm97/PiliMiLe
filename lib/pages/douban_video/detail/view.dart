@@ -61,10 +61,20 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
       ),
       body: Obx(() {
         final isFullScreen = controller.plPlayerController.isFullScreen.value;
-        final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
-        // 全屏 / 横屏时播放器撑满，移除 SafeArea + 隐藏详情区域
-        if (isFullScreen || (!PlatformUtils.isDesktop && !isPortrait)) {
+        // 全屏时播放器撑满
+        if (isFullScreen) {
+          return _buildPlayerArea(size.width, size.height);
+        }
+
+        // 桌面端：左右分栏布局（左边播放器 + 右边侧栏）
+        if (PlatformUtils.isDesktop) {
+          return _buildDesktopLayout(size);
+        }
+
+        // 手机端
+        final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+        if (!isPortrait) {
           return _buildPlayerArea(size.width, size.height);
         }
 
@@ -347,6 +357,95 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  /// 桌面端左右分栏布局：左边播放器 + 右边侧栏
+  Widget _buildDesktopLayout(Size screenSize) {
+    final theme = Theme.of(context);
+    final sidebarWidth = (screenSize.width * 0.35).clamp(300.0, 420.0);
+    final playerWidth = screenSize.width - sidebarWidth;
+
+    return Row(
+      children: [
+        // 左侧：播放器
+        SizedBox(
+          width: playerWidth,
+          height: screenSize.height,
+          child: _buildPlayerArea(playerWidth, screenSize.height),
+        ),
+        // 右侧：简介 + 换源 + 选集
+        SizedBox(
+          width: sidebarWidth,
+          height: screenSize.height,
+          child: SafeArea(
+            child: _buildDesktopSidebar(screenSize.height, theme),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 桌面端右侧侧栏：封面信息 + 控制按钮 + 换源 + 选集
+  Widget _buildDesktopSidebar(double screenHeight, ThemeData theme) {
+    if (controller.detail.value == null) {
+      return const Center(child: Text('暂无数据'));
+    }
+
+    final detail = controller.detail.value!;
+    final infoStyle = TextStyle(
+      fontSize: 13,
+      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+    );
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(14, 8, 14, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 顶部控制按钮
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                width: 34,
+                height: 34,
+                child: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.manage_search, size: 20),
+                ),
+              ),
+              SizedBox(
+                width: 34,
+                height: 34,
+                child: IconButton(
+                  onPressed: () => setState(() => _dmEnabled = !_dmEnabled),
+                  icon: Icon(
+                    _dmEnabled ? CustomIcons.dm_on : CustomIcons.dm_off,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // 封面 + 信息
+          _buildCoverInfoRow(theme, detail, infoStyle),
+          const SizedBox(height: 12),
+          // 线路选择器
+          Obx(() => SourceSelector(
+            sources: controller.sources,
+            selectedIndex: controller.selectedSourceIndex.value,
+            onSelected: controller.onSelectSource,
+          )),
+          // 集数选择器
+          Obx(() => EpisodeSelector(
+            maxPanelHeight: screenHeight * 0.55,
+            episodes: controller.currentEpisodes,
+            selectedIndex: controller.selectedEpisodeIndex.value,
+            onSelected: controller.onSelectEpisode,
+          )),
         ],
       ),
     );
