@@ -12,6 +12,7 @@ import 'package:PiliMiLe/pages/common/common_list_controller.dart';
 import 'package:PiliMiLe/pages/douban_video/detail/episode_label.dart';
 import 'package:PiliMiLe/services/account_service.dart';
 import 'package:PiliMiLe/utils/extension/scroll_controller_ext.dart';
+import 'package:PiliMiLe/utils/platform_utils.dart';
 import 'package:PiliMiLe/utils/storage.dart';
 import 'package:PiliMiLe/utils/storage_pref.dart';
 import 'package:flutter/widgets.dart' show ScrollController;
@@ -222,7 +223,7 @@ class PgcController
         '/rexxar/api/v2/subject/recent_hot/$kind',
         queryParameters: {
           'start': 0,
-          'limit': 10,
+          'limit': PlatformUtils.isDesktop ? 20 : 10,
           'category': category,
           'type': type,
         },
