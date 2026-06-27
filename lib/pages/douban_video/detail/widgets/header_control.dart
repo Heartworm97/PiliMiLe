@@ -11,6 +11,7 @@ import 'package:PiliMiLe/plugin/pl_player/controller.dart';
 import 'package:PiliMiLe/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliMiLe/services/shutdown_timer_service.dart'
     show shutdownTimerService;
+import 'package:PiliMiLe/pages/douban_video/detail/episode_label.dart';
 import 'package:PiliMiLe/utils/image_utils.dart';
 import 'package:PiliMiLe/utils/page_utils.dart';
 import 'package:PiliMiLe/utils/platform_utils.dart';
@@ -326,11 +327,13 @@ class DoubanVideoHeaderControl extends StatelessWidget {
           ((!plPlayerController.horizontalScreen ||
                   plPlayerController.isDesktopPip) &&
               !isPortrait)) {
+        final ep = doubanController.selectedEpisode;
+        final label = ep != null ? '$title ${episodeLabel(ep)}' : title;
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.only(left: 4),
             child: Text(
-              title,
+              label,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
