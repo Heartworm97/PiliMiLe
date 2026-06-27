@@ -128,7 +128,7 @@ class _SourceSelectorState extends State<SourceSelector> {
                 final indicatorColor = !isAvailable
                     ? Colors.red
                     : isBBBlueRay
-                        ? Colors.blueAccent
+                        ? Colors.amber
                         : isBuiltin
                             ? Colors.green
                             : Colors.orange;
