@@ -219,7 +219,7 @@ dependency_overrides:
     git:
       url: https://github.com/bggRGjQaUbCoE/screen_brightness.git
       path: screen_brightness_android
-      ref: main
+      ref: 239b9e4595f257184c8afcaf21167f8667ba367d
 
 dev_dependencies:
   flutter_test:
