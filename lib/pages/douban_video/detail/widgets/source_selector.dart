@@ -195,7 +195,7 @@ class _SourceSelectorState extends State<SourceSelector> {
                                   boxShadow: isBBBlueRay && isAvailable
                                       ? [
                                           BoxShadow(
-                                            color: indicatorColor.withValues(alpha: 0.5),
+                                            color: Colors.amber.withValues(alpha: 0.7),
                                             blurRadius: 4,
                                             spreadRadius: 1,
                                           ),
