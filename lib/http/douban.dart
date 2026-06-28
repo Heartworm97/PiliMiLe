@@ -408,12 +408,6 @@ class DoubanHttp {
                 _lcsRatio(keywordForMatch, item.vodName) >= 0.5)
             .toList();
 
-        if (kDebugMode) {
-          for (final item in filteredList) {
-                debugPrint('剧名: ${item.vodName} | 海报: ${item.vodPic}');
-          }
-        }
-
         if (filteredList.isEmpty) {
           return {'status': false, 'data': null, 'msg': '没有相关数据'};
         }
