@@ -73,8 +73,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         }
 
         // 手机端
-        final isPortrait =
-            MediaQuery.of(context).orientation == Orientation.portrait;
+        final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
         if (!isPortrait) {
           return _buildPlayerArea(size.width, size.height);
         }
@@ -220,6 +219,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
             ),
           ),
         ),
+
       ],
     );
   }
@@ -228,7 +228,8 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     // 播放器下方可用高度
     final statusBarHeight = MediaQuery.of(context).padding.top;
     final playerHeight = screenSize.width * 9 / 16;
-    final availableBelow = screenSize.height - statusBarHeight - playerHeight;
+    final availableBelow =
+        screenSize.height - statusBarHeight - playerHeight;
 
     // 无数据
     if (controller.detail.value == null) {
@@ -263,9 +264,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                     child: TabBar(
                       padding: EdgeInsets.zero,
                       labelStyle:
-                          TabBarTheme.of(
-                            context,
-                          ).labelStyle?.copyWith(fontSize: 13) ??
+                          TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 13) ??
                           const TextStyle(fontSize: 13),
                       labelPadding: const EdgeInsets.symmetric(horizontal: 10),
                       dividerColor: Colors.transparent,
@@ -286,7 +285,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                             height: 38,
                             child: IconButton(
                               onPressed: () {},
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.manage_search,
                                 size: 22,
                               ),
@@ -296,17 +295,14 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                             width: 38,
                             height: 38,
                             child: IconButton(
-                              onPressed: () =>
-                                  setState(() => _dmEnabled = !_dmEnabled),
+                              onPressed: () => setState(() => _dmEnabled = !_dmEnabled),
                               icon: Icon(
-                                _dmEnabled
-                                    ? CustomIcons.dm_on
-                                    : CustomIcons.dm_off,
+                                _dmEnabled ? CustomIcons.dm_on : CustomIcons.dm_off,
                                 size: 22,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 14),
+                          SizedBox(width: 14),
                         ],
                       ),
                     ),
@@ -332,22 +328,18 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                       _buildCoverInfoRow(theme, detail, infoStyle),
                       const SizedBox(height: 12),
                       // 线路选择器
-                      Obx(
-                        () => SourceSelector(
-                          sources: controller.sources,
-                          selectedIndex: controller.selectedSourceIndex.value,
-                          onSelected: controller.onSelectSource,
-                        ),
-                      ),
+                      Obx(() => SourceSelector(
+                        sources: controller.sources,
+                        selectedIndex: controller.selectedSourceIndex.value,
+                        onSelected: controller.onSelectSource,
+                      )),
                       // 集数选择器
-                      Obx(
-                        () => EpisodeSelector(
-                          maxPanelHeight: availableBelow,
-                          episodes: controller.currentEpisodes,
-                          selectedIndex: controller.selectedEpisodeIndex.value,
-                          onSelected: controller.onSelectEpisode,
-                        ),
-                      ),
+                      Obx(() => EpisodeSelector(
+                        maxPanelHeight: availableBelow,
+                        episodes: controller.currentEpisodes,
+                        selectedIndex: controller.selectedEpisodeIndex.value,
+                        onSelected: controller.onSelectEpisode,
+                      )),
                       const SizedBox(height: 24),
                     ],
                   ),
@@ -357,9 +349,8 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                   child: Text(
                     '待规划',
                     style: TextStyle(
-                      color: theme.colorScheme.onSurface.withValues(
-                        alpha: 0.38,
-                      ),
+                      color: theme.colorScheme.onSurface
+                          .withValues(alpha: 0.38),
                     ),
                   ),
                 ),
@@ -431,9 +422,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                     tabAlignment: TabAlignment.start,
                     padding: EdgeInsets.zero,
                     labelStyle:
-                        TabBarTheme.of(
-                          context,
-                        ).labelStyle?.copyWith(fontSize: 14) ??
+                        TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 14) ??
                         const TextStyle(fontSize: 14),
                     labelPadding: const EdgeInsets.symmetric(horizontal: 24),
                     dividerColor: Colors.transparent,
@@ -482,22 +471,18 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                       _buildCoverInfoRow(theme, detail, infoStyle),
                       const SizedBox(height: 12),
                       // 线路选择器
-                      Obx(
-                        () => SourceSelector(
-                          sources: controller.sources,
-                          selectedIndex: controller.selectedSourceIndex.value,
-                          onSelected: controller.onSelectSource,
-                        ),
-                      ),
+                      Obx(() => SourceSelector(
+                        sources: controller.sources,
+                        selectedIndex: controller.selectedSourceIndex.value,
+                        onSelected: controller.onSelectSource,
+                      )),
                       // 集数选择器
-                      Obx(
-                        () => EpisodeSelector(
-                          maxPanelHeight: screenHeight * 0.55,
-                          episodes: controller.currentEpisodes,
-                          selectedIndex: controller.selectedEpisodeIndex.value,
-                          onSelected: controller.onSelectEpisode,
-                        ),
-                      ),
+                      Obx(() => EpisodeSelector(
+                        maxPanelHeight: screenHeight * 0.55,
+                        episodes: controller.currentEpisodes,
+                        selectedIndex: controller.selectedEpisodeIndex.value,
+                        onSelected: controller.onSelectEpisode,
+                      )),
                     ],
                   ),
                 ),
@@ -506,9 +491,8 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
                   child: Text(
                     '待规划',
                     style: TextStyle(
-                      color: theme.colorScheme.onSurface.withValues(
-                        alpha: 0.38,
-                      ),
+                      color: theme.colorScheme.onSurface
+                          .withValues(alpha: 0.38),
                     ),
                   ),
                 ),

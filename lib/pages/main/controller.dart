@@ -12,6 +12,7 @@ import 'package:PiliMiLe/pages/home/controller.dart';
 import 'package:PiliMiLe/pages/mine/view.dart';
 import 'package:PiliMiLe/services/account_service.dart';
 import 'package:PiliMiLe/utils/extension/get_ext.dart';
+import 'package:PiliMiLe/utils/extension/iterable_ext.dart';
 import 'package:PiliMiLe/utils/feed_back.dart';
 import 'package:PiliMiLe/utils/storage.dart';
 import 'package:PiliMiLe/utils/storage_key.dart';
@@ -234,8 +235,7 @@ class MainController extends GetxController
         navigationBars = NavigationBarType.values;
       }
     } else if (raw is List && raw.isNotEmpty) {
-      navigationBars = raw
-          .cast<int>()
+      navigationBars = raw.cast<int>()
           .map((i) => NavigationBarType.values[i])
           .toList();
     } else {

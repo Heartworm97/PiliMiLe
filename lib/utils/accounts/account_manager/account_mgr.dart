@@ -182,7 +182,7 @@ class AccountManager extends Interceptor {
         (url.contains('skipSegments') && err.requestOptions.method == 'GET')) {
       // skip
     } else {
-      dioError(err).then(SmartDialog.showToast);
+      dioError(err).then((res) => SmartDialog.showToast(res));
     }
   }
 
@@ -261,7 +261,7 @@ class AccountManager extends Interceptor {
         } catch (_) {
           desc = '';
         }
-        return '$desc网络异常';
+        return '${desc}网络异常';
     }
   }
 }

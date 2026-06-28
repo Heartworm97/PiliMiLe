@@ -130,11 +130,7 @@ class _AboutPageState extends State<AboutPage> {
               theme: theme,
             ),
             const SizedBox(height: 6),
-            Icon(
-              Icons.arrow_downward,
-              size: 18,
-              color: colorScheme.primary.withAlpha(60),
-            ),
+            Icon(Icons.arrow_downward, size: 18, color: colorScheme.primary.withAlpha(60)),
             const SizedBox(height: 6),
             _buildCreditCard(
               label: '上游作者',
@@ -144,11 +140,7 @@ class _AboutPageState extends State<AboutPage> {
               theme: theme,
             ),
             const SizedBox(height: 6),
-            Icon(
-              Icons.arrow_downward,
-              size: 18,
-              color: colorScheme.primary.withAlpha(60),
-            ),
+            Icon(Icons.arrow_downward, size: 18, color: colorScheme.primary.withAlpha(60)),
             const SizedBox(height: 6),
             _buildCreditCard(
               label: '上游作者',
@@ -158,11 +150,7 @@ class _AboutPageState extends State<AboutPage> {
               theme: theme,
             ),
             const SizedBox(height: 6),
-            Icon(
-              Icons.arrow_downward,
-              size: 18,
-              color: colorScheme.primary.withAlpha(60),
-            ),
+            Icon(Icons.arrow_downward, size: 18, color: colorScheme.primary.withAlpha(60)),
             const SizedBox(height: 6),
             _buildCreditCard(
               label: '本仓库',
@@ -380,9 +368,9 @@ class _AboutPageState extends State<AboutPage> {
             leading: const Icon(Icons.info_outline),
           ),
           ListTile(
-            title: const Text(
+            title: Text(
               'Commit Hash: ${BuildConfig.commitHash}',
-              style: TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14),
             ),
             leading: const SizedBox(width: 24),
             onTap: () {},
