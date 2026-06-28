@@ -435,10 +435,12 @@ class LoginPageController extends GetxController
           break;
         case -105:
           String captureUrl = res['data']['url'];
+          debugPrint('[login] 需要人机验证, captureUrl=$captureUrl');
           Uri captureUri = Uri.parse(captureUrl);
           captchaData.token = captureUri.queryParameters['recaptcha_token']!;
           String geeGt = captureUri.queryParameters['gee_gt']!;
           String geeChallenge = captureUri.queryParameters['gee_challenge']!;
+          debugPrint('[login] 极验参数: gt=$geeGt, challenge=${geeChallenge.substring(0, 16)}..., token=${captchaData.token?.substring(0, 16)}...');
 
           getCaptcha(geeGt, geeChallenge, loginByPassword);
           break;
