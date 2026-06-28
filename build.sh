@@ -67,35 +67,53 @@ FLUTTER_CMD=""
 check_prereq() {
     title "前置检查..."
 
-    local required version
+    local required version fvm_ver
 
-    # 确定用于后续所有操作的 flutter 命令
+    # 从 .fvmrc 读取要求的版本
+    required=$(python3 -c "import json; print(json.load(open('.fvmrc'))['flutter'])" 2>/dev/null || echo "")
+
+    # 确定用于后续所有操作的 flutter 命令（按优先级）
+    # 1. 直接可用的 flutter 命令
     if command -v flutter &>/dev/null; then
         FLUTTER_CMD="flutter"
+    # 2. FVM 全局命令
     elif command -v fvm &>/dev/null && fvm flutter --version &>/dev/null 2>&1; then
         FLUTTER_CMD="fvm flutter"
+    # 3. FVM 版本缓存目录（常见于 macOS: $HOME/fvm/versions/）
+    elif [ -n "$required" ] && [ -x "$HOME/fvm/versions/$required/bin/flutter" ]; then
+        FLUTTER_CMD="$HOME/fvm/versions/$required/bin/flutter"
+    # 4. FVM 公共安装路径
+    elif [ -n "${FVM_HOME:-}" ] && [ -n "$required" ] && [ -x "$FVM_HOME/versions/$required/bin/flutter" ]; then
+        FLUTTER_CMD="$FVM_HOME/versions/$required/bin/flutter"
+    # 5. 项目本地 FVM 符号链接
+    elif [ -n "$required" ] && [ -x ".fvm/flutter_sdk/bin/flutter" ]; then
+        FLUTTER_CMD=".fvm/flutter_sdk/bin/flutter"
+    # 6. 环境变量 FLUTTER_ROOT
     elif [ -n "${FLUTTER_ROOT:-}" ] && [ -x "$FLUTTER_ROOT/bin/flutter" ]; then
         FLUTTER_CMD="$FLUTTER_ROOT/bin/flutter"
+    # 7. 常见手动安装路径
     elif [ -x "$HOME/flutter/bin/flutter" ]; then
         FLUTTER_CMD="$HOME/flutter/bin/flutter"
     else
         err "未找到 Flutter，请先安装 Flutter SDK"
-        err "  macOS: brew install fvm && fvm use 3.44.2"
-        err "  或从 https://flutter.dev 下载后加入 PATH"
+        err "  方式 1: brew install fvm && fvm install $required && fvm use $required"
+        err "  方式 2: 从 https://flutter.dev 下载后加入 PATH"
+        err "  当前 PATH: $PATH"
         exit 1
     fi
 
-    required=$(python3 -c "import json; print(json.load(open('.fvmrc'))['flutter'])" 2>/dev/null || echo "")
-    version=$($FLUTTER_CMD --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "")
+    version=$($FLUTTER_CMD --version 2>/dev/null | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "")
 
     if [ -z "$version" ]; then
-        err "无法获取 Flutter 版本，请检查 Flutter 安装"
+        err "无法获取 Flutter 版本"
+        err "  命令: $FLUTTER_CMD --version"
+        err "  输出: $($FLUTTER_CMD --version 2>&1 | head -n 1 || echo '(无输出)')"
         exit 1
     fi
 
     if [ -n "$required" ] && [ "$version" != "$required" ]; then
         warn "Flutter 版本不匹配：要求 $required，当前 $version"
-        warn "建议使用 fvm 或切换版本后重试"
+        warn "建议: fvm use $required 或切换版本后重试"
         read -rp "是否继续? [y/N] " ans
         [[ "$ans" != "y" && "$ans" != "Y" ]] && exit 0
     else
