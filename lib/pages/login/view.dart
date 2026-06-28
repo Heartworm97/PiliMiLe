@@ -536,6 +536,18 @@ class _LoginPageState extends State<LoginPage> {
                       Tab(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
+                          children: [Icon(Icons.password), Text(' 密码')],
+                        ),
+                      ),
+                      Tab(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [Icon(Icons.sms), Text(' 短信')],
+                        ),
+                      ),
+                      Tab(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [Icon(Icons.qr_code), Text(' 扫码')],
                         ),
                       ),
@@ -558,6 +570,8 @@ class _LoginPageState extends State<LoginPage> {
         bottom: !isLandscape
             ? TabBar(
                 tabs: const [
+                  Tab(icon: Icon(Icons.password), text: '密码'),
+                  Tab(icon: Icon(Icons.sms), text: '短信'),
                   Tab(icon: Icon(Icons.qr_code), text: '扫码'),
                   Tab(icon: Icon(Icons.cookie_outlined), text: 'Cookie'),
                 ],
@@ -575,6 +589,8 @@ class _LoginPageState extends State<LoginPage> {
         child: tabBarView(
           controller: _loginPageCtr.tabController,
           children: [
+            tabViewOuter(loginByPassword(theme)),
+            tabViewOuter(loginBySmS(theme)),
             tabViewOuter(loginByQRCode(theme)),
             tabViewOuter(loginByCookie(theme)),
           ],

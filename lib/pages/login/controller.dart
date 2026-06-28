@@ -51,7 +51,7 @@ class LoginPageController extends GetxController
   @override
   void onInit() {
     super.onInit();
-    tabController = TabController(length: 2, vsync: this)
+    tabController = TabController(length: 4, vsync: this)
       ..addListener(_handleTabChange);
   }
 
@@ -84,7 +84,7 @@ class LoginPageController extends GetxController
           return;
         }
         qrCodeLeftTime.value = left;
-        if (_isReq || tabController.index != 1) return;
+        if (_isReq || tabController.index != 2) return;
 
         _isReq = true;
         LoginHttp.codePoll(response.authCode).then((value) async {
@@ -109,7 +109,7 @@ class LoginPageController extends GetxController
   }
 
   void _handleTabChange() {
-    if (tabController.index == 1) {
+    if (tabController.index == 2) {
       if (qrCodeTimer == null || !qrCodeTimer!.isActive) {
         refreshQRCode();
       }
