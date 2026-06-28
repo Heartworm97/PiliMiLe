@@ -14,4 +14,3 @@
 - 修复追剧记录异步写入未 await 导致数据丢失
 - 修复追剧记录 `playedAt`/`vodId`/`title` 等多处空值强制解包崩溃
 - 修复 PGC 初始化时 `initialMorphCount` 延迟初始化问题
-

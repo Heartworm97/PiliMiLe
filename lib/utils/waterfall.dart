@@ -97,8 +97,14 @@ class SliverWaterfallFlowDelegateWithMaxCrossAxisExtent
       return crossAxisCount!;
     }
     this.crossAxisExtent = crossAxisExtent;
+    // 当窗口尺寸为 0 时 crossAxisExtent 可能为 0 或负值，保底返回 1 列
+    if (crossAxisExtent <= 0.0) {
+      return crossAxisCount = 1;
+    }
     crossAxisCount = (crossAxisExtent / (maxCrossAxisExtent + crossAxisSpacing))
         .ceil();
+    // 保底至少 1 列
+    if (crossAxisCount! < 1) crossAxisCount = 1;
     return crossAxisCount!;
   }
 

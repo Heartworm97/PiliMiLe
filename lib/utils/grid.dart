@@ -98,6 +98,19 @@ class SliverGridDelegateWithExtentAndRatio extends SliverGridDelegate {
         constraints.crossAxisExtent == crossAxisExtentCache) {
       return layoutCache!;
     }
+    // 当窗口尺寸为 0 或在 SliverMainAxisGroup 首帧布局阶段，
+    // crossAxisExtent 可能为 0 或负值，此时返回最小有效布局避免崩溃，
+    // 框架会在约束就绪后重新调用 getLayout。
+    if (constraints.crossAxisExtent <= 0.0) {
+      return layoutCache = const SliverGridRegularTileLayout(
+        crossAxisCount: 1,
+        mainAxisStride: 0.0,
+        crossAxisStride: 0.0,
+        childMainAxisExtent: 0.0,
+        childCrossAxisExtent: 0.0,
+        reverseCrossAxis: false,
+      );
+    }
     crossAxisExtentCache = constraints.crossAxisExtent;
     int crossAxisCount =
         ((constraints.crossAxisExtent - crossAxisSpacing) /
@@ -203,6 +216,19 @@ class SliverGridDelegateWithMaxCrossAxisExtent extends SliverGridDelegate {
     if (layoutCache != null &&
         constraints.crossAxisExtent == crossAxisExtentCache) {
       return layoutCache!;
+    }
+    // 当窗口尺寸为 0 或在 SliverMainAxisGroup 首帧布局阶段，
+    // crossAxisExtent 可能为 0 或负值，此时返回最小有效布局避免崩溃，
+    // 框架会在约束就绪后重新调用 getLayout。
+    if (constraints.crossAxisExtent <= 0.0) {
+      return layoutCache = const SliverGridRegularTileLayout(
+        crossAxisCount: 1,
+        mainAxisStride: 0.0,
+        crossAxisStride: 0.0,
+        childMainAxisExtent: 0.0,
+        childCrossAxisExtent: 0.0,
+        reverseCrossAxis: false,
+      );
     }
     crossAxisExtentCache = constraints.crossAxisExtent;
     int crossAxisCount =
