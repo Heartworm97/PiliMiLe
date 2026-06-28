@@ -41,6 +41,9 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
   /// 获取失败时的错误信息
   String? _errorMsg;
 
+  /// WebView 控制器，数据就绪后用于 loadData
+  InAppWebViewController? _controller;
+
   static String _showJs(String response) =>
       't=Geetest($response).onSuccess(()=>R("success",t.getValidate())).onError(o=>R("error",o)).onClose(o=>R("close",o));t.onReady(()=>t.verify())';
 
@@ -65,9 +68,10 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
       debugPrint('[geetest] 数据获取成功, JS长度=${jsSrc.length}');
       setState(() {
         _configJson = results[0].dataOrNull;
-        // 转义 </ 防止 HTML 解析时提前关闭 script 标签
-        _jsSource = jsSrc.replaceAll('</', '<\\/');
+        _jsSource = jsSrc;
       });
+      // 数据就绪，如果 WebView 已创建则立即加载完整 HTML
+      _tryLoadCaptcha();
     } else {
       final err = results[0].dataOrNull == null
           ? (results[0] as Error).errMsg
@@ -149,45 +153,47 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
     }
   }
 
+  /// 构建包含内联 JS 的完整 HTML
+  String _buildHtml() {
+    // 转义 </ 防止 HTML 解析时提前关闭 script 标签
+    final escapedJs = _jsSource!.replaceAll('</', '<\\/');
+    return '<!DOCTYPE html><html><head>'
+        '<meta name="viewport" content="width=device-width">'
+        '</head><body>'
+        '<script>$escapedJs</script>'
+        '<script>R=flutter_inappwebview.callHandler</script>'
+        '</body></html>';
+  }
+
+  /// 如果 WebView 和数据都已就绪，加载完整验证码 HTML
+  void _tryLoadCaptcha() {
+    if (_controller != null && _configJson != null && _jsSource != null) {
+      final html = _buildHtml();
+      debugPrint('[geetest] loadData 加载完整 HTML, 长度=${html.length}');
+      _controller!.loadData(data: html, mimeType: 'text/html');
+    }
+  }
+
   @override
   void dispose() {
+    _controller = null;
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // 获取失败：短暂显示错误后关闭
-    if (_errorMsg != null) {
-      Future.delayed(const Duration(milliseconds: 200), () {
+    final hasError = _errorMsg != null;
+    final ready = _configJson != null && _jsSource != null;
+
+    if (hasError) {
+      Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) Get.back();
       });
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            '验证码加载失败',
-            style: TextStyle(color: ColorScheme.of(context).error),
-          ),
-        ),
-      );
     }
-
-    // 数据未就绪：显示加载指示器
-    if (_configJson == null || _jsSource == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    // 构建内联 JS 的 HTML（不再依赖外部 URL）
-    final html =
-        '<!DOCTYPE html><html><head>'
-        '<meta name="viewport" content="width=device-width">'
-        '</head><body>'
-        '<script>$_jsSource</script>'
-        '<script>R=flutter_inappwebview.callHandler</script>'
-        '</body></html>';
 
     return Stack(
       children: [
+        // WebView 始终构建，数据就绪前用空白 HTML
         InAppWebView(
           webViewEnvironment: webViewEnvironment,
           initialSettings: InAppWebViewSettings(
@@ -222,9 +228,12 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
 
             pageZoom: Platform.isIOS ? 3 : 1,
           ),
-          initialData: InAppWebViewInitialData(data: html),
+          initialData: InAppWebViewInitialData(
+            data: '<!DOCTYPE html><html><head></head><body></body></html>',
+          ),
           onWebViewCreated: (ctr) {
             debugPrint('[geetest] WebView 已创建');
+            _controller = ctr;
             ctr
               ..addJavaScriptHandler(
                 handlerName: 'success',
@@ -251,15 +260,21 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
                   Get.back();
                 },
               );
+            // 如果数据已在 WebView 创建前就绪，直接加载完整 HTML
+            _tryLoadCaptcha();
           },
           onLoadStop: (ctr, _) {
-            debugPrint('[geetest] onLoadStop 触发, 注入初始化 JS');
-            ctr.evaluateJavascript(source: _showJs(_configJson!));
+            debugPrint('[geetest] onLoadStop 触发, ready=${_configJson != null}');
+            if (_configJson != null) {
+              debugPrint('[geetest] 注入初始化 JS');
+              ctr.evaluateJavascript(source: _showJs(_configJson!));
+            }
           },
           onConsoleMessage: (ctr, msg) {
             debugPrint('[geetest] JS [${msg.messageLevel}]: ${msg.message}');
           },
         ),
+        // 关闭按钮
         Positioned(
           left: 8,
           top: 8,
@@ -269,6 +284,20 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
             tooltip: '关闭',
           ),
         ),
+        // 加载指示器遮罩
+        if (!ready && !hasError)
+          const Center(child: CircularProgressIndicator()),
+        // 错误提示
+        if (hasError)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                '验证码加载失败',
+                style: TextStyle(color: ColorScheme.of(context).error),
+              ),
+            ),
+          ),
       ],
     );
   }
