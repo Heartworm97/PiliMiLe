@@ -32,7 +32,14 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
   static const _geetestJsUri =
       'https://static.geetest.com/static/js/fullpage.0.0.0.js';
 
-  late final Future<LoadingState<String>> _future;
+  /// 极验配置 JSON 字符串
+  String? _configJson;
+
+  /// 极验 JS 库源码（内联用）
+  String? _jsSource;
+
+  /// 获取失败时的错误信息
+  String? _errorMsg;
 
   static String _showJs(String response) =>
       't=Geetest($response).onSuccess(()=>R("success",t.getValidate())).onError(o=>R("error",o)).onClose(o=>R("close",o));t.onReady(()=>t.verify())';
@@ -40,15 +47,43 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
   @override
   void initState() {
     super.initState();
-    debugPrint('[geetest] initState, gt=${widget.gt}, challenge=${widget.challenge.substring(0, 16)}...');
-    _future = _getConfig(widget.gt, widget.challenge);
+    _fetchData();
   }
 
+  /// 并行获取极验配置和 JS 库源码
+  Future<void> _fetchData() async {
+    debugPrint(
+      '[geetest] 开始并行获取, gt=${widget.gt}, challenge=${widget.challenge.substring(0, 16)}...',
+    );
+    final results = await Future.wait([
+      _getConfig(widget.gt, widget.challenge),
+      _fetchGeetestJs(),
+    ]);
+    if (!mounted) return;
+    if (results[0].isSuccess && results[1].isSuccess) {
+      final jsSrc = results[1].dataOrNull!;
+      debugPrint('[geetest] 数据获取成功, JS长度=${jsSrc.length}');
+      setState(() {
+        _configJson = results[0].dataOrNull;
+        // 转义 </ 防止 HTML 解析时提前关闭 script 标签
+        _jsSource = jsSrc.replaceAll('</', '<\\/');
+      });
+    } else {
+      final err = results[0].dataOrNull == null
+          ? (results[0] as Error).errMsg
+          : results[1].dataOrNull == null
+              ? (results[1] as Error).errMsg
+              : '未知错误';
+      debugPrint('[geetest] 数据获取失败: $err');
+      setState(() { _errorMsg = err; });
+    }
+  }
+
+  /// 获取极验配置（通过 HTTP API）
   static Future<LoadingState<String>> _getConfig(
     String gt,
     String challenge,
   ) async {
-    debugPrint('[geetest] _getConfig 开始, gt=$gt, challenge=${challenge.substring(0, 16)}...');
     try {
       final res = await Request().get<String>(
         'https://api.geetest.com/gettype.php',
@@ -58,18 +93,15 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
           extra: {'account': const NoAccount()},
         ),
       );
-      debugPrint('[geetest] _getConfig 响应 statusCode=${res.statusCode}, data=${res.data?.toString().substring(0, 100)}');
       if (res.data case final String data) {
         if (data.startsWith('(') && data.endsWith(')')) {
           final Map<String, dynamic> config;
           try {
             config = jsonDecode(data.substring(1, data.length - 1));
           } catch (e) {
-            debugPrint('[geetest] _getConfig JSON解析失败: $e');
-            return Error(e.toString());
+            return Error('极验配置解析失败: $e');
           }
           if (config['status'] == 'success') {
-            debugPrint('[geetest] _getConfig 成功');
             return Success(
               jsonEncode(
                 config['data'] as Map<String, dynamic>..addAll({
@@ -85,16 +117,35 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
               ),
             );
           } else {
-            debugPrint('[geetest] _getConfig 返回status!=success: $data');
             return Error(data);
           }
         }
       }
-      debugPrint('[geetest] _getConfig 返回格式不匹配, data=${res.data}');
-      return Error(res.data['message']);
-    } catch (e, s) {
-      debugPrint('[geetest] _getConfig 网络异常: $e\n$s');
-      return Error(e.toString());
+      return Error(res.data['message'] ?? '未知错误');
+    } catch (e) {
+      return Error('获取极验配置异常: $e');
+    }
+  }
+
+  /// 获取极验 JS 库源码（通过 HTTP，与 WebView 无关）
+  static Future<LoadingState<String>> _fetchGeetestJs() async {
+    try {
+      final res = await Request().get<String>(
+        _geetestJsUri,
+        options: Options(
+          responseType: ResponseType.plain,
+          extra: {'account': const NoAccount()},
+        ),
+      );
+      if (res.data case final String data) {
+        if (data.isNotEmpty) {
+          return Success(data);
+        }
+        return const Error('极验JS响应为空');
+      }
+      return const Error('极验JS响应格式异常');
+    } catch (e) {
+      return Error('获取极验JS异常: $e');
     }
   }
 
@@ -105,6 +156,36 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
 
   @override
   Widget build(BuildContext context) {
+    // 获取失败：短暂显示错误后关闭
+    if (_errorMsg != null) {
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (mounted) Get.back();
+      });
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            '验证码加载失败',
+            style: TextStyle(color: ColorScheme.of(context).error),
+          ),
+        ),
+      );
+    }
+
+    // 数据未就绪：显示加载指示器
+    if (_configJson == null || _jsSource == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // 构建内联 JS 的 HTML（不再依赖外部 URL）
+    final html =
+        '<!DOCTYPE html><html><head>'
+        '<meta name="viewport" content="width=device-width">'
+        '</head><body>'
+        '<script>$_jsSource</script>'
+        '<script>R=flutter_inappwebview.callHandler</script>'
+        '</body></html>';
+
     return Stack(
       children: [
         InAppWebView(
@@ -141,56 +222,42 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
 
             pageZoom: Platform.isIOS ? 3 : 1,
           ),
-          initialData: InAppWebViewInitialData(
-            data:
-                '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"></head><body><script src="$_geetestJsUri"></script><script>R=flutter_inappwebview.callHandler</script></body></html>',
-          ),
+          initialData: InAppWebViewInitialData(data: html),
           onWebViewCreated: (ctr) {
             debugPrint('[geetest] WebView 已创建');
             ctr
               ..addJavaScriptHandler(
                 handlerName: 'success',
                 callback: (args) {
-                  debugPrint('[geetest] JS success 回调: $args');
+                  debugPrint('[geetest] 验证成功: $args');
                   if (args.isNotEmpty) {
                     if (args[0] case Map<String, dynamic> data) {
                       Get.back(result: data);
                       return;
                     }
                   }
-                  debugPrint('[geetest] 无效的验证结果: $args');
                 },
               )
               ..addJavaScriptHandler(
                 handlerName: 'error',
                 callback: (args) {
-                  debugPrint('[geetest] JS error 回调: $args');
+                  debugPrint('[geetest] 验证出错: $args');
                 },
               )
               ..addJavaScriptHandler(
                 handlerName: 'close',
                 callback: (args) {
-                  debugPrint('[geetest] JS close 回调: $args');
+                  debugPrint('[geetest] 用户关闭验证');
                   Get.back();
                 },
               );
           },
-          onLoadStop: (ctr, _) async {
-            debugPrint('[geetest] onLoadStop 触发, 等待 _future...');
-            final config = await _future;
-            debugPrint('[geetest] _future 完成, mounted=$mounted, isSuccess=${config.isSuccess}');
-            if (!mounted) return;
-            if (config case Success(:final response)) {
-              debugPrint('[geetest] 注入 JS: ${_showJs(response).substring(0, 80)}...');
-              ctr.evaluateJavascript(source: _showJs(response));
-            } else {
-              debugPrint('[geetest] 配置获取失败, 即将关闭弹窗: $config');
-              config.toast();
-              Get.back();
-            }
+          onLoadStop: (ctr, _) {
+            debugPrint('[geetest] onLoadStop 触发, 注入初始化 JS');
+            ctr.evaluateJavascript(source: _showJs(_configJson!));
           },
           onConsoleMessage: (ctr, msg) {
-            debugPrint('[geetest] JS Console [${msg.messageLevel}]: ${msg.message}');
+            debugPrint('[geetest] JS [${msg.messageLevel}]: ${msg.message}');
           },
         ),
         Positioned(
