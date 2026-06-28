@@ -155,12 +155,14 @@ class _GeetestWebviewDialogState extends State<GeetestWebviewDialog> {
 
   /// 构建包含内联 JS 的完整 HTML
   String _buildHtml() {
-    // 转义 </ 防止 HTML 解析时提前关闭 script 标签
-    final escapedJs = _jsSource!.replaceAll('</', '<\\/');
+    // 检查 JS 中是否包含 </script>（极验 JS 通常不含此序列）
+    if (_jsSource!.contains('</script>')) {
+      debugPrint('[geetest] 警告: JS源码包含</script>，可能导致HTML解析异常');
+    }
     return '<!DOCTYPE html><html><head>'
         '<meta name="viewport" content="width=device-width">'
         '</head><body>'
-        '<script>$escapedJs</script>'
+        '<script>$_jsSource</script>'
         '<script>R=flutter_inappwebview.callHandler</script>'
         '</body></html>';
   }
