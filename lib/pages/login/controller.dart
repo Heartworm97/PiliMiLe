@@ -197,7 +197,7 @@ class LoginPageController extends GetxController
 
   // app端密码登录
   Future<void> loginByPassword() async {
-    SmartDialog.showToast('该登录方式暂不可用，请使用扫码登录');
+    SmartDialog.showToast('该方式暂不可用，请使用扫码登录');
     return;
     String username = usernameTextController.text;
     String password = passwordTextController.text;
@@ -457,7 +457,7 @@ class LoginPageController extends GetxController
 
   // 短信验证码登录
   Future<void> loginBySmsCode() async {
-    SmartDialog.showToast('该登录方式暂不可用，请使用扫码登录');
+    SmartDialog.showToast('该方式暂不可用，请使用扫码登录');
     return;
     if (telTextController.text.isEmpty) {
       SmartDialog.showToast('手机号不能为空');
@@ -501,7 +501,7 @@ class LoginPageController extends GetxController
 
   // app端验证码
   Future<void> sendSmsCode() async {
-    SmartDialog.showToast('该登录方式暂不可用，请使用扫码登录');
+    SmartDialog.showToast('该方式暂不可用，请使用扫码登录');
     return;
     if (telTextController.text.isEmpty) {
       SmartDialog.showToast('手机号不能为空');
