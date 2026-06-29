@@ -376,11 +376,17 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
           child: _buildPlayerArea(playerWidth, screenSize.height),
         ),
         // 右侧：跟竖屏一样的 Tab 布局（简介/待规划 + 搜索/弹幕图标）
+        // 包裹 Navigator，使底部弹出层（选集面板等）限制在侧栏宽度内
         SizedBox(
           width: sidebarWidth,
           height: screenSize.height,
           child: SafeArea(
-            child: _buildContent(Size(sidebarWidth, screenSize.height)),
+            child: Navigator(
+              onGenerateRoute: (_) => MaterialPageRoute(
+                builder: (_) =>
+                    _buildContent(Size(sidebarWidth, screenSize.height)),
+              ),
+            ),
           ),
         ),
       ],
