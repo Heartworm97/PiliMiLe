@@ -12,6 +12,8 @@ NC='\033[0m' # No Color
 
 # 常用 iOS 模拟器 UDID（$FLUTTER_CMD devices 查看）
 IOS_SIMULATOR_UDID="1A49CA42-2DFC-49A2-9BF9-0F1C93EBF10D"
+# 常用 iPad 模拟器 UDID（$FLUTTER_CMD devices 查看，为空则弹出列表选择）
+IPAD_SIMULATOR_UDID=""
 
 info()  { echo -e "${GREEN}[✓]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[!]${NC} $1"; }
@@ -211,7 +213,82 @@ ios_simulator() {
     $FLUTTER_CMD run -d "$device_id" --dart-define-from-file=pili_release.json
 }
 
-# ---- 2. macOS 桌面端启动 ----
+# ---- 2. iPad 模拟器启动 ----
+ipad_simulator() {
+    check_prereq
+    title "iPad 模拟器"
+
+    gen_release_json
+
+    # 指定了 UDID 则直接使用
+    if [ -n "$IPAD_SIMULATOR_UDID" ]; then
+        if $FLUTTER_CMD devices 2>/dev/null | grep -q "$IPAD_SIMULATOR_UDID"; then
+            info "使用指定 iPad 模拟器: $IPAD_SIMULATOR_UDID"
+        elif xcrun simctl list devices available 2>/dev/null | grep -q "$IPAD_SIMULATOR_UDID"; then
+            info "启动 iPad 模拟器: $IPAD_SIMULATOR_UDID ..."
+            xcrun simctl boot "$IPAD_SIMULATOR_UDID" 2>/dev/null || true
+            info "等待模拟器就绪（可能需要 30 秒）..."
+            xcrun simctl bootstatus "$IPAD_SIMULATOR_UDID" -b >/dev/null 2>&1 || sleep 15
+            open -a Simulator 2>/dev/null || true
+            info "使用指定 iPad 模拟器: $IPAD_SIMULATOR_UDID"
+        else
+            err "指定 iPad 模拟器不存在: $IPAD_SIMULATOR_UDID"
+            echo "请在 Xcode → Settings → Devices 中确认该设备"
+            exit 1
+        fi
+        $FLUTTER_CMD run -d "$IPAD_SIMULATOR_UDID" --dart-define-from-file=pili_release.json
+        return
+    fi
+
+    # 未指定 UDID：列出所有可用 iPad 模拟器
+    local simulators device_id
+    simulators=$(xcrun simctl list devices available 2>/dev/null \
+        | grep -i 'iPad' \
+        | grep -oE '^[[:space:]]+[^(]+\([0-9A-Fa-f-]{36}\)' \
+        | sed -E 's/^[[:space:]]+//; s/ \([0-9A-Fa-f-]{36}\).*//')
+
+    if [ -z "$simulators" ]; then
+        err "未找到 iPad 模拟器设备"
+        echo "请确认 Xcode 中已安装至少一个 iPad 模拟器 Runtime（Settings → Platforms → iOS）"
+        exit 1
+    fi
+
+    echo "可用 iPad 模拟器:"
+    echo "$simulators" | nl -w2 -s') '
+
+    local count selection
+    count=$(echo "$simulators" | wc -l | tr -d ' ')
+
+    if [ "$count" -eq 1 ]; then
+        selection=1
+    else
+        read -rp "选择设备 [1-$count]: " selection
+    fi
+
+    local selected_name
+    selected_name=$(echo "$simulators" | sed -n "${selection}p")
+    device_id=$(xcrun simctl list devices available 2>/dev/null \
+        | grep -F "$selected_name" \
+        | grep -oE '[0-9A-Fa-f-]{36}' \
+        | head -1)
+
+    if [ -z "$device_id" ]; then
+        err "无法解析设备 ID，请确认模拟器名称未变更"
+        exit 1
+    fi
+
+    info "启动 iPad 模拟器: $selected_name ($device_id) ..."
+    if ! xcrun simctl list devices available 2>/dev/null | grep "$device_id" | grep -q 'Booted'; then
+        xcrun simctl boot "$device_id" 2>/dev/null || true
+        xcrun simctl bootstatus "$device_id" -b >/dev/null 2>&1 || sleep 15
+    fi
+    open -a Simulator 2>/dev/null || true
+
+    info "启动到 iPad 模拟器..."
+    $FLUTTER_CMD run -d "$device_id" --dart-define-from-file=pili_release.json
+}
+
+# ---- 3. macOS 桌面端启动 ----
 macos_run() {
     check_prereq
     gen_release_json
@@ -220,7 +297,7 @@ macos_run() {
     $FLUTTER_CMD run -d macos --dart-define-from-file=pili_release.json
 }
 
-# ---- 3. 构建无签名 IPA ----
+# ---- 4. 构建无签名 IPA ----
 build_unsigned_ipa() {
     check_prereq
     title "构建无签名 IPA"
@@ -270,7 +347,7 @@ build_unsigned_ipa() {
     echo "  大小: $size"
 }
 
-# ---- 4. 构建 macOS 应用 + 可选 DMG ----
+# ---- 5. 构建 macOS 应用 + 可选 DMG ----
 build_macos_app() {
     check_prereq
     title "构建 macOS 应用"
@@ -385,7 +462,7 @@ build_macos_app() {
     echo "  大小: $dmg_size"
 }
 
-# ---- 5. 清理编译缓存 ----
+# ---- 6. 清理编译缓存 ----
 clean() {
     title "清理编译缓存"
     info "清理 Flutter 缓存..."
@@ -394,7 +471,7 @@ clean() {
     echo "可考虑删除 Pods/Podfile.lock 后重新 pod install"
 }
 
-# ---- 6. 清理 Xcode DerivedData (可选) ----
+# ---- 7. 清理 Xcode DerivedData (可选) ----
 extra_clean() {
     title "清理 Xcode DerivedData"
     info "清理中..."
@@ -409,12 +486,13 @@ show_menu() {
     echo -e "${GREEN}  PiliMiLe 构建脚本${NC}"
     echo -e "${GREEN}══════════════════════════════════${NC}"
     echo ""
-    echo "  1) iOS 模拟器启动"
-    echo "  2) macOS 桌面端启动"
-    echo "  3) 构建无签名 IPA"
-    echo "  4) 构建 macOS 应用 + 可选 DMG"
-    echo "  5) 清理编译缓存"
-    echo "  6) 清理 Xcode DerivedData (可选)"
+    echo "  1) iOS 模拟器启动 (iPhone)"
+    echo "  2) iPad 模拟器启动"
+    echo "  3) macOS 桌面端启动"
+    echo "  4) 构建无签名 IPA"
+    echo "  5) 构建 macOS 应用 + 可选 DMG"
+    echo "  6) 清理编译缓存"
+    echo "  7) 清理 Xcode DerivedData (可选)"
     echo "  0) 退出"
     echo ""
 }
@@ -427,25 +505,27 @@ main() {
     if [ "${1:-}" != "" ]; then
         case "$1" in
             1) ios_simulator; exit 0 ;;
-            2) macos_run; exit 0 ;;
-            3) build_unsigned_ipa; exit 0 ;;
-            4) build_macos_app; exit 0 ;;
-            5) clean; exit 0 ;;
-            6) extra_clean; exit 0 ;;
+            2) ipad_simulator; exit 0 ;;
+            3) macos_run; exit 0 ;;
+            4) build_unsigned_ipa; exit 0 ;;
+            5) build_macos_app; exit 0 ;;
+            6) clean; exit 0 ;;
+            7) extra_clean; exit 0 ;;
             *) echo "无效选项: $1"; exit 1 ;;
         esac
     fi
 
     while true; do
         show_menu
-        read -rp "请选择 [0-6]: " choice
+        read -rp "请选择 [0-7]: " choice
         case "$choice" in
             1) ios_simulator ;;
-            2) macos_run ;;
-            3) build_unsigned_ipa ;;
-            4) build_macos_app ;;
-            5) clean ;;
-            6) extra_clean ;;
+            2) ipad_simulator ;;
+            3) macos_run ;;
+            4) build_unsigned_ipa ;;
+            5) build_macos_app ;;
+            6) clean ;;
+            7) extra_clean ;;
             0) echo "再见"; exit 0 ;;
             *) echo "无效选项" ;;
         esac
