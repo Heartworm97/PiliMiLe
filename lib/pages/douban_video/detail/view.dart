@@ -224,12 +224,12 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     );
   }
 
-  Widget _buildContent(Size screenSize, {double? maxPanelHeight}) {
-    // 播放器下方可用高度（竖屏时自动计算，侧栏时由调用方传入精确值）
-    final availableBelow = maxPanelHeight ??
-        (screenSize.height -
-            MediaQuery.of(context).padding.top -
-            screenSize.width * 9 / 16);
+  Widget _buildContent(Size screenSize) {
+    // 播放器下方可用高度
+    final statusBarHeight = MediaQuery.of(context).padding.top;
+    final playerHeight = screenSize.width * 9 / 16;
+    final availableBelow =
+        screenSize.height - statusBarHeight - playerHeight;
 
     // 无数据
     if (controller.detail.value == null) {
@@ -367,14 +367,6 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     final sidebarWidth = (screenSize.width * 0.35).clamp(300.0, 420.0);
     final playerWidth = screenSize.width - sidebarWidth;
 
-    // 选集面板高度：刚好覆盖到换源区域顶部（TabBar 45 + 上部 padding 12 + 封面 153 + 间距 12 = 222）
-    const tabBarHeight = 45.0;
-    const contentTopPadding = Style.safeSpace; // 12
-    const coverHeight = 153.0;
-    const coverSpacing = 12.0;
-    final panelMaxHeight =
-        screenSize.height - tabBarHeight - contentTopPadding - coverHeight - coverSpacing;
-
     return Row(
       children: [
         // 左侧：播放器，全高，固定不收缩
@@ -384,19 +376,11 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
           child: _buildPlayerArea(playerWidth, screenSize.height),
         ),
         // 右侧：跟竖屏一样的 Tab 布局（简介/待规划 + 搜索/弹幕图标）
-        // 包裹 Navigator，使底部弹出层（选集面板等）限制在侧栏宽度内
         SizedBox(
           width: sidebarWidth,
           height: screenSize.height,
           child: SafeArea(
-            child: Navigator(
-              onGenerateRoute: (_) => MaterialPageRoute(
-                builder: (_) => _buildContent(
-                  Size(sidebarWidth, screenSize.height),
-                  maxPanelHeight: panelMaxHeight,
-                ),
-              ),
-            ),
+            child: _buildContent(Size(sidebarWidth, screenSize.height)),
           ),
         ),
       ],
