@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 # 常用 iOS 模拟器 UDID（$FLUTTER_CMD devices 查看）
 IOS_SIMULATOR_UDID="1A49CA42-2DFC-49A2-9BF9-0F1C93EBF10D"
 # 常用 iPad 模拟器 UDID（$FLUTTER_CMD devices 查看，为空则弹出列表选择）
-IPAD_SIMULATOR_UDID=""
+IPAD_SIMULATOR_UDID="BCD81C8C-A68C-401B-B406-21F60FD8D52E"
 
 info()  { echo -e "${GREEN}[✓]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[!]${NC} $1"; }
