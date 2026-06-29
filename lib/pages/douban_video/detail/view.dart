@@ -67,7 +67,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
           return _buildPlayerArea(size.width, size.height);
         }
 
-        // 桌面端/iPad横屏：左列（播放器上+内容下）+ 右列空占位
+        // 桌面端/iPad横屏：左侧播放器全高 + 右侧竖屏同款Tab
         if (PlatformUtils.isDesktop) {
           return _buildDesktopLayout(size);
         }
@@ -362,92 +362,29 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     );
   }
 
-  /// 桌面端/iPad横屏布局：左列（播放器上+内容下）+ 右列空占位
-  /// 参考番剧详情页 _childWhenDisabledLandscapeInner 布局模式
+  /// 桌面端/iPad横屏布局：左侧播放器全高 + 右侧竖屏同款Tab
   Widget _buildDesktopLayout(Size screenSize) {
     final sidebarWidth = (screenSize.width * 0.35).clamp(300.0, 420.0);
     final playerWidth = screenSize.width - sidebarWidth;
-    final playerHeight = playerWidth * 9 / 16;
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 左列：播放器（上，固定不收缩）+ 内容（下，可滚动）
+        // 左侧：播放器，全高，固定不收缩
         SizedBox(
           width: playerWidth,
           height: screenSize.height,
-          child: Column(
-            children: [
-              // 播放器 - 固定大小，不随滚动收缩
-              SizedBox(
-                width: playerWidth,
-                height: playerHeight,
-                child: Obx(() => _buildPlayerArea(playerWidth, playerHeight)),
-              ),
-              // 简介/线路/集数 - 可滚动区域
-              Expanded(
-                child: SafeArea(
-                  top: false,
-                  child: _buildDesktopContent(screenSize.height - playerHeight),
-                ),
-              ),
-            ],
-          ),
+          child: _buildPlayerArea(playerWidth, screenSize.height),
         ),
-        // 右列：空占位符（豆瓣无"播放列表"/"相关视频"等内容）
+        // 右侧：跟竖屏一样的 Tab 布局（简介/待规划 + 搜索/弹幕图标）
         SizedBox(
           width: sidebarWidth,
           height: screenSize.height,
+          child: SafeArea(
+            child: _buildContent(Size(sidebarWidth, screenSize.height)),
+          ),
         ),
       ],
     );
-  }
-
-  /// 桌面端左列内容区：封面信息 + 线路选择 + 集数选择
-  Widget _buildDesktopContent(double availableHeight) {
-    return Obx(() {
-      final theme = Theme.of(context);
-
-      if (controller.detail.value == null) {
-        return const Center(child: Text('暂无数据'));
-      }
-
-      final detail = controller.detail.value!;
-      final infoStyle = TextStyle(
-        fontSize: 13,
-        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-      );
-
-      return SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          Style.safeSpace,
-          Style.safeSpace,
-          Style.safeSpace,
-          0,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildCoverInfoRow(theme, detail, infoStyle),
-            const SizedBox(height: 12),
-            // 线路选择器
-            SourceSelector(
-              sources: controller.sources,
-              selectedIndex: controller.selectedSourceIndex.value,
-              onSelected: controller.onSelectSource,
-            ),
-            // 集数选择器
-            EpisodeSelector(
-              maxPanelHeight: availableHeight * 0.55,
-              episodes: controller.currentEpisodes,
-              selectedIndex: controller.selectedEpisodeIndex.value,
-              onSelected: controller.onSelectEpisode,
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      );
-    });
   }
 
   Widget _buildCoverInfoRow(
