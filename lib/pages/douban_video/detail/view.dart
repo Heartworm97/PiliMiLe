@@ -67,7 +67,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
           return _buildPlayerArea(size.width, size.height);
         }
 
-        // 桌面端：左右分栏布局（左边播放器 + 右边侧栏）
+        // 桌面端/iPad横屏：左列（播放器上+内容下）+ 右列空占位
         if (PlatformUtils.isDesktop) {
           return _buildDesktopLayout(size);
         }
@@ -362,146 +362,92 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
     );
   }
 
-  /// 桌面端左右分栏布局：左边播放器 + 右边侧栏
+  /// 桌面端/iPad横屏布局：左列（播放器上+内容下）+ 右列空占位
+  /// 参考番剧详情页 _childWhenDisabledLandscapeInner 布局模式
   Widget _buildDesktopLayout(Size screenSize) {
-    final theme = Theme.of(context);
     final sidebarWidth = (screenSize.width * 0.35).clamp(300.0, 420.0);
     final playerWidth = screenSize.width - sidebarWidth;
+    final playerHeight = playerWidth * 9 / 16;
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 左侧：播放器
+        // 左列：播放器（上，固定不收缩）+ 内容（下，可滚动）
         SizedBox(
           width: playerWidth,
           height: screenSize.height,
-          child: _buildPlayerArea(playerWidth, screenSize.height),
+          child: Column(
+            children: [
+              // 播放器 - 固定大小，不随滚动收缩
+              SizedBox(
+                width: playerWidth,
+                height: playerHeight,
+                child: Obx(() => _buildPlayerArea(playerWidth, playerHeight)),
+              ),
+              // 简介/线路/集数 - 可滚动区域
+              Expanded(
+                child: SafeArea(
+                  top: false,
+                  child: _buildDesktopContent(screenSize.height - playerHeight),
+                ),
+              ),
+            ],
+          ),
         ),
-        // 右侧：简介 + 换源 + 选集
+        // 右列：空占位符（豆瓣无"播放列表"/"相关视频"等内容）
         SizedBox(
           width: sidebarWidth,
           height: screenSize.height,
-          child: SafeArea(
-            child: _buildDesktopSidebar(screenSize.height, theme),
-          ),
         ),
       ],
     );
   }
 
-  /// 桌面端右侧侧栏：TabBar（简介 + 待规划） + 控制按钮 + 换源 + 选集
-  Widget _buildDesktopSidebar(double screenHeight, ThemeData theme) {
-    if (controller.detail.value == null) {
-      return const Center(child: Text('暂无数据'));
-    }
+  /// 桌面端左列内容区：封面信息 + 线路选择 + 集数选择
+  Widget _buildDesktopContent(double availableHeight) {
+    return Obx(() {
+      final theme = Theme.of(context);
 
-    final detail = controller.detail.value!;
-    final infoStyle = TextStyle(
-      fontSize: 13,
-      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-    );
+      if (controller.detail.value == null) {
+        return const Center(child: Text('暂无数据'));
+      }
 
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        children: [
-          // TabBar + 控制按钮（同一行）
-          DecoratedBox(
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: theme.dividerColor.withValues(alpha: 0.1),
-                ),
-              ),
+      final detail = controller.detail.value!;
+      final infoStyle = TextStyle(
+        fontSize: 13,
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+      );
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          Style.safeSpace,
+          Style.safeSpace,
+          Style.safeSpace,
+          0,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildCoverInfoRow(theme, detail, infoStyle),
+            const SizedBox(height: 12),
+            // 线路选择器
+            SourceSelector(
+              sources: controller.sources,
+              selectedIndex: controller.selectedSourceIndex.value,
+              onSelected: controller.onSelectSource,
             ),
-            child: SizedBox(
-              height: 40,
-              child: Row(
-                children: [
-                  TabBar(
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    padding: EdgeInsets.zero,
-                    labelStyle:
-                        TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 14) ??
-                        const TextStyle(fontSize: 14),
-                    labelPadding: const EdgeInsets.symmetric(horizontal: 24),
-                    dividerColor: Colors.transparent,
-                    dividerHeight: 0,
-                    tabs: const [
-                      Tab(text: '简介'),
-                      Tab(text: '待规划'),
-                    ],
-                  ),
-                  const Spacer(),
-                  // 控制按钮
-                  SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.manage_search, size: 18),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: IconButton(
-                      onPressed: () => setState(() => _dmEnabled = !_dmEnabled),
-                      icon: Icon(
-                        _dmEnabled ? CustomIcons.dm_on : CustomIcons.dm_off,
-                        size: 18,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                ],
-              ),
+            // 集数选择器
+            EpisodeSelector(
+              maxPanelHeight: availableHeight * 0.55,
+              episodes: controller.currentEpisodes,
+              selectedIndex: controller.selectedEpisodeIndex.value,
+              onSelected: controller.onSelectEpisode,
             ),
-          ),
-          // Tab 内容
-          Expanded(
-            child: TabBarView(
-              children: [
-                // 简介 Tab
-                SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(14, 8, 14, 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildCoverInfoRow(theme, detail, infoStyle),
-                      const SizedBox(height: 12),
-                      // 线路选择器
-                      Obx(() => SourceSelector(
-                        sources: controller.sources,
-                        selectedIndex: controller.selectedSourceIndex.value,
-                        onSelected: controller.onSelectSource,
-                      )),
-                      // 集数选择器
-                      Obx(() => EpisodeSelector(
-                        maxPanelHeight: screenHeight * 0.55,
-                        episodes: controller.currentEpisodes,
-                        selectedIndex: controller.selectedEpisodeIndex.value,
-                        onSelected: controller.onSelectEpisode,
-                      )),
-                    ],
-                  ),
-                ),
-                // 待规划 Tab
-                Center(
-                  child: Text(
-                    '待规划',
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface
-                          .withValues(alpha: 0.38),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 24),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildCoverInfoRow(
