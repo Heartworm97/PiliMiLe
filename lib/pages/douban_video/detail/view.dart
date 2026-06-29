@@ -75,7 +75,7 @@ class _DoubanVideoDetailPageState extends State<DoubanVideoDetailPage> {
         // 手机端
         final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
         if (!isPortrait) {
-          return _buildPlayerArea(size.width, size.height);
+          return _buildDesktopLayout(size);
         }
 
         return SafeArea(
